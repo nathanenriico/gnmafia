@@ -278,7 +278,6 @@
   }
 
   function renderCartPanel() {
-    // Render a centered checkout page/panel (similar to full checkout layout)
     let overlay = document.getElementById('checkoutOverlay');
     let container;
     if (!overlay) {
@@ -301,23 +300,24 @@
     const { total } = cartTotals(cart);
     container.innerHTML = '';
 
-    // Steps bar (top)
-    const steps = document.createElement('div');
-    steps.className = 'checkout-steps';
-    steps.innerHTML = `
-      <div class="step step-active"><span>1</span> Carrinho</div>
-      <div class="step"><span>2</span> Identificação</div>
-      <div class="step"><span>3</span> Pagamento</div>
+    // Header com logo e botão fechar
+    const header = document.createElement('div');
+    header.className = 'checkout-header';
+    header.innerHTML = `
+      <img src="d8dcbe50-c110-4b9f-84e4-fd1ce7b58988.jpg" alt="GN Máfia" class="checkout-logo" />
+      <button class="cart-modal-close" id="closeCartBtn">✕</button>
     `;
-    container.appendChild(steps);
+    container.appendChild(header);
+    header.querySelector('#closeCartBtn').addEventListener('click', closeCartModal);
 
-    // Main content two columns
+    // Main content duas colunas
     const content = document.createElement('div');
     content.className = 'checkout-content';
 
     const left = document.createElement('div');
     left.className = 'checkout-left';
-    const title = document.createElement('h2'); title.textContent = 'Produtos';
+    const title = document.createElement('h2');
+    title.textContent = 'Produtos';
     left.appendChild(title);
 
     if (!cart.items.length) {
@@ -378,18 +378,15 @@
       left.appendChild(itemList);
     }
 
-    // append form under items
-    left.appendChild(createCheckoutForm(cart));
-
     const right = document.createElement('aside');
     right.className = 'checkout-right';
     const summary = document.createElement('div');
     summary.className = 'checkout-summary';
     summary.innerHTML = `
       <h4>Resumo</h4>
-      <div class="summary-row"><span>Valor dos produtos</span><strong id="summaryProducts">${formatBRL(total)}</strong></div>
-      <div class="summary-row"><span>Frete</span><span id="summaryShipping">A calcular</span></div>
-      <div class="summary-total"><span>Total da compra</span><strong id="summaryTotal">${formatBRL(total)}</strong></div>
+      <div class="summary-row"><span>Valor dos produtos</span><strong>${formatBRL(total)}</strong></div>
+      <div class="summary-row"><span>Frete</span><span>A calcular</span></div>
+      <div class="summary-total"><span>Total da compra</span><strong>${formatBRL(total)}</strong></div>
       <button class="checkout-continue">Continuar</button>
     `;
     right.appendChild(summary);
