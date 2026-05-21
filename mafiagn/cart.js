@@ -304,7 +304,7 @@
     const header = document.createElement('div');
     header.className = 'checkout-header';
     header.innerHTML = `
-      <img src="d8dcbe50-c110-4b9f-84e4-fd1ce7b58988.jpg" alt="GN Máfia" class="checkout-logo" />
+      <img src="logo.jpeg" alt="GN Máfia" class="checkout-logo" />
       <button class="cart-modal-close" id="closeCartBtn">✕</button>
     `;
     container.appendChild(header);
