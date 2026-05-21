@@ -89,169 +89,24 @@
     return value.replace(/\D/g, '');
   }
 
-  function validateCheckoutForm(values) {
-    if (!values.customerName.trim()) return 'Por favor, informe seu nome completo.';
-    const phoneDigits = sanitizePhone(values.customerPhone);
-    if (!/^[0-9]{10,13}$/.test(phoneDigits)) return 'Por favor, informe o WhatsApp com DDD (somente números).';
-    const cepDigits = sanitizeCep(values.customerCep);
-    if (!/^[0-9]{8}$/.test(cepDigits)) return 'Por favor, informe um CEP válido com 8 dígitos.';
-    if (!values.customerNumber.trim()) return 'Por favor, informe o número do endereço.';
-    if (!values.customerStreet.trim()) return 'Por favor, informe a rua/logradouro.';
-    if (!values.customerNeighborhood.trim()) return 'Por favor, informe o bairro.';
-    if (!values.customerCity.trim()) return 'Por favor, informe a cidade.';
-    if (!values.customerState.trim()) return 'Por favor, informe o estado.';
-    return null;
-  }
-
-  async function fetchAddressByCep(cep, form) {
-    const inputStreet = form.querySelector('input[name="customerStreet"]');
-    const inputNeighborhood = form.querySelector('input[name="customerNeighborhood"]');
-    const inputCity = form.querySelector('input[name="customerCity"]');
-    const inputState = form.querySelector('input[name="customerState"]');
+  async function fetchAddressByCep(cep, onSuccess) {
     const cepValue = sanitizeCep(cep);
     if (cepValue.length !== 8) return;
-
     try {
-      const response = await fetch(`https://viacep.com.br/ws/${cepValue}/json/`);
-      const data = await response.json();
-      if (data.erro) {
-        showMiniToast('CEP não encontrado. Confira o número e tente novamente.');
-        return;
-      }
-      inputStreet.value = data.logradouro || '';
-      inputNeighborhood.value = data.bairro || '';
-      inputCity.value = data.localidade || '';
-      inputState.value = data.uf || '';
-    } catch (error) {
-      showMiniToast('Não foi possível buscar o CEP. Tente novamente.');
-    }
+      const res = await fetch(`https://viacep.com.br/ws/${cepValue}/json/`);
+      const data = await res.json();
+      if (data.erro) { showMiniToast('CEP não encontrado.'); return; }
+      onSuccess(data);
+    } catch { showMiniToast('Não foi possível buscar o CEP.'); }
   }
 
-  function createCheckoutForm(cart) {
-    const form = document.createElement('form');
-    form.className = 'whatsapp-form';
-    const title = document.createElement('h4');
-    title.textContent = 'Finalize pelo WhatsApp';
-    form.appendChild(title);
-
-    const grid = document.createElement('div');
-    grid.className = 'checkout-grid';
-
-    const personal = document.createElement('div');
-    personal.className = 'checkout-section';
-    const personalTitle = document.createElement('h5');
-    personalTitle.textContent = 'Dados Pessoais';
-    personal.appendChild(personalTitle);
-
-    const personalFields = [
-      { label: 'Nome Completo', name: 'customerName', placeholder: 'Seu nome completo', type: 'text' },
-      { label: 'WhatsApp (com DDD)', name: 'customerPhone', placeholder: '11999999999', type: 'tel' }
-    ];
-
-    personalFields.forEach(field => {
-      const wrapper = document.createElement('label');
-      wrapper.className = 'form-field';
-      const label = document.createElement('span');
-      label.textContent = field.label;
-      const input = document.createElement('input');
-      input.type = field.type;
-      input.name = field.name;
-      input.placeholder = field.placeholder;
-      wrapper.appendChild(label);
-      wrapper.appendChild(input);
-      personal.appendChild(wrapper);
-    });
-
-    const delivery = document.createElement('div');
-    delivery.className = 'checkout-section';
-    const deliveryTitle = document.createElement('h5');
-    deliveryTitle.textContent = 'Dados de Entrega';
-    delivery.appendChild(deliveryTitle);
-
-    const deliveryFields = [
-      { label: 'CEP', name: 'customerCep', placeholder: '00000-000', type: 'text' },
-      { label: 'Número', name: 'customerNumber', placeholder: 'Número', type: 'text' },
-      { label: 'Complemento (opcional)', name: 'customerComplement', placeholder: 'Apartamento, bloco, etc.', type: 'text' },
-      { label: 'Rua / Logradouro', name: 'customerStreet', placeholder: 'Rua preenchida automaticamente', type: 'text' },
-      { label: 'Bairro', name: 'customerNeighborhood', placeholder: 'Bairro preenchido automaticamente', type: 'text' },
-      { label: 'Cidade', name: 'customerCity', placeholder: 'Cidade preenchida automaticamente', type: 'text' },
-      { label: 'Estado', name: 'customerState', placeholder: 'UF preenchido automaticamente', type: 'text' }
-    ];
-
-    deliveryFields.forEach(field => {
-      const wrapper = document.createElement('label');
-      wrapper.className = 'form-field';
-      const label = document.createElement('span');
-      label.textContent = field.label;
-      const input = document.createElement('input');
-      input.type = field.type;
-      input.name = field.name;
-      input.placeholder = field.placeholder;
-      if (['customerStreet', 'customerNeighborhood', 'customerCity', 'customerState'].includes(field.name)) {
-        input.autocomplete = 'street-address';
-      }
-      wrapper.appendChild(label);
-      wrapper.appendChild(input);
-      delivery.appendChild(wrapper);
-      if (field.name === 'customerCep') {
-        input.addEventListener('blur', () => fetchAddressByCep(input.value, form));
-      }
-    });
-
-    grid.appendChild(personal);
-    grid.appendChild(delivery);
-    form.appendChild(grid);
-
-    const button = document.createElement('button');
-    button.type = 'submit';
-    button.className = 'whatsapp-button';
-    button.textContent = '🟢 Finalizar Pedido via WhatsApp';
-    form.appendChild(button);
-
-    const note = document.createElement('p');
-    note.className = 'cart-note';
-    note.textContent = 'O WhatsApp será aberto com mensagem pronta. Se não atendermos na hora, o atendimento automático do WhatsApp Business vai confirmar seus dados e pedido.';
-    form.appendChild(note);
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      const values = {
-        customerName: formData.get('customerName')?.toString() || '',
-        customerPhone: formData.get('customerPhone')?.toString() || '',
-        customerCep: formData.get('customerCep')?.toString() || '',
-        customerNumber: formData.get('customerNumber')?.toString() || '',
-        customerComplement: formData.get('customerComplement')?.toString() || '',
-        customerStreet: formData.get('customerStreet')?.toString() || '',
-        customerNeighborhood: formData.get('customerNeighborhood')?.toString() || '',
-        customerCity: formData.get('customerCity')?.toString() || '',
-        customerState: formData.get('customerState')?.toString() || ''
-      };
-      const error = validateCheckoutForm(values);
-      if (error) {
-        showMiniToast(error);
-        return;
-      }
-      const digits = sanitizePhone(values.customerPhone);
-      const message = buildWhatsAppMessage(cart, values.customerName, digits, {
-        cep: sanitizeCep(values.customerCep),
-        number: values.customerNumber,
-        complement: values.customerComplement,
-        street: values.customerStreet,
-        neighborhood: values.customerNeighborhood,
-        city: values.customerCity,
-        state: values.customerState
-      });
-      const partnerNumber = STORE_PHONE;
-      if (!/^[0-9]{11,13}$/.test(partnerNumber)) {
-        showMiniToast('Configure o número do WhatsApp da loja em cart.js antes de finalizar.');
-        return;
-      }
-      const url = `https://wa.me/${partnerNumber}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-    });
-
-    return form;
+  function validateCheckoutForm(values) {
+    if (!values.customerName.trim()) return 'Por favor, informe seu nome completo.';
+    const cepDigits = sanitizeCep(values.customerCep);
+    if (!/^[0-9]{8}$/.test(cepDigits)) return 'Por favor, informe um CEP válido com 8 dígitos.';
+    if (!values.customerStreet.trim()) return 'Por favor, informe a rua.';
+    if (!values.customerNumber.trim()) return 'Por favor, informe o número.';
+    return null;
   }
 
   function updateCartItem(id, newQty) {
@@ -277,7 +132,7 @@
     if (overlay) overlay.style.display = 'none';
   }
 
-  function renderCartPanel() {
+  function buildCheckoutShell(activeStep) {
     let overlay = document.getElementById('checkoutOverlay');
     let container;
     if (!overlay) {
@@ -289,31 +144,54 @@
       container.className = 'checkout-container';
       overlay.appendChild(container);
       document.body.appendChild(overlay);
-      overlay.addEventListener('click', (event) => {
-        if (event.target === overlay) closeCartModal();
-      });
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCartModal(); });
     } else {
       container = document.getElementById('checkoutContainer');
     }
-
-    const cart = loadCart();
-    const { total } = cartTotals(cart);
     container.innerHTML = '';
 
-    // Header com logo e botão fechar
+    // Header
     const header = document.createElement('div');
     header.className = 'checkout-header';
-    header.innerHTML = `
-      <img src="logo.jpeg" alt="GN Máfia" class="checkout-logo" />
-      <button class="cart-modal-close" id="closeCartBtn">✕</button>
-    `;
+    header.innerHTML = `<img src="logo.jpeg" alt="GN Máfia" class="checkout-logo" /><button class="cart-modal-close" id="closeCartBtn">✕</button>`;
     container.appendChild(header);
     header.querySelector('#closeCartBtn').addEventListener('click', closeCartModal);
 
-    // Main content duas colunas
+    // Steps
+    const steps = document.createElement('div');
+    steps.className = 'checkout-steps';
+    steps.innerHTML = [
+      { n: 1, label: 'Carrinho' },
+      { n: 2, label: 'Identificação' },
+      { n: 3, label: 'Pagamento' }
+    ].map(s => `<div class="step${s.n === activeStep ? ' step-active' : s.n < activeStep ? ' step-done' : ''}"><span>${s.n}</span>${s.label}</div>`).join('');
+    container.appendChild(steps);
+
+    return { overlay, container };
+  }
+
+  function renderSummary(total) {
+    const right = document.createElement('aside');
+    right.className = 'checkout-right';
+    right.innerHTML = `
+      <div class="checkout-summary">
+        <h4>Resumo</h4>
+        <div class="summary-row"><span>Valor dos produtos</span><strong>${formatBRL(total)}</strong></div>
+        <div class="summary-row"><span>Frete</span><span>A calcular</span></div>
+        <div class="summary-total"><span>Total da compra</span><strong>${formatBRL(total)}</strong></div>
+      </div>`;
+    return right;
+  }
+
+  function renderCartPanel() {
+    const { overlay, container } = buildCheckoutShell(1);
+    const cart = loadCart();
+    const { total } = cartTotals(cart);
+
     const content = document.createElement('div');
     content.className = 'checkout-content';
 
+    // Coluna esquerda — produtos
     const left = document.createElement('div');
     left.className = 'checkout-left';
     const title = document.createElement('h2');
@@ -344,58 +222,133 @@
         const controls = document.createElement('div');
         controls.className = 'cart-item-controls';
         const minus = document.createElement('button');
-        minus.type = 'button';
-        minus.className = 'qty-control';
-        minus.textContent = '−';
+        minus.type = 'button'; minus.className = 'qty-control'; minus.textContent = '−';
         const qty = document.createElement('input');
-        qty.type = 'number';
-        qty.className = 'qty-input';
-        qty.value = it.qty;
-        qty.min = '1';
+        qty.type = 'number'; qty.className = 'qty-input'; qty.value = it.qty; qty.min = '1';
         const plus = document.createElement('button');
-        plus.type = 'button';
-        plus.className = 'qty-control';
-        plus.textContent = '+';
+        plus.type = 'button'; plus.className = 'qty-control'; plus.textContent = '+';
         const remove = document.createElement('button');
-        remove.type = 'button';
-        remove.className = 'remove-item';
-        remove.textContent = 'Remover';
+        remove.type = 'button'; remove.className = 'remove-item'; remove.textContent = 'Remover';
 
         minus.addEventListener('click', () => { updateCartItem(it.id, it.qty - 1); renderCartPanel(); });
         plus.addEventListener('click', () => { updateCartItem(it.id, it.qty + 1); renderCartPanel(); });
-        qty.addEventListener('change', () => { const value = Number(qty.value) || 1; updateCartItem(it.id, value); renderCartPanel(); });
+        qty.addEventListener('change', () => { updateCartItem(it.id, Number(qty.value) || 1); renderCartPanel(); });
         remove.addEventListener('click', () => { removeCartItem(it.id); renderCartPanel(); });
 
-        controls.appendChild(minus);
-        controls.appendChild(qty);
-        controls.appendChild(plus);
-        controls.appendChild(remove);
-
-        row.appendChild(details);
-        row.appendChild(controls);
+        controls.append(minus, qty, plus, remove);
+        row.append(details, controls);
         itemList.appendChild(row);
       });
       left.appendChild(itemList);
     }
 
-    const right = document.createElement('aside');
-    right.className = 'checkout-right';
-    const summary = document.createElement('div');
-    summary.className = 'checkout-summary';
-    summary.innerHTML = `
-      <h4>Resumo</h4>
-      <div class="summary-row"><span>Valor dos produtos</span><strong>${formatBRL(total)}</strong></div>
-      <div class="summary-row"><span>Frete</span><span>A calcular</span></div>
-      <div class="summary-total"><span>Total da compra</span><strong>${formatBRL(total)}</strong></div>
-      <button class="checkout-continue">Continuar</button>
-    `;
-    right.appendChild(summary);
+    // Coluna direita — resumo + continuar
+    const right = renderSummary(total);
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'checkout-continue';
+    continueBtn.textContent = 'Continuar';
+    continueBtn.addEventListener('click', () => {
+      if (!cart.items.length) { showMiniToast('Adicione produtos ao carrinho.'); return; }
+      renderIdentificationPanel();
+    });
+    right.querySelector('.checkout-summary').appendChild(continueBtn);
 
-    content.appendChild(left);
-    content.appendChild(right);
+    content.append(left, right);
     container.appendChild(content);
+    overlay.style.display = 'block';
+  }
 
-    return container;
+  function renderIdentificationPanel() {
+    const { overlay, container } = buildCheckoutShell(2);
+    const cart = loadCart();
+    const { total } = cartTotals(cart);
+
+    const content = document.createElement('div');
+    content.className = 'checkout-content';
+
+    // Coluna esquerda — formulário
+    const left = document.createElement('div');
+    left.className = 'checkout-left';
+
+    const title = document.createElement('h2');
+    title.textContent = 'Identificação';
+    left.appendChild(title);
+
+    const form = document.createElement('form');
+    form.className = 'identification-form';
+
+    const fields = [
+      { label: 'Nome completo', name: 'customerName', type: 'text', placeholder: 'Seu nome completo' },
+      { label: 'CEP', name: 'customerCep', type: 'text', placeholder: '00000-000' },
+      { label: 'Rua / Logradouro', name: 'customerStreet', type: 'text', placeholder: 'Preenchido automaticamente pelo CEP' },
+      { label: 'Número', name: 'customerNumber', type: 'text', placeholder: 'Ex: 42 ou Apto 12' },
+    ];
+
+    const inputs = {};
+    fields.forEach(f => {
+      const label = document.createElement('label');
+      label.className = 'form-field';
+      label.innerHTML = `<span>${f.label}</span>`;
+      const input = document.createElement('input');
+      input.type = f.type;
+      input.name = f.name;
+      input.placeholder = f.placeholder;
+      if (f.name === 'customerStreet') input.readOnly = true;
+      label.appendChild(input);
+      form.appendChild(label);
+      inputs[f.name] = input;
+    });
+
+    inputs.customerCep.addEventListener('blur', () => {
+      fetchAddressByCep(inputs.customerCep.value, (data) => {
+        inputs.customerStreet.value = data.logradouro || '';
+      });
+    });
+
+    const actions = document.createElement('div');
+    actions.className = 'form-actions';
+
+    const backBtn = document.createElement('button');
+    backBtn.type = 'button';
+    backBtn.className = 'btn-back';
+    backBtn.textContent = '← Voltar';
+    backBtn.addEventListener('click', renderCartPanel);
+
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.className = 'checkout-continue';
+    submitBtn.textContent = '🟢 Finalizar via WhatsApp';
+
+    actions.append(backBtn, submitBtn);
+    form.appendChild(actions);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const values = {
+        customerName: inputs.customerName.value,
+        customerCep: inputs.customerCep.value,
+        customerStreet: inputs.customerStreet.value,
+        customerNumber: inputs.customerNumber.value,
+      };
+      const error = validateCheckoutForm(values);
+      if (error) { showMiniToast(error); return; }
+      const message = buildWhatsAppMessage(cart, values.customerName, '', {
+        cep: sanitizeCep(values.customerCep),
+        street: values.customerStreet,
+        number: values.customerNumber,
+        complement: '', neighborhood: '', city: '', state: ''
+      });
+      window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+    });
+
+    left.appendChild(form);
+
+    // Coluna direita — resumo
+    const right = renderSummary(total);
+
+    content.append(left, right);
+    container.appendChild(content);
+    overlay.style.display = 'block';
   }
 
   function toggleCartPanel() {
