@@ -163,8 +163,7 @@
     steps.className = 'checkout-steps';
     steps.innerHTML = [
       { n: 1, label: 'Carrinho' },
-      { n: 2, label: 'Identificação' },
-      { n: 3, label: 'Pagamento' }
+      { n: 2, label: 'Identificação' }
     ].map(s => `<div class="step${s.n === activeStep ? ' step-active' : s.n < activeStep ? ' step-done' : ''}"><span>${s.n}</span>${s.label}</div>`).join('');
     container.appendChild(steps);
 
