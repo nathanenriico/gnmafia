@@ -1,0 +1,30 @@
+# Firebase Config (se você adicionar arquivo de configuração separado)
+firebase-config.js
+.firebaserc
+firebase-debug.log
+
+# Credenciais e chaves
+*.key
+*.pem
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backups
+*.bak
+*.backup
