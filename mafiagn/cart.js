@@ -106,6 +106,7 @@
     if (!/^[0-9]{8}$/.test(cepDigits)) return 'Por favor, informe um CEP válido com 8 dígitos.';
     if (!values.customerStreet.trim()) return 'Por favor, informe a rua.';
     if (!values.customerNumber.trim()) return 'Por favor, informe o número.';
+    if (!values.customerNeighborhood.trim()) return 'Por favor, informe o bairro.';
     return null;
   }
 
@@ -280,8 +281,9 @@
     const fields = [
       { label: 'Nome completo', name: 'customerName', type: 'text', placeholder: 'Seu nome completo' },
       { label: 'CEP', name: 'customerCep', type: 'text', placeholder: '00000-000' },
-      { label: 'Rua / Logradouro', name: 'customerStreet', type: 'text', placeholder: 'Preenchido automaticamente pelo CEP' },
+      { label: 'Rua / Logradouro', name: 'customerStreet', type: 'text', placeholder: 'Preenchido automaticamente pelo CEP', readonly: true },
       { label: 'Número', name: 'customerNumber', type: 'text', placeholder: 'Ex: 42 ou Apto 12' },
+      { label: 'Bairro', name: 'customerNeighborhood', type: 'text', placeholder: 'Preenchido automaticamente pelo CEP', readonly: true },
     ];
 
     const inputs = {};
@@ -293,7 +295,7 @@
       input.type = f.type;
       input.name = f.name;
       input.placeholder = f.placeholder;
-      if (f.name === 'customerStreet') input.readOnly = true;
+      if (f.readonly) input.readOnly = true;
       label.appendChild(input);
       form.appendChild(label);
       inputs[f.name] = input;
@@ -302,6 +304,7 @@
     inputs.customerCep.addEventListener('blur', () => {
       fetchAddressByCep(inputs.customerCep.value, (data) => {
         inputs.customerStreet.value = data.logradouro || '';
+        inputs.customerNeighborhood.value = data.bairro || '';
       });
     });
 
@@ -329,6 +332,7 @@
         customerCep: inputs.customerCep.value,
         customerStreet: inputs.customerStreet.value,
         customerNumber: inputs.customerNumber.value,
+        customerNeighborhood: inputs.customerNeighborhood.value,
       };
       const error = validateCheckoutForm(values);
       if (error) { showMiniToast(error); return; }
@@ -336,7 +340,9 @@
         cep: sanitizeCep(values.customerCep),
         street: values.customerStreet,
         number: values.customerNumber,
-        complement: '', neighborhood: '', city: '', state: ''
+        complement: '',
+        neighborhood: inputs.customerNeighborhood.value,
+        city: '', state: ''
       });
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
     });
