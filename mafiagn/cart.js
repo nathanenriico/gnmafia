@@ -387,11 +387,14 @@
       btn.addEventListener('click', (e) => {
         const card = e.target.closest('.product-card');
         const imgEl = card.querySelector('.main-img, img');
+        const rawSrc = card.getAttribute('data-image') || (imgEl ? imgEl.getAttribute('src') : '');
+        const base = window.location.href.replace(/\/[^\/]*$/, '/');
+        const absoluteImage = rawSrc ? (rawSrc.startsWith('http') ? rawSrc : base + rawSrc) : '';
         const product = {
           id: card.getAttribute('data-name'),
           name: card.getAttribute('data-name'),
           price: Number(card.getAttribute('data-price')),
-          image: card.getAttribute('data-image') || (imgEl ? imgEl.getAttribute('src') : '')
+          image: absoluteImage
         };
         addToCart(product);
       });
