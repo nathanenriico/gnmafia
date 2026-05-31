@@ -342,6 +342,13 @@
 
     inputs.customerCep.addEventListener('blur', () => {
       fetchAddressByCep(inputs.customerCep.value, (data) => {
+        if (data.localidade !== 'Atibaia') {
+          showMiniToast('Desculpe, entregamos apenas em Atibaia - SP.');
+          inputs.customerCep.value = '';
+          inputs.customerStreet.value = '';
+          inputs.customerNeighborhood.value = '';
+          return;
+        }
         inputs.customerStreet.value = data.logradouro || '';
         inputs.customerNeighborhood.value = data.bairro || '';
       });
