@@ -957,6 +957,44 @@ body {
 .form-field input:focus { outline: none; border-color: rgba(213,166,81,0.5); }
 .form-field input[readonly] { opacity: 0.55; cursor: not-allowed; }
 
+.form-select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(213,166,81,0.4);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23d5a651' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  transition: border-color 0.2s;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--gold-light);
+}
+
+.form-select option {
+  background: #0f0d0d;
+  color: var(--text);
+}
+
+.payment-note {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(213,166,81,0.3);
+  background: rgba(213,166,81,0.08);
+  color: var(--gold-light);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
 .form-actions { display: flex; gap: 10px; margin-top: 4px; }
 
 .btn-back {

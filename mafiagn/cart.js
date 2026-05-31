@@ -107,6 +107,7 @@
     if (!values.customerStreet.trim()) return 'Por favor, informe a rua.';
     if (!values.customerNumber.trim()) return 'Por favor, informe o número.';
     if (!values.customerNeighborhood.trim()) return 'Por favor, informe o bairro.';
+    if (!values.customerPayment) return 'Por favor, selecione a forma de pagamento.';
     return null;
   }
 
@@ -311,6 +312,34 @@
       inputs[f.name] = input;
     });
 
+    // Campo forma de pagamento (entre Número e Bairro)
+    const payLabel = document.createElement('label');
+    payLabel.className = 'form-field';
+    payLabel.innerHTML = '<span>💳 Forma de Pagamento *</span>';
+    const paySelect = document.createElement('select');
+    paySelect.name = 'customerPayment';
+    paySelect.className = 'form-select';
+    paySelect.innerHTML = `
+      <option value="">Selecione uma opção</option>
+      <option value="PIX">PIX</option>
+      <option value="Cartão de Débito">Cartão de Débito</option>
+      <option value="Cartão de Crédito">Cartão de Crédito</option>
+    `;
+    const payNote = document.createElement('div');
+    payNote.className = 'payment-note';
+    payNote.style.display = 'none';
+    payNote.textContent = '⚠️ O pagamento será realizado somente no momento da entrega do pedido.';
+    paySelect.addEventListener('change', () => {
+      payNote.style.display = paySelect.value ? 'block' : 'none';
+    });
+    payLabel.appendChild(paySelect);
+    payLabel.appendChild(payNote);
+
+    // Inserir após o campo Número (antes do Bairro)
+    const neighborhoodField = form.querySelector('[name="customerNeighborhood"]')?.closest('label');
+    form.insertBefore(payLabel, neighborhoodField || null);
+    inputs.customerPayment = paySelect;
+
     inputs.customerCep.addEventListener('blur', () => {
       fetchAddressByCep(inputs.customerCep.value, (data) => {
         inputs.customerStreet.value = data.logradouro || '';
@@ -343,17 +372,12 @@
         customerStreet: inputs.customerStreet.value,
         customerNumber: inputs.customerNumber.value,
         customerNeighborhood: inputs.customerNeighborhood.value,
+        customerPayment: inputs.customerPayment.value,
       };
       const error = validateCheckoutForm(values);
       if (error) { showMiniToast(error); return; }
-      const message = buildWhatsAppMessage(cart, values.customerName, '', {
-        cep: sanitizeCep(values.customerCep),
-        street: values.customerStreet,
-        number: values.customerNumber,
-        complement: '',
-        neighborhood: inputs.customerNeighborhood.value,
-        city: '', state: ''
-      });
+      const items = cart.items.map(item => `- ${item.name} x${item.qty}`).join('\n');
+      const message = `Novo Pedido - GN Máfia\n\nCliente: ${values.customerName}\n\nEndereço: Rua ${values.customerStreet}, nº ${values.customerNumber}\nBairro: ${values.customerNeighborhood}\nCEP: ${sanitizeCep(values.customerCep)}\n\n💳 Forma de Pagamento: ${values.customerPayment}\n⚠️ Pagamento na entrega.\n\nPedido:\n${items}`;
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
     });
 
