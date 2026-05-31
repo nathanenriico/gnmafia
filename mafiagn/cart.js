@@ -377,7 +377,7 @@
       const error = validateCheckoutForm(values);
       if (error) { showMiniToast(error); return; }
       const items = cart.items.map(item => `- ${item.name} x${item.qty}`).join('\n');
-      const message = `Novo Pedido - GN Máfia\n\nCliente: ${values.customerName}\n\nEndereço: Rua ${values.customerStreet}, nº ${values.customerNumber}\nBairro: ${values.customerNeighborhood}\nCEP: ${sanitizeCep(values.customerCep)}\n\n💳 Forma de Pagamento: ${values.customerPayment}\n⚠️ Pagamento na entrega.\n\nPedido:\n${items}`;
+      const message = `Novo Pedido - GN Mafia\n\nCliente: ${values.customerName}\n\nEndereco: Rua ${values.customerStreet}, n ${values.customerNumber}\nBairro: ${values.customerNeighborhood}\nCEP: ${sanitizeCep(values.customerCep)}\n\nForma de Pagamento: ${values.customerPayment}\nPagamento na entrega.\n\nPedido:\n${items}`;
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
     });
 
