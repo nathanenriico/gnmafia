@@ -281,6 +281,68 @@ body {
   margin: 2px 0 0;
 }
 
+/* ── COUPON BANNER ── */
+.coupon-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #1a1200, #2a1e00);
+  border-top: 1px solid rgba(213,166,81,0.3);
+  border-bottom: 1px solid rgba(213,166,81,0.3);
+  padding: 14px 24px;
+  font-size: 0.88rem;
+  color: #e8d5a3;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.coupon-banner strong {
+  color: var(--gold-light);
+  letter-spacing: 0.06em;
+}
+
+.coupon-copy {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border: none;
+  border-radius: 6px;
+  padding: 7px 16px;
+  color: #050404;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.coupon-copy:hover { opacity: 0.85; }
+
+/* ── PRODUCT BADGES ── */
+.badge-units,
+.badge-discount {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+.badge-units {
+  background: rgba(220, 50, 50, 0.9);
+  color: #fff;
+}
+
+.badge-discount {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #050404;
+}
+
 /* ── SECTION ── */
 .section {
   max-width: 1280px;
@@ -341,10 +403,30 @@ body {
 .product-img-wrap { position: relative; }
 
 .product-img {
+  width: 100%;
   height: 240px;
-  background:
-    radial-gradient(circle at 60% 30%, rgba(213,166,81,0.25), transparent 50%),
-    linear-gradient(180deg, #1a1616, #0a0808);
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid var(--border);
+}
+
+.product-img.main-img {
+  border-bottom: 1px solid var(--border);
+}
+
+.product-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 16px 0;
+}
+
+.gallery-thumb {
+  width: 100%;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
 
 .product-info {
