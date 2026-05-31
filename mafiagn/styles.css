@@ -811,12 +811,29 @@ body {
 .cart-item-list { display: grid; gap: 12px; margin-bottom: 8px; }
 
 .cart-item {
-  display: grid;
-  gap: 12px;
+  display: flex;
+  gap: 14px;
   padding: 14px;
   border-radius: 10px;
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);
+  align-items: center;
+}
+
+.cart-item-img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: #1a1616;
+}
+
+.cart-item-body {
+  flex: 1;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
 }
 
 .cart-item-details {

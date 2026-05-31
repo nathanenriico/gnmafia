@@ -210,6 +210,12 @@
         const row = document.createElement('div');
         row.className = 'cart-item';
 
+        // Imagem do produto
+        const img = document.createElement('img');
+        img.className = 'cart-item-img';
+        img.src = it.image || '';
+        img.alt = it.name;
+
         const details = document.createElement('div');
         details.className = 'cart-item-details';
         const name = document.createElement('strong');
@@ -236,7 +242,12 @@
         remove.addEventListener('click', () => { removeCartItem(it.id); renderCartPanel(); });
 
         controls.append(minus, qty, plus, remove);
-        row.append(details, controls);
+
+        const itemBody = document.createElement('div');
+        itemBody.className = 'cart-item-body';
+        itemBody.append(details, controls);
+
+        row.append(img, itemBody);
         itemList.appendChild(row);
       });
       left.appendChild(itemList);
@@ -378,7 +389,8 @@
         const product = {
           id: card.getAttribute('data-name'),
           name: card.getAttribute('data-name'),
-          price: Number(card.getAttribute('data-price'))
+          price: Number(card.getAttribute('data-price')),
+          image: card.querySelector('.main-img, .product-img')?.src || ''
         };
         addToCart(product);
       });
