@@ -386,11 +386,12 @@
     $all('.add-to-cart').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const card = e.target.closest('.product-card');
+        const imgEl = card.querySelector('.main-img, img');
         const product = {
           id: card.getAttribute('data-name'),
           name: card.getAttribute('data-name'),
           price: Number(card.getAttribute('data-price')),
-          image: card.querySelector('.main-img, .product-img')?.src || ''
+          image: card.getAttribute('data-image') || (imgEl ? imgEl.getAttribute('src') : '')
         };
         addToCart(product);
       });
