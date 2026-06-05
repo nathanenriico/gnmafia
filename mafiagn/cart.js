@@ -386,6 +386,8 @@
       const items = cart.items.map(item => `- ${item.name} x${item.qty}`).join('\n');
       const message = `Novo Pedido - GN Mafia\n\nCliente: ${values.customerName}\n\nEndereco: Rua ${values.customerStreet}, n ${values.customerNumber}\nBairro: ${values.customerNeighborhood}\nCEP: ${sanitizeCep(values.customerCep)}\n\nForma de Pagamento: ${values.customerPayment}\nPagamento na entrega.\n\nPedido:\n${items}`;
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+      closeCartModal();
+      setTimeout(() => showRegisterPopup(values.customerName, values.customerCep), 800);
     });
 
     left.appendChild(form);
@@ -396,6 +398,85 @@
     content.append(left, right);
     container.appendChild(content);
     overlay.style.display = 'block';
+  }
+
+  const CUSTOMERS_KEY = 'gn_customers_v1';
+
+  function loadCustomers() {
+    try { return JSON.parse(localStorage.getItem(CUSTOMERS_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function saveCustomer(data) {
+    const customers = loadCustomers();
+    const exists = customers.find(c => c.email === data.email);
+    if (exists) { showMiniToast('E-mail já cadastrado!'); return false; }
+    const coupon = 'GN' + Math.random().toString(36).substring(2,7).toUpperCase();
+    customers.push({ ...data, coupon, createdAt: new Date().toISOString() });
+    localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(customers));
+    return coupon;
+  }
+
+  function showRegisterPopup(prefillName, prefillCep) {
+    if (localStorage.getItem('gn_register_done')) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'register-overlay';
+
+    overlay.innerHTML = `
+      <div class="register-modal">
+        <button class="register-close" id="regClose">✕</button>
+        <div class="register-top">
+          <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
+          <h2>Pedido enviado!</h2>
+          <p class="register-sub">Quer receber <strong>cupons exclusivos</strong> e ficar por dentro das promoções da GN Máfia?</p>
+          <div class="register-benefits">
+            <span>10% OFF na próxima compra</span>
+            <span>Promoções antecipadas</span>
+            <span>Novidades em primeira mão</span>
+          </div>
+        </div>
+        <form class="register-form" id="registerForm">
+          <label class="form-field"><span>Nome completo</span><input type="text" name="regName" placeholder="Seu nome" value="${prefillName || ''}" required /></label>
+          <label class="form-field"><span>E-mail</span><input type="email" name="regEmail" placeholder="seu@email.com" required /></label>
+          <label class="form-field"><span>WhatsApp (com DDD)</span><input type="tel" name="regPhone" placeholder="11999999999" required /></label>
+          <button type="submit" class="checkout-continue">Criar cadastro e receber cupom</button>
+        </form>
+        <button class="register-skip" id="regSkip">Agora não</button>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+    overlay.style.display = 'flex';
+
+    const close = () => { overlay.remove(); };
+    overlay.querySelector('#regClose').addEventListener('click', close);
+    overlay.querySelector('#regSkip').addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+    overlay.querySelector('#registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const data = {
+        name: fd.get('regName'),
+        email: fd.get('regEmail'),
+        phone: fd.get('regPhone'),
+        cep: prefillCep || ''
+      };
+      const coupon = saveCustomer(data);
+      if (!coupon) return;
+      localStorage.setItem('gn_register_done', '1');
+      overlay.querySelector('.register-modal').innerHTML = `
+        <div class="register-success">
+          <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
+          <h2>Cadastro criado!</h2>
+          <p>Seu cupom exclusivo:</p>
+          <div class="register-coupon">${coupon}</div>
+          <p class="register-coupon-note">Use na sua próxima compra e ganhe 10% OFF.</p>
+          <button class="checkout-continue" onclick="this.closest('.register-overlay').remove()">Fechar</button>
+        </div>
+      `;
+    });
   }
 
   function toggleCartPanel() {
