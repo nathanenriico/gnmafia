@@ -342,8 +342,11 @@
 
     inputs.customerCep.addEventListener('blur', () => {
       fetchAddressByCep(inputs.customerCep.value, (data) => {
-        if (data.localidade !== 'Atibaia') {
-          showMiniToast('Desculpe, entregamos apenas em Atibaia - SP.');
+        const cepNum = parseInt(sanitizeCep(inputs.customerCep.value));
+        const atibaia = cepNum >= 12940001 && cepNum <= 12954999;
+        const braganca = cepNum >= 12900000 && cepNum <= 12929999;
+        if (!atibaia && !braganca) {
+          showMiniToast('Desculpe, entregamos apenas em Atibaia e Bragança Paulista.');
           inputs.customerCep.value = '';
           inputs.customerStreet.value = '';
           inputs.customerNeighborhood.value = '';
