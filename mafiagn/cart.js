@@ -577,6 +577,7 @@
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const data = await res.json();
+        console.log('Profile login response:', res.status, data);
         if (!data || !data.length) {
           showMiniToast('E-mail não encontrado.');
           btn.textContent = 'Acessar perfil';
