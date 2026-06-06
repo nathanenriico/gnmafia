@@ -1074,6 +1074,68 @@ body {
 
 .form-actions { display: flex; gap: 10px; margin-top: 4px; }
 
+/* ── COUPON FIELD ── */
+.coupon-field-wrap {
+  display: grid;
+  gap: 7px;
+}
+
+.form-field-label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.coupon-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.coupon-input-row input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid rgba(213,166,81,0.4);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.coupon-input-row input:focus {
+  outline: none;
+  border-color: var(--gold-light);
+}
+
+.coupon-input-row button {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border: none;
+  border-radius: 8px;
+  padding: 0 18px;
+  color: #050404;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.coupon-input-row button:hover { opacity: 0.88; }
+
+.coupon-msg-success {
+  font-size: 0.8rem;
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.coupon-msg-error {
+  font-size: 0.8rem;
+  color: #f55e5e;
+  font-weight: 600;
+}
+
 .btn-back {
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--border);

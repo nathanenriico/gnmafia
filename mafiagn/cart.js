@@ -274,11 +274,12 @@
     const { overlay, container } = buildCheckoutShell(2);
     const cart = loadCart();
     const { total } = cartTotals(cart);
+    let appliedDiscount = 0;
+    let appliedCoupon = '';
 
     const content = document.createElement('div');
     content.className = 'checkout-content';
 
-    // Coluna esquerda — formulário
     const left = document.createElement('div');
     left.className = 'checkout-left';
 
@@ -312,10 +313,10 @@
       inputs[f.name] = input;
     });
 
-    // Campo forma de pagamento (entre Número e Bairro)
+    // Campo forma de pagamento
     const payLabel = document.createElement('label');
     payLabel.className = 'form-field';
-    payLabel.innerHTML = '<span>💳 Forma de Pagamento *</span>';
+    payLabel.innerHTML = '<span>Forma de Pagamento *</span>';
     const paySelect = document.createElement('select');
     paySelect.name = 'customerPayment';
     paySelect.className = 'form-select';
@@ -328,17 +329,71 @@
     const payNote = document.createElement('div');
     payNote.className = 'payment-note';
     payNote.style.display = 'none';
-    payNote.textContent = '⚠️ O pagamento será realizado somente no momento da entrega do pedido.';
+    payNote.textContent = 'O pagamento será realizado somente no momento da entrega do pedido.';
     paySelect.addEventListener('change', () => {
       payNote.style.display = paySelect.value ? 'block' : 'none';
     });
     payLabel.appendChild(paySelect);
     payLabel.appendChild(payNote);
-
-    // Inserir após o campo Número (antes do Bairro)
     const neighborhoodField = form.querySelector('[name="customerNeighborhood"]')?.closest('label');
     form.insertBefore(payLabel, neighborhoodField || null);
     inputs.customerPayment = paySelect;
+
+    // Campo cupom
+    const couponWrap = document.createElement('div');
+    couponWrap.className = 'coupon-field-wrap';
+    couponWrap.innerHTML = `
+      <span class="form-field-label">Cupom de desconto</span>
+      <div class="coupon-input-row">
+        <input type="text" id="couponInput" placeholder="Ex: GN4K2XM" autocomplete="off" />
+        <button type="button" id="couponApplyBtn">Aplicar</button>
+      </div>
+      <div id="couponMsg"></div>
+    `;
+    form.appendChild(couponWrap);
+
+    // Resumo lateral atualizável
+    const right = document.createElement('aside');
+    right.className = 'checkout-right';
+
+    function updateSummary(discount) {
+      const finalTotal = discount > 0 ? total * 0.9 : total;
+      right.innerHTML = `
+        <div class="checkout-summary">
+          <h4>Resumo</h4>
+          <div class="summary-row"><span>Valor dos produtos</span><strong>${formatBRL(total)}</strong></div>
+          ${discount > 0 ? `<div class="summary-row" style="color:#4caf50"><span>Desconto (10%)</span><strong>- ${formatBRL(total * 0.1)}</strong></div>` : ''}
+          <div class="summary-row"><span>Frete</span><span>A calcular</span></div>
+          <div class="summary-total"><span>Total da compra</span><strong>${formatBRL(finalTotal)}</strong></div>
+        </div>`;
+    }
+    updateSummary(0);
+
+    // Lógica do cupom
+    couponWrap.querySelector('#couponApplyBtn').addEventListener('click', async () => {
+      const code = couponWrap.querySelector('#couponInput').value.trim().toUpperCase();
+      const msg = couponWrap.querySelector('#couponMsg');
+      if (!code) { msg.textContent = 'Informe um cupom.'; msg.className = 'coupon-msg-error'; return; }
+
+      // Busca o cupom no supabase
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?cupom=eq.${encodeURIComponent(code)}&select=nome,email,cupom`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const data = await res.json();
+      if (!data || !data.length) {
+        msg.textContent = 'Cupom inválido ou já utilizado.';
+        msg.className = 'coupon-msg-error';
+        appliedDiscount = 0;
+        appliedCoupon = '';
+        updateSummary(0);
+        return;
+      }
+      appliedDiscount = 0.1;
+      appliedCoupon = code;
+      msg.textContent = 'Cupom aplicado! 10% de desconto.';
+      msg.className = 'coupon-msg-success';
+      updateSummary(1);
+    });
 
     inputs.customerCep.addEventListener('blur', () => {
       fetchAddressByCep(inputs.customerCep.value, (data) => {
@@ -359,22 +414,15 @@
 
     const actions = document.createElement('div');
     actions.className = 'form-actions';
-
     const backBtn = document.createElement('button');
-    backBtn.type = 'button';
-    backBtn.className = 'btn-back';
-    backBtn.textContent = '← Voltar';
+    backBtn.type = 'button'; backBtn.className = 'btn-back'; backBtn.textContent = '← Voltar';
     backBtn.addEventListener('click', renderCartPanel);
-
     const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.className = 'checkout-continue';
-    submitBtn.textContent = '🟢 Finalizar via WhatsApp';
-
+    submitBtn.type = 'submit'; submitBtn.className = 'checkout-continue'; submitBtn.textContent = 'Finalizar via WhatsApp';
     actions.append(backBtn, submitBtn);
     form.appendChild(actions);
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const values = {
         customerName: inputs.customerName.value,
@@ -386,8 +434,25 @@
       };
       const error = validateCheckoutForm(values);
       if (error) { showMiniToast(error); return; }
+
+      const finalTotal = appliedDiscount > 0 ? total * 0.9 : total;
       const items = cart.items.map(item => `- ${item.name} x${item.qty}`).join('\n');
-      const message = `Novo Pedido - GN Mafia\n\nCliente: ${values.customerName}\n\nEndereco: Rua ${values.customerStreet}, n ${values.customerNumber}\nBairro: ${values.customerNeighborhood}\nCEP: ${sanitizeCep(values.customerCep)}\n\nForma de Pagamento: ${values.customerPayment}\nPagamento na entrega.\n\nPedido:\n${items}`;
+      const discountLine = appliedDiscount > 0 ? `\nCupom: ${appliedCoupon} (-10%) = ${formatBRL(finalTotal)}` : '';
+      const message = `Novo Pedido - GN Mafia\n\nCliente: ${values.customerName}\n\nEndereco: Rua ${values.customerStreet}, n ${values.customerNumber}\nBairro: ${values.customerNeighborhood}\nCEP: ${sanitizeCep(values.customerCep)}\n\nForma de Pagamento: ${values.customerPayment}\nPagamento na entrega.${discountLine}\n\nTotal: ${formatBRL(finalTotal)}\n\nPedido:\n${items}`;
+
+      // Remove o cupom do banco após uso
+      if (appliedCoupon) {
+        await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?cupom=eq.${encodeURIComponent(appliedCoupon)}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify({ cupom: null })
+        });
+      }
+
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
       closeCartModal();
       setTimeout(() => {
@@ -398,10 +463,6 @@
     });
 
     left.appendChild(form);
-
-    // Coluna direita — resumo
-    const right = renderSummary(total);
-
     content.append(left, right);
     container.appendChild(content);
     overlay.style.display = 'block';
