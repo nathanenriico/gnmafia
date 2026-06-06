@@ -407,7 +407,7 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InloZ2d6aHlhYnVxanV4dGV0anBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NTc4MzIsImV4cCI6MjA5NjMzMzgzMn0.jvF7q0tkjFOzYp1JOBG_2e2RbpZZ2euSKc1r4VHUnJs';
 
   async function saveCustomerSupabase(data) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/clientes`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
