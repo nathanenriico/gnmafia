@@ -525,6 +525,99 @@
     });
   }
 
+  async function showProfilePanel() {
+    const existing = document.getElementById('profileOverlay');
+    if (existing) { existing.remove(); return; }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'profileOverlay';
+    overlay.className = 'profile-overlay';
+    overlay.innerHTML = `<div class="profile-modal"><div class="profile-loading">Carregando...</div></div>`;
+    document.body.appendChild(overlay);
+    overlay.style.display = 'flex';
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+    // Busca cliente pelo email salvo localmente
+    const savedEmail = localStorage.getItem('gn_profile_email');
+    let cliente = null;
+
+    if (savedEmail) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(savedEmail)}&select=nome,email,cupom`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const data = await res.json();
+      if (data && data.length) cliente = data[0];
+    }
+
+    const modal = overlay.querySelector('.profile-modal');
+
+    if (!cliente) {
+      // Tela de login por email
+      modal.innerHTML = `
+        <button class="register-close" id="profileClose">✕</button>
+        <div style="text-align:center">
+          <img src="logo.jpeg" class="register-logo" alt="GN Máfia" />
+          <h2 style="color:var(--gold-light);margin-bottom:8px">Minha Conta</h2>
+          <p style="color:var(--muted);font-size:0.88rem;margin-bottom:24px">Informe seu e-mail para acessar seu perfil</p>
+        </div>
+        <form id="profileLoginForm" style="display:grid;gap:14px">
+          <label class="form-field"><span>E-mail</span><input type="email" name="loginEmail" placeholder="seu@email.com" required /></label>
+          <button type="submit" class="checkout-continue">Acessar perfil</button>
+        </form>
+        <p style="text-align:center;margin-top:12px;font-size:0.78rem;color:var(--muted)">Ainda não tem cadastro? Finalize uma compra para criar.</p>
+      `;
+      modal.querySelector('#profileClose').addEventListener('click', () => overlay.remove());
+      modal.querySelector('#profileLoginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = new FormData(e.target).get('loginEmail');
+        const btn = e.target.querySelector('button');
+        btn.textContent = 'Buscando...';
+        btn.disabled = true;
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(email)}&select=nome,email,cupom`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const data = await res.json();
+        if (!data || !data.length) {
+          showMiniToast('E-mail não encontrado.');
+          btn.textContent = 'Acessar perfil';
+          btn.disabled = false;
+          return;
+        }
+        localStorage.setItem('gn_profile_email', email);
+        overlay.remove();
+        showProfilePanel();
+      });
+    } else {
+      // Tela de perfil
+      const firstName = cliente.nome.split(' ')[0];
+      modal.innerHTML = `
+        <button class="register-close" id="profileClose">✕</button>
+        <div class="profile-header">
+          <img src="logo.jpeg" class="register-logo" alt="GN Máfia" />
+          <h2>Olá, <span style="color:var(--gold-light)">${firstName}</span>!</h2>
+          <p style="color:var(--muted);font-size:0.82rem">${cliente.email}</p>
+        </div>
+        <div class="profile-section">
+          <h4>Seus Cupons</h4>
+          ${ cliente.cupom
+            ? `<div class="profile-coupon">
+                <div class="register-coupon">${cliente.cupom}</div>
+                <p class="register-coupon-note">10% OFF na próxima compra</p>
+                <button class="coupon-copy" onclick="navigator.clipboard.writeText('${cliente.cupom}');this.textContent='Copiado!';setTimeout(()=>this.textContent='Copiar cupom',2000)">Copiar cupom</button>
+              </div>`
+            : `<p style="color:var(--muted);font-size:0.85rem">Nenhum cupom disponível.</p>`
+          }
+        </div>
+        <button class="register-skip" id="profileLogout">Sair da conta</button>
+      `;
+      modal.querySelector('#profileClose').addEventListener('click', () => overlay.remove());
+      modal.querySelector('#profileLogout').addEventListener('click', () => {
+        localStorage.removeItem('gn_profile_email');
+        overlay.remove();
+      });
+    }
+  }
+
   function toggleCartPanel() {
     let overlay = document.getElementById('checkoutOverlay');
     if (!overlay) {
@@ -562,6 +655,12 @@
     cartBtn && cartBtn.addEventListener('click', (e) => {
       e.preventDefault();
       toggleCartPanel();
+    });
+
+    const profileBtn = document.getElementById('profileBtn');
+    profileBtn && profileBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      showProfilePanel();
     });
   });
 

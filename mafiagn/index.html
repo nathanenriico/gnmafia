@@ -36,7 +36,7 @@
 
     <div class="actions">
       <button class="icon-btn">🔍</button>
-      <button class="icon-btn">👤</button>
+      <button class="icon-btn" id="profileBtn">👤</button>
       <button class="icon-btn cart-icon-btn" id="cartBtn">
         🛒
         <span class="cart-badge" id="cartCount">0</span>
@@ -95,11 +95,6 @@
     </div>
   </div>
 
-  <!-- CUPOM BANNER -->
-  <div class="coupon-banner">
-    <span>🎁 Use o cupom <strong>BEMVINDO10</strong> e ganhe <strong>10% OFF</strong> na sua primeira compra!</span>
-    <button class="coupon-copy" onclick="navigator.clipboard.writeText('BEMVINDO10');this.textContent='✅ Copiado!';setTimeout(()=>this.textContent='Copiar cupom',2000)">Copiar cupom</button>
-  </div>
 
   <!-- COLEÇÕES -->
   <section class="section" id="colecoes">
@@ -283,12 +278,65 @@
 
   <div class="copyright">© 2024 GN Máfia. Todos os direitos reservados.</div>
 
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lbClose">&#x2715;</button>
+    <button class="lightbox-arrow prev" id="lbPrev">&#8592;</button>
+    <img class="lightbox-img" id="lbImg" src="" alt="" />
+    <button class="lightbox-arrow next" id="lbNext">&#8594;</button>
+    <div class="lightbox-counter" id="lbCounter"></div>
+  </div>
+
   <script src="cart.js"></script>
   <script>
     // Mobile nav toggle
     document.getElementById('navToggle').addEventListener('click', () => {
       document.getElementById('navLinks').classList.toggle('open');
     });
+
+    // Lightbox
+    (function () {
+      const lb = document.getElementById('lightbox');
+      const lbImg = document.getElementById('lbImg');
+      const lbCounter = document.getElementById('lbCounter');
+      let images = [];
+      let current = 0;
+
+      function openLightbox(imgs, idx) {
+        images = imgs;
+        current = idx;
+        show();
+        lb.classList.add('open');
+      }
+
+      function show() {
+        lbImg.src = images[current];
+        lbCounter.textContent = (current + 1) + ' / ' + images.length;
+      }
+
+      function prev() { current = (current - 1 + images.length) % images.length; show(); }
+      function next() { current = (current + 1) % images.length; show(); }
+      function close() { lb.classList.remove('open'); lbImg.src = ''; }
+
+      document.getElementById('lbClose').addEventListener('click', close);
+      document.getElementById('lbPrev').addEventListener('click', prev);
+      document.getElementById('lbNext').addEventListener('click', next);
+      lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+      document.addEventListener('keydown', (e) => {
+        if (!lb.classList.contains('open')) return;
+        if (e.key === 'ArrowLeft') prev();
+        if (e.key === 'ArrowRight') next();
+        if (e.key === 'Escape') close();
+      });
+
+      document.querySelectorAll('.product-card').forEach(card => {
+        const allImgs = Array.from(card.querySelectorAll('.main-img, .gallery-thumb')).map(i => i.src);
+        card.querySelector('.main-img')?.addEventListener('click', () => openLightbox(allImgs, 0));
+        card.querySelectorAll('.gallery-thumb').forEach((thumb, i) => {
+          thumb.addEventListener('click', () => openLightbox(allImgs, i + 1));
+        });
+      });
+    })();
   </script>
 </body>
 </html>

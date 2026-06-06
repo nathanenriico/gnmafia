@@ -1216,6 +1216,60 @@ body {
   color: var(--muted);
 }
 
+/* ── PROFILE PANEL ── */
+.profile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.profile-modal {
+  width: min(400px, 100%);
+  background: linear-gradient(180deg, #141010, #0a0808);
+  border: 1px solid rgba(213,166,81,0.3);
+  border-radius: 20px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.8);
+  padding: 36px 28px 28px;
+  position: relative;
+  text-align: center;
+}
+
+.profile-loading {
+  color: var(--muted);
+  padding: 40px;
+  font-size: 0.9rem;
+}
+
+.profile-header {
+  margin-bottom: 24px;
+}
+
+.profile-header h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.profile-section h4 {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.profile-coupon {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 1100px) {
   .footer {
