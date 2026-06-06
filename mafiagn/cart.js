@@ -390,7 +390,11 @@
       const message = `Novo Pedido - GN Mafia\n\nCliente: ${values.customerName}\n\nEndereco: Rua ${values.customerStreet}, n ${values.customerNumber}\nBairro: ${values.customerNeighborhood}\nCEP: ${sanitizeCep(values.customerCep)}\n\nForma de Pagamento: ${values.customerPayment}\nPagamento na entrega.\n\nPedido:\n${items}`;
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
       closeCartModal();
-      setTimeout(() => showRegisterPopup(values.customerName, values.customerCep), 800);
+      setTimeout(() => {
+        if (!localStorage.getItem('gn_profile_email')) {
+          showRegisterPopup(values.customerName, values.customerCep);
+        }
+      }, 800);
     });
 
     left.appendChild(form);
@@ -449,7 +453,7 @@
   }
 
   function showRegisterPopup(prefillName, prefillCep) {
-    if (localStorage.getItem('gn_register_done')) return;
+    if (localStorage.getItem('gn_profile_email')) return;
 
     const overlay = document.createElement('div');
     overlay.className = 'register-overlay';
@@ -511,6 +515,7 @@
         btn.disabled = false;
         return;
       }
+      localStorage.setItem('gn_profile_email', data.email);
       localStorage.setItem('gn_register_done', '1');
       overlay.querySelector('.register-modal').innerHTML = `
         <div class="register-success">
