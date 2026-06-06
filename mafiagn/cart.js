@@ -403,6 +403,28 @@
     overlay.style.display = 'block';
   }
 
+  const SUPABASE_URL = 'https://yhggzhyabuqjuxtetjpj.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InloZ2d6aHlhYnVxanV4dGV0anBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NTc4MzIsImV4cCI6MjA5NjMzMzgzMn0.jvF7q0tkjFOzYp1JOBG_2e2RbpZZ2euSKc1r4VHUnJs';
+
+  async function saveCustomerSupabase(data) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/clientes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        nome: data.name,
+        email: data.email,
+        whatsapp: data.phone,
+        cupom: data.coupon
+      })
+    });
+    return res.ok || res.status === 201;
+  }
+
   const CUSTOMERS_KEY = 'gn_customers_v1';
 
   function loadCustomers() {
@@ -457,17 +479,26 @@
     overlay.querySelector('#regSkip').addEventListener('click', close);
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
 
-    overlay.querySelector('#registerForm').addEventListener('submit', (e) => {
+    overlay.querySelector('#registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
+      const coupon = 'GN' + Math.random().toString(36).substring(2,7).toUpperCase();
       const data = {
         name: fd.get('regName'),
         email: fd.get('regEmail'),
         phone: fd.get('regPhone'),
-        cep: prefillCep || ''
+        coupon
       };
-      const coupon = saveCustomer(data);
-      if (!coupon) return;
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.textContent = 'Salvando...';
+      btn.disabled = true;
+      const ok = await saveCustomerSupabase(data);
+      if (!ok) {
+        showMiniToast('E-mail já cadastrado ou erro ao salvar.');
+        btn.textContent = 'Criar cadastro e receber cupom';
+        btn.disabled = false;
+        return;
+      }
       localStorage.setItem('gn_register_done', '1');
       overlay.querySelector('.register-modal').innerHTML = `
         <div class="register-success">
