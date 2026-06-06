@@ -422,7 +422,13 @@
         cupom: data.coupon
       })
     });
-    return res.ok || res.status === 201;
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error('Supabase erro:', err);
+      if (err.code === '23505') return 'duplicate';
+      return 'error';
+    }
+    return 'ok';
   }
 
   const CUSTOMERS_KEY = 'gn_customers_v1';
@@ -493,8 +499,14 @@
       btn.textContent = 'Salvando...';
       btn.disabled = true;
       const ok = await saveCustomerSupabase(data);
-      if (!ok) {
-        showMiniToast('E-mail já cadastrado ou erro ao salvar.');
+      if (ok === 'duplicate') {
+        showMiniToast('E-mail já cadastrado!');
+        btn.textContent = 'Criar cadastro e receber cupom';
+        btn.disabled = false;
+        return;
+      }
+      if (ok === 'error') {
+        showMiniToast('Erro ao salvar. Tente novamente.');
         btn.textContent = 'Criar cadastro e receber cupom';
         btn.disabled = false;
         return;
