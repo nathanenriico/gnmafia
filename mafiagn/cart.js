@@ -661,9 +661,9 @@
     let cliente = null;
 
     if (savedEmail) {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(savedEmail)}&select=nome,email,cupom&t=${Date.now()}`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(savedEmail)}&select=nome,email,cupom`, {
         cache: 'no-store',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Cache-Control': 'no-cache, no-store' }
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
       });
       const data = await res.json();
       if (data && data.length) cliente = data[0];
@@ -694,7 +694,8 @@
         btn.textContent = 'Buscando...';
         btn.disabled = true;
         const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(email)}&select=nome,email,cupom`, {
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Cache-Control': 'no-store' }
+          cache: 'no-store',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const data = await res.json();
         console.log('Profile login response:', res.status, data);
