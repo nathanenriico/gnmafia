@@ -508,11 +508,9 @@
 
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
       closeCartModal();
-      setTimeout(() => {
-        if (!localStorage.getItem('gn_profile_email')) {
-          showRegisterPopup(values.customerName, values.customerCep);
-        }
-      }, 800);
+      if (!localStorage.getItem('gn_profile_email')) {
+        showRegisterPopup(values.customerName, values.customerCep);
+      }
     });
 
     left.appendChild(form);
