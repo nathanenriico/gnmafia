@@ -276,6 +276,7 @@
     const { total } = cartTotals(cart);
     let appliedDiscount = 0;
     let appliedCoupon = '';
+    let appliedCouponType = ''; // 'sorteio' ou 'pessoal'
 
     const content = document.createElement('div');
     content.className = 'checkout-content';
@@ -369,30 +370,79 @@
     }
     updateSummary(0);
 
-    // Lógica do cupom
+    // Logica do cupom
     couponWrap.querySelector('#couponApplyBtn').addEventListener('click', async () => {
       const code = couponWrap.querySelector('#couponInput').value.trim().toUpperCase();
       const msg = couponWrap.querySelector('#couponMsg');
       if (!code) { msg.textContent = 'Informe um cupom.'; msg.className = 'coupon-msg-error'; return; }
 
-      // Busca o cupom no supabase
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?cupom=eq.${encodeURIComponent(code)}&select=nome,email,cupom`, {
+      const btn = couponWrap.querySelector('#couponApplyBtn');
+      btn.textContent = 'Verificando...';
+      btn.disabled = true;
+
+      // 1. Verifica cupons de sorteio
+      const sorteioRes = await fetch(`${SUPABASE_URL}/rest/v1/cupons_sorteio?codigo=eq.${encodeURIComponent(code)}&select=id,codigo,desconto_percent,limite,usados,ativo`, {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
       });
-      const data = await res.json();
-      if (!data || !data.length) {
-        msg.textContent = 'Cupom inválido ou já utilizado.';
-        msg.className = 'coupon-msg-error';
-        appliedDiscount = 0;
-        appliedCoupon = '';
-        updateSummary(0);
+      const sorteioData = await sorteioRes.json();
+
+      if (sorteioData && sorteioData.length) {
+        const cupom = sorteioData[0];
+        if (!cupom.ativo) {
+          msg.textContent = 'Este cupom nao esta mais ativo.';
+          msg.className = 'coupon-msg-error';
+          btn.textContent = 'Aplicar'; btn.disabled = false;
+          return;
+        }
+        if (cupom.usados >= cupom.limite) {
+          msg.textContent = `Cupom esgotado! Todas as ${cupom.limite} vagas ja foram utilizadas.`;
+          msg.className = 'coupon-msg-error';
+          btn.textContent = 'Aplicar'; btn.disabled = false;
+          return;
+        }
+        // Reserva o uso incrementando usados
+        await fetch(`${SUPABASE_URL}/rest/v1/cupons_sorteio?id=eq.${cupom.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify({ usados: cupom.usados + 1 })
+        });
+        appliedDiscount = cupom.desconto_percent / 100;
+        appliedCoupon = code;
+        appliedCouponType = 'sorteio';
+        const vagasRestantes = cupom.limite - cupom.usados - 1;
+        msg.textContent = `Cupom aplicado! ${cupom.desconto_percent}% de desconto. ${vagasRestantes > 0 ? `Restam ${vagasRestantes} vagas.` : 'Ultima vaga!'}` ;
+        msg.className = 'coupon-msg-success';
+        updateSummary(1);
+        btn.textContent = 'Aplicado'; btn.disabled = true;
         return;
       }
-      appliedDiscount = 0.1;
-      appliedCoupon = code;
-      msg.textContent = 'Cupom aplicado! 10% de desconto.';
-      msg.className = 'coupon-msg-success';
-      updateSummary(1);
+
+      // 2. Verifica cupons pessoais (dados_clientes)
+      const pessoalRes = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?cupom=eq.${encodeURIComponent(code)}&select=nome,email,cupom`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const pessoalData = await pessoalRes.json();
+
+      if (pessoalData && pessoalData.length) {
+        appliedDiscount = 0.1;
+        appliedCoupon = code;
+        appliedCouponType = 'pessoal';
+        msg.textContent = 'Cupom aplicado! 10% de desconto.';
+        msg.className = 'coupon-msg-success';
+        updateSummary(1);
+        btn.textContent = 'Aplicado'; btn.disabled = true;
+        return;
+      }
+
+      msg.textContent = 'Cupom invalido ou ja utilizado.';
+      msg.className = 'coupon-msg-error';
+      appliedDiscount = 0; appliedCoupon = ''; appliedCouponType = '';
+      updateSummary(0);
+      btn.textContent = 'Aplicar'; btn.disabled = false;
     });
 
     inputs.customerCep.addEventListener('blur', () => {
@@ -440,8 +490,8 @@
       const discountLine = appliedDiscount > 0 ? `\nCupom: ${appliedCoupon} (-10%) = ${formatBRL(finalTotal)}` : '';
       const message = `Novo Pedido - GN Mafia\n\nCliente: ${values.customerName}\n\nEndereco: Rua ${values.customerStreet}, n ${values.customerNumber}\nBairro: ${values.customerNeighborhood}\nCEP: ${sanitizeCep(values.customerCep)}\n\nForma de Pagamento: ${values.customerPayment}\nPagamento na entrega.${discountLine}\n\nTotal: ${formatBRL(finalTotal)}\n\nPedido:\n${items}`;
 
-      // Remove o cupom do banco após uso
-      if (appliedCoupon) {
+      // Remove o cupom do banco apos uso
+      if (appliedCoupon && appliedCouponType === 'pessoal') {
         await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?cupom=eq.${encodeURIComponent(appliedCoupon)}`, {
           method: 'PATCH',
           headers: {
@@ -452,6 +502,7 @@
           body: JSON.stringify({ cupom: null })
         });
       }
+      // Cupom de sorteio: usados ja foi incrementado ao aplicar
 
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
       closeCartModal();
