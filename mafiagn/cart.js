@@ -492,17 +492,19 @@
 
       // Remove o cupom do banco apos uso
       if (appliedCoupon && appliedCouponType === 'pessoal') {
-        await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?cupom=eq.${encodeURIComponent(appliedCoupon)}`, {
+        const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?cupom=eq.${encodeURIComponent(appliedCoupon)}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
             'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'return=representation'
           },
           body: JSON.stringify({ cupom: null })
         });
+        const patchData = await patchRes.json().catch(() => null);
+        console.log('Cupom removido:', patchRes.status, patchData);
       }
-      // Cupom de sorteio: usados ja foi incrementado ao aplicar
 
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
       closeCartModal();
@@ -659,8 +661,9 @@
     let cliente = null;
 
     if (savedEmail) {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(savedEmail)}&select=nome,email,cupom`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Cache-Control': 'no-store' }
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(savedEmail)}&select=nome,email,cupom&t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Cache-Control': 'no-cache, no-store' }
       });
       const data = await res.json();
       if (data && data.length) cliente = data[0];
