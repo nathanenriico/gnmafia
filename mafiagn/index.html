@@ -30,6 +30,7 @@
       <a href="#inicio">INÍCIO</a>
       <a href="#colecoes">COLEÇÕES</a>
       <a href="#produtos">PRODUTOS</a>
+      <a href="#sorteios">SORTEIOS</a>
       <a href="#sobre">SOBRE NÓS</a>
       <a href="#contato">CONTATO</a>
     </nav>
@@ -176,6 +177,18 @@
     </div>
   </section>
 
+  <!-- SORTEIOS -->
+  <section class="section" id="sorteios">
+    <div class="section-header">
+      <h2>SORTEIOS E CUPONS</h2>
+      <span class="badge-gold">TEMPO LIMITADO</span>
+    </div>
+    <p class="sorteios-desc">Cupons de desconto exclusivos disponíveis por tempo limitado. Seja um dos primeiros a usar!</p>
+    <div class="sorteios-grid" id="sorteiosGrid">
+      <div class="sorteio-loading">Carregando cupons...</div>
+    </div>
+  </section>
+
   <!-- AVALIAÇÕES -->
   <section class="testimonials" id="sobre">
     <div class="testimonials-inner">
@@ -293,6 +306,61 @@
     document.getElementById('navToggle').addEventListener('click', () => {
       document.getElementById('navLinks').classList.toggle('open');
     });
+
+    // Sorteios
+    (async function() {
+      const SUPABASE_URL = 'https://yhggzhyabuqjuxtetjpj.supabase.co';
+      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InloZ2d6aHlhYnVxanV4dGV0anBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NTc4MzIsImV4cCI6MjA5NjMzMzgzMn0.jvF7q0tkjFOzYp1JOBG_2e2RbpZZ2euSKc1r4VHUnJs';
+      const grid = document.getElementById('sorteiosGrid');
+
+      async function loadSorteios() {
+        grid.innerHTML = '<div class="sorteio-loading">Carregando cupons...</div>';
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/cupons_sorteio?select=*&order=criado_em.desc`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const data = await res.json();
+
+        if (!data || !data.length) {
+          grid.innerHTML = '<div class="sorteio-empty">Nenhum sorteio ativo no momento. Fique de olho!</div>';
+          return;
+        }
+
+        grid.innerHTML = '';
+        data.forEach(cupom => {
+          const esgotado = !cupom.ativo || cupom.usados >= cupom.limite;
+          const restantes = cupom.limite - cupom.usados;
+          const card = document.createElement('div');
+          card.className = 'sorteio-card' + (esgotado ? ' sorteio-esgotado' : '');
+          card.innerHTML = `
+            <div class="sorteio-badge">${esgotado ? 'ESGOTADO' : 'DISPONIVEL'}</div>
+            <div class="sorteio-desconto">${cupom.desconto_percent}% OFF</div>
+            <div class="sorteio-codigo ${esgotado ? 'codigo-riscado' : ''}">${cupom.codigo}</div>
+            <div class="sorteio-vagas">
+              ${esgotado
+                ? 'Todas as vagas foram utilizadas'
+                : `${restantes} de ${cupom.limite} vagas restantes`
+              }
+            </div>
+            <div class="sorteio-barra-wrap">
+              <div class="sorteio-barra" style="width:${Math.min((cupom.usados/cupom.limite)*100,100)}%"></div>
+            </div>
+            ${!esgotado ? `<button class="sorteio-copy-btn" data-code="${cupom.codigo}">Copiar cupom</button>` : ''}
+          `;
+          if (!esgotado) {
+            card.querySelector('.sorteio-copy-btn').addEventListener('click', function() {
+              navigator.clipboard.writeText(cupom.codigo);
+              this.textContent = 'Copiado!';
+              setTimeout(() => this.textContent = 'Copiar cupom', 2000);
+            });
+          }
+          grid.appendChild(card);
+        });
+      }
+
+      loadSorteios();
+      // Atualiza a cada 30 segundos
+      setInterval(loadSorteios, 30000);
+    })();
 
     // Lightbox
     (function () {
