@@ -660,7 +660,7 @@
 
     if (savedEmail) {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(savedEmail)}&select=nome,email,cupom`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Cache-Control': 'no-store' }
       });
       const data = await res.json();
       if (data && data.length) cliente = data[0];
@@ -691,7 +691,7 @@
         btn.textContent = 'Buscando...';
         btn.disabled = true;
         const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(email)}&select=nome,email,cupom`, {
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Cache-Control': 'no-store' }
         });
         const data = await res.json();
         console.log('Profile login response:', res.status, data);
@@ -706,7 +706,6 @@
         showProfilePanel();
       });
     } else {
-      // Tela de perfil
       const firstName = cliente.nome.split(' ')[0];
       modal.innerHTML = `
         <button class="register-close" id="profileClose">✕</button>
@@ -720,10 +719,10 @@
           ${ cliente.cupom
             ? `<div class="profile-coupon">
                 <div class="register-coupon">${cliente.cupom}</div>
-                <p class="register-coupon-note">10% OFF na próxima compra</p>
+                <p class="register-coupon-note">10% OFF na próxima compra — uso único</p>
                 <button class="coupon-copy" onclick="navigator.clipboard.writeText('${cliente.cupom}');this.textContent='Copiado!';setTimeout(()=>this.textContent='Copiar cupom',2000)">Copiar cupom</button>
               </div>`
-            : `<p style="color:var(--muted);font-size:0.85rem">Nenhum cupom disponível.</p>`
+            : `<p style="color:var(--muted);font-size:0.85rem">Nenhum cupom disponível.<br><span style="font-size:0.78rem">O cupom é removido após o uso.</span></p>`
           }
         </div>
         <button class="register-skip" id="profileLogout">Sair da conta</button>
