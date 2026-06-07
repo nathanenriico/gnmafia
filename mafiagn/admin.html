@@ -453,12 +453,19 @@
     // DELETAR
     async function deletarCupom(id, codigo) {
       if (!confirm(`Excluir o cupom "${codigo}"? Esta ação não pode ser desfeita.`)) return;
-      await fetch(`${SUPABASE_URL}/rest/v1/cupons_sorteio?id=eq.${id}`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/cupons_sorteio?id=eq.${id}`, {
         method: 'DELETE',
         headers: headers()
       });
-      toast(`Cupom ${codigo} excluído.`);
-      loadCupons();
+      console.log('DELETE status:', res.status);
+      if (res.ok || res.status === 204) {
+        toast(`Cupom ${codigo} excluído.`);
+        loadCupons();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.error('DELETE erro:', err);
+        toast('Erro ao excluir. Veja o console.');
+      }
     }
 
     // Realtime
