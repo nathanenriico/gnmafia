@@ -99,6 +99,37 @@
       border-bottom: 1px solid var(--border);
     }
 
+    .admin-tabs {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
+    }
+    .admin-tab-btn {
+      border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+      color: var(--muted); border-radius: 999px; padding: 9px 14px;
+      cursor: pointer; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.04em;
+    }
+    .admin-tab-btn.active {
+      background: linear-gradient(135deg, rgba(213,166,81,0.18), rgba(213,166,81,0.08));
+      color: var(--gold-light); border-color: rgba(213,166,81,0.35);
+    }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+
+    .photo-form-grid {
+      display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 14px; align-items: end;
+    }
+    .photo-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+    }
+    .photo-card img { width: 100%; height: 160px; object-fit: cover; display: block; }
+    .photo-card-body { padding: 12px; display: grid; gap: 8px; }
+    .photo-card-title { font-weight: 700; color: var(--gold-light); }
+    .photo-card-meta { color: var(--muted); font-size: 0.78rem; }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .photo-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn-photo { padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.04); color: var(--text); cursor: pointer; font-size: 0.78rem; }
+    .btn-photo.edit { border-color: rgba(213,166,81,0.35); color: var(--gold-light); }
+    .btn-photo.delete { border-color: rgba(245,94,94,0.35); color: var(--red); }
+
     /* CRIAR CUPOM */
     .create-form {
       background: var(--surface); border: 1px solid var(--border);
@@ -220,19 +251,54 @@
 
     <div class="admin-body">
 
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" data-tab="overview">Visão Geral</button>
+        <button class="admin-tab-btn" data-tab="photos">Fotos do Site</button>
+        <button class="admin-tab-btn" data-tab="cupons">Cupons</button>
+        <button class="admin-tab-btn" data-tab="clientes">Clientes</button>
+      </div>
+
       <!-- STATS -->
-      <div>
+      <div id="overview" class="admin-panel active">
         <div class="section-title">Visão Geral</div>
         <div class="stats-grid" id="statsGrid">
           <div class="stat-card"><div class="stat-label">Total de Cupons</div><div class="stat-value" id="statTotal">—</div></div>
           <div class="stat-card"><div class="stat-label">Cupons Ativos</div><div class="stat-value" id="statAtivos">—</div></div>
-          <div class="stat-card"><div class="stat-label">Usos Realizados</div><div class="stat-value" id="statUsos">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total de Pedidos</div><div class="stat-value" id="statUsos">—</div></div>
           <div class="stat-card"><div class="stat-label">Clientes Cadastrados</div><div class="stat-value" id="statClientes">—</div></div>
         </div>
       </div>
 
+      <!-- FOTOS -->
+      <div id="photos" class="admin-panel">
+        <div class="section-title">Fotos do Site</div>
+        <div class="table-wrap" style="padding:18px; display:grid; gap:16px;">
+          <div class="photo-form-grid">
+            <div class="form-group">
+              <label>Título da foto</label>
+              <input type="text" id="photoTitle" placeholder="Ex: Coleção Verão" />
+            </div>
+            <div class="form-group">
+              <label>Legenda / ALT</label>
+              <input type="text" id="photoAlt" placeholder="Descrição da imagem" />
+            </div>
+            <div class="form-group">
+              <label>Preço (R$)</label>
+              <input type="number" id="photoPrice" min="0" step="0.01" placeholder="99.90" />
+            </div>
+            <div class="form-group">
+              <label>Imagem</label>
+              <input type="file" id="photoFile" accept="image/*" />
+            </div>
+            <button class="btn-create" id="savePhotoBtn">Adicionar foto</button>
+          </div>
+          <p style="color:var(--muted); font-size:0.82rem;">As fotos salvas aqui aparecem na galeria do site. Você pode editar o título e trocar a imagem quando quiser.</p>
+          <div class="photo-grid" id="photoGrid"></div>
+        </div>
+      </div>
+
       <!-- CRIAR CUPOM -->
-      <div>
+      <div id="cupons" class="admin-panel">
         <div class="section-title">Criar Novo Cupom de Sorteio</div>
         <div class="create-form">
           <div class="form-group">
@@ -252,7 +318,7 @@
       </div>
 
       <!-- CUPONS SORTEIO -->
-      <div>
+      <div id="cuponsList" class="admin-panel">
         <div class="section-title">Cupons de Sorteio</div>
         <div class="table-wrap">
           <table>
@@ -270,8 +336,50 @@
         </div>
       </div>
 
-      <!-- CLIENTES -->
+      <!-- PEDIDOS -->
       <div>
+        <div class="section-title">Pedidos Realizados</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>E-mail</th>
+                <th>Itens</th>
+                <th>Total</th>
+                <th>Pagamento</th>
+                <th>Cupom</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody id="pedidosBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PEDIDOS -->
+      <div>
+        <div class="section-title">Pedidos Realizados</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>E-mail</th>
+                <th>Itens</th>
+                <th>Total</th>
+                <th>Pagamento</th>
+                <th>Cupom</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody id="pedidosBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CLIENTES -->
+      <div id="clientes" class="admin-panel">
         <div class="section-title">Clientes Cadastrados</div>
         <div class="table-wrap">
           <table class="clientes-table">
@@ -294,7 +402,7 @@
   <script>
     const SUPABASE_URL = 'https://yhggzhyabuqjuxtetjpj.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InloZ2d6aHlhYnVxanV4dGV0anBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NTc4MzIsImV4cCI6MjA5NjMzMzgzMn0.jvF7q0tkjFOzYp1JOBG_2e2RbpZZ2euSKc1r4VHUnJs';
-    const ADMIN_SENHA = 'gnmafia2025';
+    const ADMIN_SENHA = 'gnmafia2026';
 
     function headers(extra = {}) {
       return { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', ...extra };
@@ -342,8 +450,161 @@
     }
 
     async function loadAll() {
-      await Promise.all([loadCupons(), loadClientes()]);
+      await Promise.all([loadCupons(), loadClientes(), loadPedidos()]);
+      loadPhotos();
     }
+
+    async function loadPedidos() {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/pedidos?select=*&order=criado_em.desc`, { headers: headers() });
+      const data = await res.json();
+      renderPedidos(data || []);
+    }
+
+    function renderPedidos(pedidos) {
+      const tbody = document.getElementById('pedidosBody');
+      if (!tbody) return;
+      if (!pedidos.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Nenhum pedido registrado ainda.</td></tr>';
+        return;
+      }
+      document.getElementById('statUsos').textContent = pedidos.length;
+      tbody.innerHTML = pedidos.map(p => {
+        const data = new Date(p.criado_em).toLocaleString('pt-BR');
+        return `
+          <tr>
+            <td><strong>${p.cliente_nome}</strong></td>
+            <td style="color:var(--muted);font-size:0.82rem">${p.cliente_email}</td>
+            <td style="font-size:0.82rem;color:var(--muted)">${p.itens}</td>
+            <td><strong style="color:var(--gold-light)">R$ ${Number(p.total).toFixed(2).replace('.',',')}</strong></td>
+            <td style="font-size:0.82rem">${p.forma_pagamento || '—'}</td>
+            <td>${p.cupom_usado ? `<span class="tag-ativo">${p.cupom_usado}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+            <td style="font-size:0.78rem;color:var(--muted)">${data}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.admin-panel').forEach(panel => panel.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.getAttribute('data-tab');
+        if (target === 'overview') {
+          document.getElementById('overview').classList.add('active');
+        } else if (target === 'photos') {
+          document.getElementById('photos').classList.add('active');
+        } else if (target === 'cupons') {
+          document.getElementById('cupons').classList.add('active');
+          document.getElementById('cuponsList').classList.add('active');
+        } else if (target === 'clientes') {
+          document.getElementById('clientes').classList.add('active');
+        }
+      });
+    });
+
+    const PHOTO_KEY = 'gn_site_photos';
+    let photoEditingId = null;
+
+    function loadPhotos() {
+      const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]');
+      renderPhotos(photos);
+    }
+
+    function renderPhotos(photos) {
+      const grid = document.getElementById('photoGrid');
+      if (!photos.length) {
+        grid.innerHTML = '<div class="empty-row" style="grid-column:1/-1;">Nenhuma foto cadastrada.</div>';
+        return;
+      }
+      grid.innerHTML = photos.map((photo, index) => `
+        <article class="photo-card">
+          <img src="${photo.src}" alt="${photo.alt || photo.title}" />
+          <div class="photo-card-body">
+            <div class="photo-card-title">${photo.title || 'Foto ' + (index + 1)}</div>
+            <div class="photo-card-meta">${photo.alt || 'Sem legenda'}</div>
+            <div class="photo-card-meta">Preço: R$ ${Number(photo.price || 0).toFixed(2).replace('.', ',')}</div>
+            <div class="photo-actions">
+              <button class="btn-photo edit" onclick="editPhoto('${photo.id}')">Editar</button>
+              <button class="btn-photo delete" onclick="deletePhoto('${photo.id}')">Excluir</button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function editPhoto(id) {
+      const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]');
+      const photo = photos.find(item => item.id === id);
+      if (!photo) return;
+      document.getElementById('photoTitle').value = photo.title || '';
+      document.getElementById('photoAlt').value = photo.alt || '';
+      document.getElementById('photoPrice').value = photo.price || '';
+      photoEditingId = id;
+      document.getElementById('savePhotoBtn').textContent = 'Salvar edição';
+      document.querySelector('.admin-tab-btn[data-tab="photos"]').click();
+    }
+
+    function deletePhoto(id) {
+      const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]');
+      const next = photos.filter(item => item.id !== id);
+      localStorage.setItem(PHOTO_KEY, JSON.stringify(next));
+      loadPhotos();
+      toast('Foto excluída.');
+      window.dispatchEvent(new Event('gnPhotosUpdated'));
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById('savePhotoBtn').addEventListener('click', async () => {
+      const title = document.getElementById('photoTitle').value.trim();
+      const alt = document.getElementById('photoAlt').value.trim();
+      const price = parseFloat(document.getElementById('photoPrice').value);
+      const file = document.getElementById('photoFile').files[0];
+      const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]');
+
+      if (!title) { toast('Informe um título para a foto.'); return; }
+
+      if (photoEditingId) {
+        const existing = photos.find(item => item.id === photoEditingId);
+        const nextSrc = file ? await readFileAsDataUrl(file) : existing?.src || '';
+        const next = photos.map(item => item.id === photoEditingId ? {
+          ...item,
+          title,
+          alt,
+          price: Number.isFinite(price) ? price : (item.price || 0),
+          src: nextSrc,
+          updatedAt: new Date().toISOString()
+        } : item);
+        localStorage.setItem(PHOTO_KEY, JSON.stringify(next));
+        toast('Foto editada com sucesso.');
+        photoEditingId = null;
+        document.getElementById('savePhotoBtn').textContent = 'Adicionar foto';
+      } else {
+        if (!file) { toast('Selecione uma imagem para adicionar.'); return; }
+        const src = await readFileAsDataUrl(file);
+        photos.unshift({ id: 'photo-' + Date.now(), title, alt, price: Number.isFinite(price) ? price : 0, src, createdAt: new Date().toISOString() });
+        localStorage.setItem(PHOTO_KEY, JSON.stringify(photos));
+        toast('Foto adicionada com sucesso.');
+      }
+
+      document.getElementById('photoTitle').value = '';
+      document.getElementById('photoAlt').value = '';
+      document.getElementById('photoPrice').value = '';
+      document.getElementById('photoFile').value = '';
+      loadPhotos();
+      window.dispatchEvent(new Event('gnPhotosUpdated'));
+    });
+
+    window.editPhoto = editPhoto;
+    window.deletePhoto = deletePhoto;
 
     async function loadCupons() {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/cupons_sorteio?select=*&order=criado_em.desc`, { headers: headers() });

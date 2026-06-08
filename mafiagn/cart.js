@@ -506,6 +506,25 @@
         console.log('Cupom removido:', patchRes.status, patchData);
       }
 
+      // Registra o pedido no banco
+      const clienteEmail = localStorage.getItem('gn_profile_email') || 'nao_cadastrado';
+      const itensList = cart.items.map(i => `${i.name} x${i.qty}`).join(', ');
+      const enderecoStr = `Rua ${values.customerStreet}, n ${values.customerNumber}, ${values.customerNeighborhood}, CEP ${sanitizeCep(values.customerCep)}`;
+      await fetch(`${SUPABASE_URL}/rest/v1/pedidos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({
+          cliente_email: clienteEmail,
+          cliente_nome: values.customerName,
+          itens: itensList,
+          total: finalTotal,
+          forma_pagamento: values.customerPayment,
+          cupom_usado: appliedCoupon || null,
+          desconto: appliedDiscount > 0 ? parseFloat((total * 0.1).toFixed(2)) : 0,
+          endereco: enderecoStr
+        })
+      });
+
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
       closeCartModal();
       if (!localStorage.getItem('gn_profile_email')) {
@@ -572,7 +591,6 @@
 
     overlay.innerHTML = `
       <div class="register-modal">
-        <button class="register-close" id="regClose">✕</button>
         <div class="register-top">
           <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
           <h2>Pedido enviado!</h2>
@@ -597,9 +615,10 @@
     overlay.style.display = 'flex';
 
     const close = () => { overlay.remove(); };
-    overlay.querySelector('#regClose').addEventListener('click', close);
     overlay.querySelector('#regSkip').addEventListener('click', close);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) e.stopPropagation();
+    });
 
     overlay.querySelector('#registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -753,21 +772,25 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     updateHeader(loadCart());
-    $all('.add-to-cart').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const card = e.target.closest('.product-card');
-        const imgEl = card.querySelector('.main-img, img');
-        const rawSrc = card.getAttribute('data-image') || (imgEl ? imgEl.getAttribute('src') : '');
-        const base = window.location.href.replace(/\/[^\/]*$/, '/');
-        const absoluteImage = rawSrc ? (rawSrc.startsWith('http') ? rawSrc : base + rawSrc) : '';
-        const product = {
-          id: card.getAttribute('data-name'),
-          name: card.getAttribute('data-name'),
-          price: Number(card.getAttribute('data-price')),
-          image: absoluteImage
-        };
-        addToCart(product);
-      });
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.add-to-cart');
+      if (!btn) return;
+      e.preventDefault();
+      const card = btn.closest('.product-card');
+      if (!card) return;
+      const imgEl = card.querySelector('.main-img, img');
+      const rawSrc = card.getAttribute('data-image') || (imgEl ? imgEl.getAttribute('src') : '');
+      const base = window.location.href.replace(/\/[^\/]*$/, '/');
+      const absoluteImage = rawSrc
+        ? (rawSrc.startsWith('http') || rawSrc.startsWith('data:') || rawSrc.startsWith('blob:') ? rawSrc : base + rawSrc)
+        : '';
+      const product = {
+        id: card.getAttribute('data-name'),
+        name: card.getAttribute('data-name'),
+        price: Number(card.getAttribute('data-price')) || 0,
+        image: absoluteImage
+      };
+      addToCart(product);
     });
 
     const cartBtn = document.getElementById('cartBtn');
