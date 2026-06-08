@@ -314,6 +314,43 @@
       inputs[f.name] = input;
     });
 
+    // Preenche automaticamente se cliente estiver logado
+    const savedEmail = localStorage.getItem('gn_profile_email');
+    if (savedEmail) {
+      fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(savedEmail)}&select=nome,email`, {
+        cache: 'no-store',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      }).then(r => r.json()).then(data => {
+        if (data && data.length) {
+          inputs.customerName.value = data[0].nome || '';
+        }
+      });
+
+      // Busca ultimo endereco usado
+      fetch(`${SUPABASE_URL}/rest/v1/pedidos?cliente_email=eq.${encodeURIComponent(savedEmail)}&select=endereco&order=criado_em.desc&limit=1`, {
+        cache: 'no-store',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      }).then(r => r.json()).then(data => {
+        if (data && data.length && data[0].endereco) {
+          // Formato: "Rua X, n Y, Bairro Z, CEP 00000000"
+          const end = data[0].endereco;
+          const cepMatch = end.match(/CEP\s*(\d{8})/);
+          const numMatch = end.match(/,\s*n\s*([^,]+),/);
+          const bairroMatch = end.match(/,\s*([^,]+),\s*CEP/);
+          const ruaMatch = end.match(/^Rua\s*([^,]+),/);
+          if (cepMatch) {
+            const cep = cepMatch[1];
+            inputs.customerCep.value = cep.replace(/(\d{5})(\d{3})/, '$1-$2');
+            fetchAddressByCep(cep, (addr) => {
+              inputs.customerStreet.value = addr.logradouro || '';
+              inputs.customerNeighborhood.value = addr.bairro || '';
+            });
+          }
+          if (numMatch) inputs.customerNumber.value = numMatch[1].trim();
+        }
+      });
+    }
+
     // Campo forma de pagamento
     const payLabel = document.createElement('label');
     payLabel.className = 'form-field';
