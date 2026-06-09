@@ -728,7 +728,7 @@
     if (!cliente) {
       // Tela de login por email
       modal.innerHTML = `
-        <button class="register-close" id="profileClose">âœ•</button>
+        <button class="register-close id=profileClose style=position:absolute;top:14px;right:16px>X</button>
         <div style="text-align:center">
           <img src="logo.jpeg" class="register-logo" alt="GN MÃ¡fia" />
           <h2 style="color:var(--gold-light);margin-bottom:8px">Minha Conta</h2>
@@ -766,7 +766,7 @@
     } else {
       const firstName = cliente.nome.split(' ')[0];
       modal.innerHTML = `
-        <button class="register-close" id="profileClose">âœ•</button>
+ <button class=register-close id=profileClose style=position:absolute;top:14px;right:16px>X</button>
         <div class="profile-header">
           <img src="logo.jpeg" class="register-logo" alt="GN MÃ¡fia" />
           <h2>OlÃ¡, <span style="color:var(--gold-light)">${firstName}</span>!</h2>

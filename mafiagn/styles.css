@@ -436,6 +436,19 @@ body {
 
 .gallery-thumb:hover { border-color: var(--gold-light); opacity: 0.85; }
 
+.featured-photo-card {
+  border: 1px solid rgba(213,166,81,0.18);
+  background: linear-gradient(180deg, #121010, #0b0909);
+}
+.featured-photo-card .product-info strong {
+  color: var(--gold-light);
+}
+.featured-photo-card .product-price {
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
 /* ── LIGHTBOX ── */
 .lightbox {
   position: fixed;
@@ -1299,6 +1312,8 @@ body {
   padding: 36px 28px 28px;
   position: relative;
   text-align: center;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .profile-loading {
