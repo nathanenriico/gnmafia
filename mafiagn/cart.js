@@ -1,4 +1,4 @@
-// cart.js — client-side cart with localStorage
+﻿// cart.js â€” client-side cart with localStorage
 (function () {
   const STORAGE_KEY = 'gn_cart_v1';
 
@@ -30,7 +30,7 @@
     if (tot) tot.textContent = formatBRL(total);
   }
 
-  const STORE_PHONE = '5511942977855'; // substitua pelo número real do WhatsApp da loja (com DDI)
+  const STORE_PHONE = '5511942977855'; // substitua pelo nÃºmero real do WhatsApp da loja (com DDI)
 
   function addToCart(product) {
     const cart = loadCart();
@@ -75,10 +75,10 @@
   function buildWhatsAppMessage(cart, customerName, customerPhone, addressData) {
     const items = cart.items.map(item => `- ${item.name} x${item.qty}`).join('\n');
     const phoneLabel = formatPhoneBR(customerPhone);
-    const addressLine = `Rua ${addressData.street}, nº ${addressData.number}`;
+    const addressLine = `Rua ${addressData.street}, nÂº ${addressData.number}`;
     const complemento = addressData.complement ? `Complemento: ${addressData.complement}\n` : '';
 
-    return `Novo Pedido - GN Máfia\n\nCliente: ${customerName}\nWhatsApp: ${phoneLabel}\n\nEndereço: ${addressLine}\n${complemento}Bairro: ${addressData.neighborhood}\nCidade/UF: ${addressData.city} - ${addressData.state}\nCEP: ${addressData.cep}\n\nPedido:\n${items}`;
+    return `Novo Pedido - GN MÃ¡fia\n\nCliente: ${customerName}\nWhatsApp: ${phoneLabel}\n\nEndereÃ§o: ${addressLine}\n${complemento}Bairro: ${addressData.neighborhood}\nCidade/UF: ${addressData.city} - ${addressData.state}\nCEP: ${addressData.cep}\n\nPedido:\n${items}`;
   }
 
   function sanitizePhone(value) {
@@ -95,17 +95,17 @@
     try {
       const res = await fetch(`https://viacep.com.br/ws/${cepValue}/json/`);
       const data = await res.json();
-      if (data.erro) { showMiniToast('CEP não encontrado.'); return; }
+      if (data.erro) { showMiniToast('CEP nÃ£o encontrado.'); return; }
       onSuccess(data);
-    } catch { showMiniToast('Não foi possível buscar o CEP.'); }
+    } catch { showMiniToast('NÃ£o foi possÃ­vel buscar o CEP.'); }
   }
 
   function validateCheckoutForm(values) {
     if (!values.customerName.trim()) return 'Por favor, informe seu nome completo.';
     const cepDigits = sanitizeCep(values.customerCep);
-    if (!/^[0-9]{8}$/.test(cepDigits)) return 'Por favor, informe um CEP válido com 8 dígitos.';
+    if (!/^[0-9]{8}$/.test(cepDigits)) return 'Por favor, informe um CEP vÃ¡lido com 8 dÃ­gitos.';
     if (!values.customerStreet.trim()) return 'Por favor, informe a rua.';
-    if (!values.customerNumber.trim()) return 'Por favor, informe o número.';
+    if (!values.customerNumber.trim()) return 'Por favor, informe o nÃºmero.';
     if (!values.customerNeighborhood.trim()) return 'Por favor, informe o bairro.';
     if (!values.customerPayment) return 'Por favor, selecione a forma de pagamento.';
     return null;
@@ -155,7 +155,7 @@
     // Header
     const header = document.createElement('div');
     header.className = 'checkout-header';
-    header.innerHTML = `<img src="logo.jpeg" alt="GN Máfia" class="checkout-logo" /><button class="cart-modal-close" id="closeCartBtn">✕</button>`;
+    header.innerHTML = `<img src="logo.jpeg" alt="GN MÃ¡fia" class="checkout-logo" /><button class="cart-modal-close" id="closeCartBtn">âœ•</button>`;
     container.appendChild(header);
     header.querySelector('#closeCartBtn').addEventListener('click', closeCartModal);
 
@@ -164,7 +164,7 @@
     steps.className = 'checkout-steps';
     steps.innerHTML = [
       { n: 1, label: 'Carrinho' },
-      { n: 2, label: 'Identificação' }
+      { n: 2, label: 'IdentificaÃ§Ã£o' }
     ].map(s => `<div class="step${s.n === activeStep ? ' step-active' : s.n < activeStep ? ' step-done' : ''}"><span>${s.n}</span>${s.label}</div>`).join('');
     container.appendChild(steps);
 
@@ -192,7 +192,7 @@
     const content = document.createElement('div');
     content.className = 'checkout-content';
 
-    // Coluna esquerda — produtos
+    // Coluna esquerda â€” produtos
     const left = document.createElement('div');
     left.className = 'checkout-left';
     const title = document.createElement('h2');
@@ -202,7 +202,7 @@
     if (!cart.items.length) {
       const empty = document.createElement('div');
       empty.className = 'cart-empty';
-      empty.textContent = 'Seu carrinho está vazio.';
+      empty.textContent = 'Seu carrinho estÃ¡ vazio.';
       left.appendChild(empty);
     } else {
       const itemList = document.createElement('div');
@@ -229,7 +229,7 @@
         const controls = document.createElement('div');
         controls.className = 'cart-item-controls';
         const minus = document.createElement('button');
-        minus.type = 'button'; minus.className = 'qty-control'; minus.textContent = '−';
+        minus.type = 'button'; minus.className = 'qty-control'; minus.textContent = 'âˆ’';
         const qty = document.createElement('input');
         qty.type = 'number'; qty.className = 'qty-input'; qty.value = it.qty; qty.min = '1';
         const plus = document.createElement('button');
@@ -254,7 +254,7 @@
       left.appendChild(itemList);
     }
 
-    // Coluna direita — resumo + continuar
+    // Coluna direita â€” resumo + continuar
     const right = renderSummary(total);
     const continueBtn = document.createElement('button');
     continueBtn.className = 'checkout-continue';
@@ -285,7 +285,7 @@
     left.className = 'checkout-left';
 
     const title = document.createElement('h2');
-    title.textContent = 'Identificação';
+    title.textContent = 'IdentificaÃ§Ã£o';
     left.appendChild(title);
 
     const form = document.createElement('form');
@@ -295,7 +295,7 @@
       { label: 'Nome completo', name: 'customerName', type: 'text', placeholder: 'Seu nome completo' },
       { label: 'CEP', name: 'customerCep', type: 'text', placeholder: '00000-000' },
       { label: 'Rua / Logradouro', name: 'customerStreet', type: 'text', placeholder: 'Preenchido automaticamente pelo CEP', readonly: true },
-      { label: 'Número', name: 'customerNumber', type: 'text', placeholder: 'Ex: 42 ou Apto 12' },
+      { label: 'NÃºmero', name: 'customerNumber', type: 'text', placeholder: 'Ex: 42 ou Apto 12' },
       { label: 'Bairro', name: 'customerNeighborhood', type: 'text', placeholder: 'Preenchido automaticamente pelo CEP', readonly: true },
     ];
 
@@ -359,15 +359,15 @@
     paySelect.name = 'customerPayment';
     paySelect.className = 'form-select';
     paySelect.innerHTML = `
-      <option value="">Selecione uma opção</option>
+      <option value="">Selecione uma opÃ§Ã£o</option>
       <option value="PIX">PIX</option>
-      <option value="Cartão de Débito">Cartão de Débito</option>
-      <option value="Cartão de Crédito">Cartão de Crédito</option>
+      <option value="CartÃ£o de DÃ©bito">CartÃ£o de DÃ©bito</option>
+      <option value="CartÃ£o de CrÃ©dito">CartÃ£o de CrÃ©dito</option>
     `;
     const payNote = document.createElement('div');
     payNote.className = 'payment-note';
     payNote.style.display = 'none';
-    payNote.textContent = 'O pagamento será realizado somente no momento da entrega do pedido.';
+    payNote.textContent = 'O pagamento serÃ¡ realizado somente no momento da entrega do pedido.';
     paySelect.addEventListener('change', () => {
       payNote.style.display = paySelect.value ? 'block' : 'none';
     });
@@ -390,7 +390,7 @@
     `;
     form.appendChild(couponWrap);
 
-    // Resumo lateral atualizável
+    // Resumo lateral atualizÃ¡vel
     const right = document.createElement('aside');
     right.className = 'checkout-right';
 
@@ -488,7 +488,7 @@
         const atibaia = cepNum >= 12940001 && cepNum <= 12954999;
         const braganca = cepNum >= 12900000 && cepNum <= 12929999;
         if (!atibaia && !braganca) {
-          showMiniToast('Desculpe, entregamos apenas em Atibaia e Bragança Paulista.');
+          showMiniToast('Desculpe, entregamos apenas em Atibaia e BraganÃ§a Paulista.');
           inputs.customerCep.value = '';
           inputs.customerStreet.value = '';
           inputs.customerNeighborhood.value = '';
@@ -502,7 +502,7 @@
     const actions = document.createElement('div');
     actions.className = 'form-actions';
     const backBtn = document.createElement('button');
-    backBtn.type = 'button'; backBtn.className = 'btn-back'; backBtn.textContent = '← Voltar';
+    backBtn.type = 'button'; backBtn.className = 'btn-back'; backBtn.textContent = 'â† Voltar';
     backBtn.addEventListener('click', renderCartPanel);
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit'; submitBtn.className = 'checkout-continue'; submitBtn.textContent = 'Finalizar via WhatsApp';
@@ -613,7 +613,7 @@
   function saveCustomer(data) {
     const customers = loadCustomers();
     const exists = customers.find(c => c.email === data.email);
-    if (exists) { showMiniToast('E-mail já cadastrado!'); return false; }
+    if (exists) { showMiniToast('E-mail jÃ¡ cadastrado!'); return false; }
     const coupon = 'GN' + Math.random().toString(36).substring(2,7).toUpperCase();
     customers.push({ ...data, coupon, createdAt: new Date().toISOString() });
     localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(customers));
@@ -629,13 +629,13 @@
     overlay.innerHTML = `
       <div class="register-modal">
         <div class="register-top">
-          <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
+          <img src="logo.jpeg" alt="GN MÃ¡fia" class="register-logo" />
           <h2>Pedido enviado!</h2>
-          <p class="register-sub">Quer receber <strong>cupons exclusivos</strong> e ficar por dentro das promoções da GN Máfia?</p>
+          <p class="register-sub">Quer receber <strong>cupons exclusivos</strong> e ficar por dentro das promoÃ§Ãµes da GN MÃ¡fia?</p>
           <div class="register-benefits">
-            <span>10% OFF na próxima compra</span>
-            <span>Promoções antecipadas</span>
-            <span>Novidades em primeira mão</span>
+            <span>10% OFF na prÃ³xima compra</span>
+            <span>PromoÃ§Ãµes antecipadas</span>
+            <span>Novidades em primeira mÃ£o</span>
           </div>
         </div>
         <form class="register-form" id="registerForm">
@@ -644,7 +644,7 @@
           <label class="form-field"><span>WhatsApp (com DDD)</span><input type="tel" name="regPhone" placeholder="11999999999" required /></label>
           <button type="submit" class="checkout-continue">Criar cadastro e receber cupom</button>
         </form>
-        <button class="register-skip" id="regSkip">Agora não</button>
+        <button class="register-skip" id="regSkip">Agora nÃ£o</button>
       </div>
     `;
 
@@ -653,9 +653,9 @@
 
     const close = () => { overlay.remove(); };
     overlay.querySelector('#regSkip').addEventListener('click', close);
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) e.stopPropagation();
-    });
+
+
+
 
     overlay.querySelector('#registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -672,7 +672,7 @@
       btn.disabled = true;
       const ok = await saveCustomerSupabase(data);
       if (ok === 'duplicate') {
-        showMiniToast('E-mail já cadastrado!');
+        showMiniToast('E-mail jÃ¡ cadastrado!');
         btn.textContent = 'Criar cadastro e receber cupom';
         btn.disabled = false;
         return;
@@ -687,11 +687,11 @@
       localStorage.setItem('gn_register_done', '1');
       overlay.querySelector('.register-modal').innerHTML = `
         <div class="register-success">
-          <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
+          <img src="logo.jpeg" alt="GN MÃ¡fia" class="register-logo" />
           <h2>Cadastro criado!</h2>
           <p>Seu cupom exclusivo:</p>
           <div class="register-coupon">${coupon}</div>
-          <p class="register-coupon-note">Use na sua próxima compra e ganhe 10% OFF.</p>
+          <p class="register-coupon-note">Use na sua prÃ³xima compra e ganhe 10% OFF.</p>
           <button class="checkout-continue" onclick="this.closest('.register-overlay').remove()">Fechar</button>
         </div>
       `;
@@ -728,9 +728,9 @@
     if (!cliente) {
       // Tela de login por email
       modal.innerHTML = `
-        <button class="register-close" id="profileClose">✕</button>
+        <button class="register-close" id="profileClose">âœ•</button>
         <div style="text-align:center">
-          <img src="logo.jpeg" class="register-logo" alt="GN Máfia" />
+          <img src="logo.jpeg" class="register-logo" alt="GN MÃ¡fia" />
           <h2 style="color:var(--gold-light);margin-bottom:8px">Minha Conta</h2>
           <p style="color:var(--muted);font-size:0.88rem;margin-bottom:24px">Informe seu e-mail para acessar seu perfil</p>
         </div>
@@ -738,7 +738,7 @@
           <label class="form-field"><span>E-mail</span><input type="email" name="loginEmail" placeholder="seu@email.com" required /></label>
           <button type="submit" class="checkout-continue">Acessar perfil</button>
         </form>
-        <p style="text-align:center;margin-top:12px;font-size:0.78rem;color:var(--muted)">Ainda não tem cadastro? Finalize uma compra para criar.</p>
+        <p style="text-align:center;margin-top:12px;font-size:0.78rem;color:var(--muted)">Ainda nÃ£o tem cadastro? Finalize uma compra para criar.</p>
       `;
       modal.querySelector('#profileClose').addEventListener('click', () => overlay.remove());
       modal.querySelector('#profileLoginForm').addEventListener('submit', async (e) => {
@@ -754,7 +754,7 @@
         const data = await res.json();
         console.log('Profile login response:', res.status, data);
         if (!data || !data.length) {
-          showMiniToast('E-mail não encontrado.');
+          showMiniToast('E-mail nÃ£o encontrado.');
           btn.textContent = 'Acessar perfil';
           btn.disabled = false;
           return;
@@ -766,10 +766,10 @@
     } else {
       const firstName = cliente.nome.split(' ')[0];
       modal.innerHTML = `
-        <button class="register-close" id="profileClose">✕</button>
+        <button class="register-close" id="profileClose">âœ•</button>
         <div class="profile-header">
-          <img src="logo.jpeg" class="register-logo" alt="GN Máfia" />
-          <h2>Olá, <span style="color:var(--gold-light)">${firstName}</span>!</h2>
+          <img src="logo.jpeg" class="register-logo" alt="GN MÃ¡fia" />
+          <h2>OlÃ¡, <span style="color:var(--gold-light)">${firstName}</span>!</h2>
           <p style="color:var(--muted);font-size:0.82rem">${cliente.email}</p>
         </div>
         <div class="profile-section">
@@ -777,10 +777,10 @@
           ${ cliente.cupom
             ? `<div class="profile-coupon">
                 <div class="register-coupon">${cliente.cupom}</div>
-                <p class="register-coupon-note">10% OFF na próxima compra — uso único</p>
+                <p class="register-coupon-note">10% OFF na prÃ³xima compra â€” uso Ãºnico</p>
                 <button class="coupon-copy" onclick="navigator.clipboard.writeText('${cliente.cupom}');this.textContent='Copiado!';setTimeout(()=>this.textContent='Copiar cupom',2000)">Copiar cupom</button>
               </div>`
-            : `<p style="color:var(--muted);font-size:0.85rem">Nenhum cupom disponível.<br><span style="font-size:0.78rem">O cupom é removido após o uso.</span></p>`
+            : `<p style="color:var(--muted);font-size:0.85rem">Nenhum cupom disponÃ­vel.<br><span style="font-size:0.78rem">O cupom Ã© removido apÃ³s o uso.</span></p>`
           }
         </div>
         <button class="register-skip" id="profileLogout">Sair da conta</button>
