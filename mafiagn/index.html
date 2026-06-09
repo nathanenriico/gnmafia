@@ -307,6 +307,39 @@
       document.getElementById('navLinks').classList.toggle('open');
     });
 
+    function renderFeaturedPhotos() {
+      const grid = document.getElementById('produtos');
+      if (!grid) return;
+      grid.querySelectorAll('.featured-photo-card').forEach(card => card.remove());
+      const photos = JSON.parse(localStorage.getItem('gn_site_photos') || '[]');
+      if (!photos.length) return;
+
+      photos.forEach(photo => {
+        const card = document.createElement('article');
+        const price = Number(photo.price || 0);
+        const installment = (price / 6).toFixed(2).replace('.', ',');
+        card.className = 'product-card featured-photo-card';
+        card.setAttribute('data-name', photo.title || 'Coleção GN Máfia');
+        card.setAttribute('data-price', String(price));
+        card.setAttribute('data-image', photo.src || '');
+        card.innerHTML = `
+          <div class="product-img-wrap">
+            <img src="${photo.src}" alt="${photo.alt || photo.title}" class="product-img main-img" />
+          </div>
+          <div class="product-info">
+            <strong>${photo.title || 'Coleção GN Máfia'}</strong>
+            <span class="product-price">R$ ${price.toFixed(2).replace('.', ',')}</span>
+            <span class="product-installment">ou 6x de R$ ${installment}</span>
+          </div>
+          <button class="add-to-cart-btn add-to-cart" aria-label="Adicionar ao carrinho">🛒</button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    renderFeaturedPhotos();
+    window.addEventListener('gnPhotosUpdated', renderFeaturedPhotos);
+
     // Sorteios
     (async function() {
       const SUPABASE_URL = 'https://yhggzhyabuqjuxtetjpj.supabase.co';

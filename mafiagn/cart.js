@@ -1,4 +1,4 @@
-﻿// cart.js â€” client-side cart with localStorage
+// cart.js — client-side cart with localStorage
 (function () {
   const STORAGE_KEY = 'gn_cart_v1';
 
@@ -30,7 +30,7 @@
     if (tot) tot.textContent = formatBRL(total);
   }
 
-  const STORE_PHONE = '5511942977855'; // substitua pelo nÃºmero real do WhatsApp da loja (com DDI)
+  const STORE_PHONE = '5511942977855'; // substitua pelo número real do WhatsApp da loja (com DDI)
 
   function addToCart(product) {
     const cart = loadCart();
@@ -75,10 +75,10 @@
   function buildWhatsAppMessage(cart, customerName, customerPhone, addressData) {
     const items = cart.items.map(item => `- ${item.name} x${item.qty}`).join('\n');
     const phoneLabel = formatPhoneBR(customerPhone);
-    const addressLine = `Rua ${addressData.street}, nÂº ${addressData.number}`;
+    const addressLine = `Rua ${addressData.street}, nº ${addressData.number}`;
     const complemento = addressData.complement ? `Complemento: ${addressData.complement}\n` : '';
 
-    return `Novo Pedido - GN MÃ¡fia\n\nCliente: ${customerName}\nWhatsApp: ${phoneLabel}\n\nEndereÃ§o: ${addressLine}\n${complemento}Bairro: ${addressData.neighborhood}\nCidade/UF: ${addressData.city} - ${addressData.state}\nCEP: ${addressData.cep}\n\nPedido:\n${items}`;
+    return `Novo Pedido - GN Máfia\n\nCliente: ${customerName}\nWhatsApp: ${phoneLabel}\n\nEndereço: ${addressLine}\n${complemento}Bairro: ${addressData.neighborhood}\nCidade/UF: ${addressData.city} - ${addressData.state}\nCEP: ${addressData.cep}\n\nPedido:\n${items}`;
   }
 
   function sanitizePhone(value) {
@@ -95,17 +95,17 @@
     try {
       const res = await fetch(`https://viacep.com.br/ws/${cepValue}/json/`);
       const data = await res.json();
-      if (data.erro) { showMiniToast('CEP nÃ£o encontrado.'); return; }
+      if (data.erro) { showMiniToast('CEP não encontrado.'); return; }
       onSuccess(data);
-    } catch { showMiniToast('NÃ£o foi possÃ­vel buscar o CEP.'); }
+    } catch { showMiniToast('Não foi possível buscar o CEP.'); }
   }
 
   function validateCheckoutForm(values) {
     if (!values.customerName.trim()) return 'Por favor, informe seu nome completo.';
     const cepDigits = sanitizeCep(values.customerCep);
-    if (!/^[0-9]{8}$/.test(cepDigits)) return 'Por favor, informe um CEP vÃ¡lido com 8 dÃ­gitos.';
+    if (!/^[0-9]{8}$/.test(cepDigits)) return 'Por favor, informe um CEP válido com 8 dígitos.';
     if (!values.customerStreet.trim()) return 'Por favor, informe a rua.';
-    if (!values.customerNumber.trim()) return 'Por favor, informe o nÃºmero.';
+    if (!values.customerNumber.trim()) return 'Por favor, informe o número.';
     if (!values.customerNeighborhood.trim()) return 'Por favor, informe o bairro.';
     if (!values.customerPayment) return 'Por favor, selecione a forma de pagamento.';
     return null;
@@ -155,7 +155,7 @@
     // Header
     const header = document.createElement('div');
     header.className = 'checkout-header';
-    header.innerHTML = `<img src="logo.jpeg" alt="GN MÃ¡fia" class="checkout-logo" /><button class="cart-modal-close" id="closeCartBtn">âœ•</button>`;
+    header.innerHTML = `<img src="logo.jpeg" alt="GN Máfia" class="checkout-logo" /><button class="cart-modal-close" id="closeCartBtn">✕</button>`;
     container.appendChild(header);
     header.querySelector('#closeCartBtn').addEventListener('click', closeCartModal);
 
@@ -164,7 +164,7 @@
     steps.className = 'checkout-steps';
     steps.innerHTML = [
       { n: 1, label: 'Carrinho' },
-      { n: 2, label: 'IdentificaÃ§Ã£o' }
+      { n: 2, label: 'Identificação' }
     ].map(s => `<div class="step${s.n === activeStep ? ' step-active' : s.n < activeStep ? ' step-done' : ''}"><span>${s.n}</span>${s.label}</div>`).join('');
     container.appendChild(steps);
 
@@ -192,7 +192,7 @@
     const content = document.createElement('div');
     content.className = 'checkout-content';
 
-    // Coluna esquerda â€” produtos
+    // Coluna esquerda — produtos
     const left = document.createElement('div');
     left.className = 'checkout-left';
     const title = document.createElement('h2');
@@ -202,7 +202,7 @@
     if (!cart.items.length) {
       const empty = document.createElement('div');
       empty.className = 'cart-empty';
-      empty.textContent = 'Seu carrinho estÃ¡ vazio.';
+      empty.textContent = 'Seu carrinho está vazio.';
       left.appendChild(empty);
     } else {
       const itemList = document.createElement('div');
@@ -229,7 +229,7 @@
         const controls = document.createElement('div');
         controls.className = 'cart-item-controls';
         const minus = document.createElement('button');
-        minus.type = 'button'; minus.className = 'qty-control'; minus.textContent = 'âˆ’';
+        minus.type = 'button'; minus.className = 'qty-control'; minus.textContent = '−';
         const qty = document.createElement('input');
         qty.type = 'number'; qty.className = 'qty-input'; qty.value = it.qty; qty.min = '1';
         const plus = document.createElement('button');
@@ -254,7 +254,7 @@
       left.appendChild(itemList);
     }
 
-    // Coluna direita â€” resumo + continuar
+    // Coluna direita — resumo + continuar
     const right = renderSummary(total);
     const continueBtn = document.createElement('button');
     continueBtn.className = 'checkout-continue';
@@ -270,13 +270,28 @@
     overlay.style.display = 'block';
   }
 
-  function renderIdentificationPanel() {
+  async function renderIdentificationPanel() {
     const { overlay, container } = buildCheckoutShell(2);
     const cart = loadCart();
     const { total } = cartTotals(cart);
     let appliedDiscount = 0;
     let appliedCoupon = '';
-    let appliedCouponType = ''; // 'sorteio' ou 'pessoal'
+    let appliedCouponType = '';
+
+    // Busca dados do cliente logado
+    let clienteLogado = null;
+    const savedEmail = localStorage.getItem('gn_profile_email');
+    console.log('[ID] email salvo:', savedEmail);
+    if (savedEmail) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(savedEmail)}&select=nome,email,whatsapp,cep,rua,numero,bairro`, {
+        cache: 'no-store',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const data = await res.json();
+      console.log('[ID] dados do cliente:', res.status, data);
+      if (data && data.length) clienteLogado = data[0];
+    }
+    console.log('[ID] clienteLogado:', clienteLogado);
 
     const content = document.createElement('div');
     content.className = 'checkout-content';
@@ -285,7 +300,7 @@
     left.className = 'checkout-left';
 
     const title = document.createElement('h2');
-    title.textContent = 'IdentificaÃ§Ã£o';
+    title.textContent = 'Identificação';
     left.appendChild(title);
 
     const form = document.createElement('form');
@@ -295,7 +310,7 @@
       { label: 'Nome completo', name: 'customerName', type: 'text', placeholder: 'Seu nome completo' },
       { label: 'CEP', name: 'customerCep', type: 'text', placeholder: '00000-000' },
       { label: 'Rua / Logradouro', name: 'customerStreet', type: 'text', placeholder: 'Preenchido automaticamente pelo CEP', readonly: true },
-      { label: 'NÃºmero', name: 'customerNumber', type: 'text', placeholder: 'Ex: 42 ou Apto 12' },
+      { label: 'Número', name: 'customerNumber', type: 'text', placeholder: 'Ex: 42 ou Apto 12' },
       { label: 'Bairro', name: 'customerNeighborhood', type: 'text', placeholder: 'Preenchido automaticamente pelo CEP', readonly: true },
     ];
 
@@ -314,41 +329,17 @@
       inputs[f.name] = input;
     });
 
-    // Preenche automaticamente se cliente estiver logado
-    const savedEmail = localStorage.getItem('gn_profile_email');
-    if (savedEmail) {
-      fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(savedEmail)}&select=nome,email`, {
-        cache: 'no-store',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-      }).then(r => r.json()).then(data => {
-        if (data && data.length) {
-          inputs.customerName.value = data[0].nome || '';
-        }
-      });
-
-      // Busca ultimo endereco usado
-      fetch(`${SUPABASE_URL}/rest/v1/pedidos?cliente_email=eq.${encodeURIComponent(savedEmail)}&select=endereco&order=criado_em.desc&limit=1`, {
-        cache: 'no-store',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-      }).then(r => r.json()).then(data => {
-        if (data && data.length && data[0].endereco) {
-          // Formato: "Rua X, n Y, Bairro Z, CEP 00000000"
-          const end = data[0].endereco;
-          const cepMatch = end.match(/CEP\s*(\d{8})/);
-          const numMatch = end.match(/,\s*n\s*([^,]+),/);
-          const bairroMatch = end.match(/,\s*([^,]+),\s*CEP/);
-          const ruaMatch = end.match(/^Rua\s*([^,]+),/);
-          if (cepMatch) {
-            const cep = cepMatch[1];
-            inputs.customerCep.value = cep.replace(/(\d{5})(\d{3})/, '$1-$2');
-            fetchAddressByCep(cep, (addr) => {
-              inputs.customerStreet.value = addr.logradouro || '';
-              inputs.customerNeighborhood.value = addr.bairro || '';
-            });
-          }
-          if (numMatch) inputs.customerNumber.value = numMatch[1].trim();
-        }
-      });
+    // Preenche automaticamente se cliente logado
+    if (clienteLogado) {
+      if (clienteLogado.nome) inputs.customerName.value = clienteLogado.nome;
+      if (clienteLogado.cep) {
+        inputs.customerCep.value = clienteLogado.cep;
+        fetchAddressByCep(clienteLogado.cep, (viaCep) => {
+          inputs.customerStreet.value = clienteLogado.rua || viaCep.logradouro || '';
+          inputs.customerNeighborhood.value = clienteLogado.bairro || viaCep.bairro || '';
+        });
+      }
+      if (clienteLogado.numero) inputs.customerNumber.value = clienteLogado.numero;
     }
 
     // Campo forma de pagamento
@@ -359,15 +350,15 @@
     paySelect.name = 'customerPayment';
     paySelect.className = 'form-select';
     paySelect.innerHTML = `
-      <option value="">Selecione uma opÃ§Ã£o</option>
+      <option value="">Selecione uma opção</option>
       <option value="PIX">PIX</option>
-      <option value="CartÃ£o de DÃ©bito">CartÃ£o de DÃ©bito</option>
-      <option value="CartÃ£o de CrÃ©dito">CartÃ£o de CrÃ©dito</option>
+      <option value="Cartão de Débito">Cartão de Débito</option>
+      <option value="Cartão de Crédito">Cartão de Crédito</option>
     `;
     const payNote = document.createElement('div');
     payNote.className = 'payment-note';
     payNote.style.display = 'none';
-    payNote.textContent = 'O pagamento serÃ¡ realizado somente no momento da entrega do pedido.';
+    payNote.textContent = 'O pagamento será realizado somente no momento da entrega do pedido.';
     paySelect.addEventListener('change', () => {
       payNote.style.display = paySelect.value ? 'block' : 'none';
     });
@@ -390,7 +381,7 @@
     `;
     form.appendChild(couponWrap);
 
-    // Resumo lateral atualizÃ¡vel
+    // Resumo lateral atualizável
     const right = document.createElement('aside');
     right.className = 'checkout-right';
 
@@ -465,6 +456,14 @@
       const pessoalData = await pessoalRes.json();
 
       if (pessoalData && pessoalData.length) {
+        const donoEmail = pessoalData[0].email;
+        const emailLogado = localStorage.getItem('gn_profile_email');
+        if (!emailLogado || emailLogado.toLowerCase() !== donoEmail.toLowerCase()) {
+          msg.textContent = 'Este cupom pertence a outra conta.';
+          msg.className = 'coupon-msg-error';
+          btn.textContent = 'Aplicar'; btn.disabled = false;
+          return;
+        }
         appliedDiscount = 0.1;
         appliedCoupon = code;
         appliedCouponType = 'pessoal';
@@ -488,7 +487,7 @@
         const atibaia = cepNum >= 12940001 && cepNum <= 12954999;
         const braganca = cepNum >= 12900000 && cepNum <= 12929999;
         if (!atibaia && !braganca) {
-          showMiniToast('Desculpe, entregamos apenas em Atibaia e BraganÃ§a Paulista.');
+          showMiniToast('Desculpe, entregamos apenas em Atibaia e Bragança Paulista.');
           inputs.customerCep.value = '';
           inputs.customerStreet.value = '';
           inputs.customerNeighborhood.value = '';
@@ -502,7 +501,7 @@
     const actions = document.createElement('div');
     actions.className = 'form-actions';
     const backBtn = document.createElement('button');
-    backBtn.type = 'button'; backBtn.className = 'btn-back'; backBtn.textContent = 'â† Voltar';
+    backBtn.type = 'button'; backBtn.className = 'btn-back'; backBtn.textContent = '← Voltar';
     backBtn.addEventListener('click', renderCartPanel);
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit'; submitBtn.className = 'checkout-continue'; submitBtn.textContent = 'Finalizar via WhatsApp';
@@ -543,28 +542,59 @@
         console.log('Cupom removido:', patchRes.status, patchData);
       }
 
-      // Registra o pedido no banco
-      const clienteEmail = localStorage.getItem('gn_profile_email') || 'nao_cadastrado';
-      const itensList = cart.items.map(i => `${i.name} x${i.qty}`).join(', ');
-      const enderecoStr = `Rua ${values.customerStreet}, n ${values.customerNumber}, ${values.customerNeighborhood}, CEP ${sanitizeCep(values.customerCep)}`;
-      await fetch(`${SUPABASE_URL}/rest/v1/pedidos`, {
+      window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+
+      // Registra pedido no banco
+      const emailCliente = localStorage.getItem('gn_profile_email') || '';
+      fetch(`${SUPABASE_URL}/rest/v1/pedidos`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
         body: JSON.stringify({
-          cliente_email: clienteEmail,
+          cliente_email: emailCliente,
           cliente_nome: values.customerName,
-          itens: itensList,
+          itens: cart.items.map(i => `${i.name} x${i.qty}`).join(', '),
           total: finalTotal,
           forma_pagamento: values.customerPayment,
           cupom_usado: appliedCoupon || null,
-          desconto: appliedDiscount > 0 ? parseFloat((total * 0.1).toFixed(2)) : 0,
-          endereco: enderecoStr
+          desconto: appliedDiscount > 0 ? total * 0.1 : 0,
+          endereco: `${values.customerStreet}, ${values.customerNumber} - ${values.customerNeighborhood} - CEP ${sanitizeCep(values.customerCep)}`
         })
       });
 
-      window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+      // Salva endereço no Supabase se logado
+      const loggedEmail = localStorage.getItem('gn_profile_email');
+      if (loggedEmail) {
+        const patchEndRes = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(loggedEmail)}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify({
+            cep: sanitizeCep(values.customerCep),
+            rua: values.customerStreet,
+            numero: values.customerNumber,
+            bairro: values.customerNeighborhood
+          })
+        });
+        console.log('[PATCH endereço] status:', patchEndRes.status, await patchEndRes.text());
+      }
+
       closeCartModal();
       if (!localStorage.getItem('gn_profile_email')) {
+        localStorage.setItem('gn_register_pending', JSON.stringify({ name: values.customerName, cep: values.customerCep }));
+        localStorage.setItem('gn_register_pending_addr', JSON.stringify({
+          cep: sanitizeCep(values.customerCep),
+          rua: values.customerStreet,
+          numero: values.customerNumber,
+          bairro: values.customerNeighborhood
+        }));
         showRegisterPopup(values.customerName, values.customerCep);
       }
     });
@@ -613,7 +643,7 @@
   function saveCustomer(data) {
     const customers = loadCustomers();
     const exists = customers.find(c => c.email === data.email);
-    if (exists) { showMiniToast('E-mail jÃ¡ cadastrado!'); return false; }
+    if (exists) { showMiniToast('E-mail já cadastrado!'); return false; }
     const coupon = 'GN' + Math.random().toString(36).substring(2,7).toUpperCase();
     customers.push({ ...data, coupon, createdAt: new Date().toISOString() });
     localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(customers));
@@ -628,34 +658,33 @@
 
     overlay.innerHTML = `
       <div class="register-modal">
+        <button class="register-close" id="regClose">✕</button>
         <div class="register-top">
-          <img src="logo.jpeg" alt="GN MÃ¡fia" class="register-logo" />
+          <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
           <h2>Pedido enviado!</h2>
-          <p class="register-sub">Quer receber <strong>cupons exclusivos</strong> e ficar por dentro das promoÃ§Ãµes da GN MÃ¡fia?</p>
+          <p class="register-sub">Quer receber <strong>cupons exclusivos</strong> e ficar por dentro das promoções da GN Máfia?</p>
           <div class="register-benefits">
-            <span>10% OFF na prÃ³xima compra</span>
-            <span>PromoÃ§Ãµes antecipadas</span>
-            <span>Novidades em primeira mÃ£o</span>
+            <span>10% OFF na próxima compra</span>
+            <span>Promoções antecipadas</span>
+            <span>Novidades em primeira mão</span>
           </div>
         </div>
         <form class="register-form" id="registerForm">
           <label class="form-field"><span>Nome completo</span><input type="text" name="regName" placeholder="Seu nome" value="${prefillName || ''}" required /></label>
           <label class="form-field"><span>E-mail</span><input type="email" name="regEmail" placeholder="seu@email.com" required /></label>
-          <label class="form-field"><span>WhatsApp (com DDD)</span><input type="tel" name="regPhone" placeholder="11999999999" required /></label>
+          <label class="form-field"><span>WhatsApp (com DDD)</span><input type="tel" name="regPhone" placeholder="11999999999" maxlength="11" required /></label>
           <button type="submit" class="checkout-continue">Criar cadastro e receber cupom</button>
         </form>
-        <button class="register-skip" id="regSkip">Agora nÃ£o</button>
+        <button class="register-skip" id="regSkip">Agora não</button>
       </div>
     `;
 
     document.body.appendChild(overlay);
     overlay.style.display = 'flex';
 
-    const close = () => { overlay.remove(); };
+    const close = () => { overlay.remove(); localStorage.removeItem('gn_register_pending'); localStorage.removeItem('gn_register_pending_addr'); };
+    overlay.querySelector('#regClose').addEventListener('click', close);
     overlay.querySelector('#regSkip').addEventListener('click', close);
-
-
-
 
     overlay.querySelector('#registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -672,7 +701,7 @@
       btn.disabled = true;
       const ok = await saveCustomerSupabase(data);
       if (ok === 'duplicate') {
-        showMiniToast('E-mail jÃ¡ cadastrado!');
+        showMiniToast('E-mail já cadastrado!');
         btn.textContent = 'Criar cadastro e receber cupom';
         btn.disabled = false;
         return;
@@ -685,13 +714,25 @@
       }
       localStorage.setItem('gn_profile_email', data.email);
       localStorage.setItem('gn_register_done', '1');
+      localStorage.removeItem('gn_register_pending');
+      // Salva endereço do pedido junto ao novo cadastro
+      const pendingAddr = localStorage.getItem('gn_register_pending_addr');
+      if (pendingAddr) {
+        const addr = JSON.parse(pendingAddr);
+        fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(data.email)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+          body: JSON.stringify(addr)
+        });
+        localStorage.removeItem('gn_register_pending_addr');
+      }
       overlay.querySelector('.register-modal').innerHTML = `
         <div class="register-success">
-          <img src="logo.jpeg" alt="GN MÃ¡fia" class="register-logo" />
+          <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
           <h2>Cadastro criado!</h2>
           <p>Seu cupom exclusivo:</p>
           <div class="register-coupon">${coupon}</div>
-          <p class="register-coupon-note">Use na sua prÃ³xima compra e ganhe 10% OFF.</p>
+          <p class="register-coupon-note">Use na sua próxima compra e ganhe 10% OFF.</p>
           <button class="checkout-continue" onclick="this.closest('.register-overlay').remove()">Fechar</button>
         </div>
       `;
@@ -728,9 +769,9 @@
     if (!cliente) {
       // Tela de login por email
       modal.innerHTML = `
-        <button class="register-close id=profileClose style=position:absolute;top:14px;right:16px>X</button>
+        <button class="register-close" id="profileClose">✕</button>
         <div style="text-align:center">
-          <img src="logo.jpeg" class="register-logo" alt="GN MÃ¡fia" />
+          <img src="logo.jpeg" class="register-logo" alt="GN Máfia" />
           <h2 style="color:var(--gold-light);margin-bottom:8px">Minha Conta</h2>
           <p style="color:var(--muted);font-size:0.88rem;margin-bottom:24px">Informe seu e-mail para acessar seu perfil</p>
         </div>
@@ -738,7 +779,7 @@
           <label class="form-field"><span>E-mail</span><input type="email" name="loginEmail" placeholder="seu@email.com" required /></label>
           <button type="submit" class="checkout-continue">Acessar perfil</button>
         </form>
-        <p style="text-align:center;margin-top:12px;font-size:0.78rem;color:var(--muted)">Ainda nÃ£o tem cadastro? Finalize uma compra para criar.</p>
+        <p style="text-align:center;margin-top:12px;font-size:0.78rem;color:var(--muted)">Ainda não tem cadastro? Finalize uma compra para criar.</p>
       `;
       modal.querySelector('#profileClose').addEventListener('click', () => overlay.remove());
       modal.querySelector('#profileLoginForm').addEventListener('submit', async (e) => {
@@ -754,7 +795,7 @@
         const data = await res.json();
         console.log('Profile login response:', res.status, data);
         if (!data || !data.length) {
-          showMiniToast('E-mail nÃ£o encontrado.');
+          showMiniToast('E-mail não encontrado.');
           btn.textContent = 'Acessar perfil';
           btn.disabled = false;
           return;
@@ -766,10 +807,10 @@
     } else {
       const firstName = cliente.nome.split(' ')[0];
       modal.innerHTML = `
- <button class=register-close id=profileClose style=position:absolute;top:14px;right:16px>X</button>
+        <button class="register-close" id="profileClose">✕</button>
         <div class="profile-header">
-          <img src="logo.jpeg" class="register-logo" alt="GN MÃ¡fia" />
-          <h2>OlÃ¡, <span style="color:var(--gold-light)">${firstName}</span>!</h2>
+          <img src="logo.jpeg" class="register-logo" alt="GN Máfia" />
+          <h2>Olá, <span style="color:var(--gold-light)">${firstName}</span>!</h2>
           <p style="color:var(--muted);font-size:0.82rem">${cliente.email}</p>
         </div>
         <div class="profile-section">
@@ -777,10 +818,10 @@
           ${ cliente.cupom
             ? `<div class="profile-coupon">
                 <div class="register-coupon">${cliente.cupom}</div>
-                <p class="register-coupon-note">10% OFF na prÃ³xima compra â€” uso Ãºnico</p>
+                <p class="register-coupon-note">10% OFF na próxima compra — uso único</p>
                 <button class="coupon-copy" onclick="navigator.clipboard.writeText('${cliente.cupom}');this.textContent='Copiado!';setTimeout(()=>this.textContent='Copiar cupom',2000)">Copiar cupom</button>
               </div>`
-            : `<p style="color:var(--muted);font-size:0.85rem">Nenhum cupom disponÃ­vel.<br><span style="font-size:0.78rem">O cupom Ã© removido apÃ³s o uso.</span></p>`
+            : `<p style="color:var(--muted);font-size:0.85rem">Nenhum cupom disponível.<br><span style="font-size:0.78rem">O cupom é removido após o uso.</span></p>`
           }
         </div>
         <button class="register-skip" id="profileLogout">Sair da conta</button>
@@ -809,25 +850,27 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     updateHeader(loadCart());
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.add-to-cart');
-      if (!btn) return;
-      e.preventDefault();
-      const card = btn.closest('.product-card');
-      if (!card) return;
-      const imgEl = card.querySelector('.main-img, img');
-      const rawSrc = card.getAttribute('data-image') || (imgEl ? imgEl.getAttribute('src') : '');
-      const base = window.location.href.replace(/\/[^\/]*$/, '/');
-      const absoluteImage = rawSrc
-        ? (rawSrc.startsWith('http') || rawSrc.startsWith('data:') || rawSrc.startsWith('blob:') ? rawSrc : base + rawSrc)
-        : '';
-      const product = {
-        id: card.getAttribute('data-name'),
-        name: card.getAttribute('data-name'),
-        price: Number(card.getAttribute('data-price')) || 0,
-        image: absoluteImage
-      };
-      addToCart(product);
+
+    const pending = localStorage.getItem('gn_register_pending');
+    if (pending && !localStorage.getItem('gn_profile_email')) {
+      const { name, cep } = JSON.parse(pending);
+      showRegisterPopup(name, cep);
+    }
+    $all('.add-to-cart').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const card = e.target.closest('.product-card');
+        const imgEl = card.querySelector('.main-img, img');
+        const rawSrc = card.getAttribute('data-image') || (imgEl ? imgEl.getAttribute('src') : '');
+        const base = window.location.href.replace(/\/[^\/]*$/, '/');
+        const absoluteImage = rawSrc ? (rawSrc.startsWith('http') ? rawSrc : base + rawSrc) : '';
+        const product = {
+          id: card.getAttribute('data-name'),
+          name: card.getAttribute('data-name'),
+          price: Number(card.getAttribute('data-price')),
+          image: absoluteImage
+        };
+        addToCart(product);
+      });
     });
 
     const cartBtn = document.getElementById('cartBtn');
