@@ -483,21 +483,41 @@
       btn.textContent = 'Aplicar'; btn.disabled = false;
     });
 
-    inputs.customerCep.addEventListener('blur', () => {
-      fetchAddressByCep(inputs.customerCep.value, (data) => {
-        const cepNum = parseInt(sanitizeCep(inputs.customerCep.value));
-        const atibaia = cepNum >= 12940001 && cepNum <= 12954999;
-        const braganca = cepNum >= 12900000 && cepNum <= 12959999;
-        if (!atibaia && !braganca) {
-          showMiniToast('Desculpe, entregamos apenas em Atibaia e Bragança Paulista.');
-          inputs.customerCep.value = '';
+    inputs.customerCep.addEventListener('blur', async () => {
+      const cepVal = sanitizeCep(inputs.customerCep.value);
+      if (cepVal.length !== 8) return;
+      const cepNum = parseInt(cepVal);
+      const atibaia = cepNum >= 12940001 && cepNum <= 12954999;
+      const braganca = cepNum >= 12900000 && cepNum <= 12959999;
+      if (!atibaia && !braganca) {
+        showMiniToast('Desculpe, entregamos apenas em Atibaia e Bragan\u00e7a Paulista.');
+        inputs.customerCep.value = '';
+        inputs.customerStreet.value = '';
+        inputs.customerNeighborhood.value = '';
+        return;
+      }
+      try {
+        const res = await fetch('https://viacep.com.br/ws/' + cepVal + '/json/');
+        const data = await res.json();
+        if (data.erro) {
+          inputs.customerStreet.readOnly = false;
+          inputs.customerNeighborhood.readOnly = false;
+          inputs.customerStreet.placeholder = 'Digite sua rua';
+          inputs.customerNeighborhood.placeholder = 'Digite seu bairro';
           inputs.customerStreet.value = '';
           inputs.customerNeighborhood.value = '';
-          return;
+          inputs.customerStreet.focus();
+          showMiniToast('CEP n\u00e3o encontrado na base. Preencha o endere\u00e7o manualmente.');
+        } else {
+          inputs.customerStreet.readOnly = true;
+          inputs.customerNeighborhood.readOnly = true;
+          inputs.customerStreet.value = data.logradouro || '';
+          inputs.customerNeighborhood.value = data.bairro || '';
         }
-        inputs.customerStreet.value = data.logradouro || '';
-        inputs.customerNeighborhood.value = data.bairro || '';
-      });
+      } catch {
+        inputs.customerStreet.readOnly = false;
+        inputs.customerNeighborhood.readOnly = false;
+      }
     });
 
     const actions = document.createElement('div');
