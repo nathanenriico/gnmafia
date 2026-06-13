@@ -2466,7 +2466,7 @@ body {
   .footer-logo { height: 52px; }
 
   /* Esconde colunas de links no footer mobile, mant�m s� brand */
-  .footer-col { display: none; }
+
 
   /* -- SORTEIOS -- */
   .sorteios-grid { grid-template-columns: 1fr; }
@@ -3016,7 +3016,7 @@ body {
   .review-cards { grid-template-columns: 1fr; }
   .testimonials { padding: 24px 14px; }
   .footer { grid-template-columns: 1fr; padding: 24px 14px 16px; gap: 16px; }
-  .footer-col { display: none; }
+
   .footer-logo { height: 50px; }
   .lightbox-arrow { width: 34px; height: 34px; font-size: 1rem; }
   .lightbox-arrow.prev { left: 6px; }
@@ -3026,3 +3026,21 @@ body {
   .kit-add-btn { max-width: 100%; }
 }
 
+
+
+/* -- FOOTER MOBILE: exibe categorias, atendimento e pagamento -- */
+@media (max-width: 600px) {
+  .footer { grid-template-columns: 1fr 1fr; padding: 28px 16px 20px; gap: 24px; }
+  .footer-brand { grid-column: 1 / -1; }
+  .footer-col { display: block; }
+  .footer-col h4 { font-size: 0.75rem; margin-bottom: 10px; }
+  .footer-col a { font-size: 0.8rem; margin-bottom: 6px; }
+  .pay-badge { font-size: 0.65rem; padding: 3px 7px; }
+  .sec-badge { font-size: 0.72rem; }
+}
+
+@media (max-width: 480px) {
+  .footer { grid-template-columns: 1fr 1fr; padding: 24px 14px 16px; gap: 20px; }
+  .footer-brand { grid-column: 1 / -1; }
+  .footer-col { display: block; }
+}
