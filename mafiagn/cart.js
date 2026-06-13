@@ -30,7 +30,7 @@
     if (tot) tot.textContent = formatBRL(total);
   }
 
-  const STORE_PHONE = '5511942977855'; // substitua pelo número real do WhatsApp da loja (com DDI)
+  const STORE_PHONE = '5511947036093'; // substitua pelo número real do WhatsApp da loja (com DDI)
 
   function addToCart(product) {
     const cart = loadCart();
@@ -588,13 +588,13 @@
 
       // Registra pedido no banco
       const emailCliente = localStorage.getItem('gn_profile_email') || '';
-      fetch(`${SUPABASE_URL}/rest/v1/pedidos`, {
+      const pedidoRes = await fetch(`${SUPABASE_URL}/rest/v1/pedidos`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'apikey': SUPABASE_KEY,
           'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'return=minimal'
+          'Prefer': 'return=representation'
         },
         body: JSON.stringify({
           cliente_email: emailCliente,
@@ -607,6 +607,8 @@
           endereco: `${values.customerStreet}, ${values.customerNumber} - ${values.customerNeighborhood} - CEP ${sanitizeCep(values.customerCep)}`
         })
       });
+      const pedidoData = await pedidoRes.json().catch(() => null);
+      const pedidoId = pedidoData && pedidoData[0] && pedidoData[0].id;
 
       // Salva endereço no Supabase se logado
       const loggedEmail = localStorage.getItem('gn_profile_email');
@@ -637,7 +639,7 @@
           numero: values.customerNumber,
           bairro: values.customerNeighborhood
         }));
-        showRegisterPopup(values.customerName, values.customerCep);
+        showRegisterPopup(values.customerName, values.customerCep, pedidoId);
       }
     });
 
@@ -692,7 +694,7 @@
     return coupon;
   }
 
-  function showRegisterPopup(prefillName, prefillCep) {
+  function showRegisterPopup(prefillName, prefillCep, pedidoId) {
     if (localStorage.getItem('gn_profile_email')) return;
 
     const overlay = document.createElement('div');
@@ -757,6 +759,14 @@
       localStorage.setItem('gn_profile_email', data.email);
       localStorage.setItem('gn_register_done', '1');
       localStorage.removeItem('gn_register_pending');
+      // Atualiza email no pedido recém-criado
+      if (pedidoId) {
+        fetch(`${SUPABASE_URL}/rest/v1/pedidos?id=eq.${pedidoId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+          body: JSON.stringify({ cliente_email: data.email })
+        });
+      }
       // Salva endereço do pedido junto ao novo cadastro
       const pendingAddr = localStorage.getItem('gn_register_pending_addr');
       if (pendingAddr) {
