@@ -45,6 +45,8 @@
     showMiniToast(`${product.name} adicionado ao carrinho`);
   }
 
+  window.gnAddToCart = addToCart;
+
   function showMiniToast(text) {
     const t = document.createElement('div');
     t.textContent = text;
@@ -543,6 +545,10 @@
       }
 
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+
+      // Limpa o carrinho
+      saveCart({ items: [] });
+      updateHeader({ items: [] });
 
       // Registra pedido no banco
       const emailCliente = localStorage.getItem('gn_profile_email') || '';
