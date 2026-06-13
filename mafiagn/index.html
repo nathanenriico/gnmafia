@@ -759,6 +759,8 @@
         card.setAttribute('data-name', photo.title || 'Coleção GN Máfia');
         card.setAttribute('data-price', String(price));
         card.setAttribute('data-image', photo.src || '');
+        card.setAttribute('data-category', photo.category || 'bobojaco');
+        card.setAttribute('data-sizes', 'P,M,G,GG');
         card.innerHTML = `
           <div class="product-img-wrap">
             <img src="${photo.src}" alt="${photo.alt || photo.title}" class="product-img main-img" />

@@ -115,8 +115,18 @@
     .admin-panel.active { display: block; }
 
     .photo-form-grid {
-      display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 14px; align-items: end;
+      display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr auto; gap: 14px; align-items: end;
     }
+    .photo-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0 8px;
+      border-bottom: 1px solid var(--border);
+      margin-top: 24px;
+    }
+    .photo-section-header:first-of-type { margin-top: 0; }
+    .photo-section-title { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-light); }
+    .photo-section-count { font-size: 0.75rem; color: var(--muted); }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px; margin-bottom: 8px; }
     .photo-card {
       background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
     }
@@ -281,6 +291,18 @@
             <div class="form-group">
               <label>Legenda / ALT</label>
               <input type="text" id="photoAlt" placeholder="Descrição da imagem" />
+            </div>
+            <div class="form-group">
+              <label>Categoria</label>
+              <select id="photoCategory" style="padding:11px 14px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;">
+                <option value="bobojaco">Bobojacos</option>
+                <option value="moletom">Moletons</option>
+                <option value="conjunto">Conjuntos</option>
+                <option value="camisa">Camisas</option>
+                <option value="bermuda">Bermudas</option>
+                <option value="acessorio">Acessórios</option>
+                <option value="atacado">Atacado</option>
+              </select>
             </div>
             <div class="form-group">
               <label>Preço (R$)</label>
@@ -511,25 +533,44 @@
       renderPhotos(photos);
     }
 
+    const CATEGORY_LABELS = { bobojaco:'Bobojacos', moletom:'Moletons', conjunto:'Conjuntos', camisa:'Camisas', bermuda:'Bermudas', acessorio:'Acessórios', atacado:'Atacado' };
+    const CATEGORY_ORDER  = ['bobojaco','moletom','conjunto','camisa','bermuda','acessorio','atacado'];
+
     function renderPhotos(photos) {
       const grid = document.getElementById('photoGrid');
       if (!photos.length) {
         grid.innerHTML = '<div class="empty-row" style="grid-column:1/-1;">Nenhuma foto cadastrada.</div>';
         return;
       }
-      grid.innerHTML = photos.map((photo, index) => `
-        <article class="photo-card">
-          <img src="${photo.src}" alt="${photo.alt || photo.title}" />
-          <div class="photo-card-body">
-            <div class="photo-card-title">${photo.title || 'Foto ' + (index + 1)}</div>
-            <div class="photo-card-meta">${photo.alt || 'Sem legenda'}</div>
-            <div class="photo-card-meta">Preço: R$ ${Number(photo.price || 0).toFixed(2).replace('.', ',')}</div>
-            <div class="photo-actions">
-              <button class="btn-photo edit" onclick="editPhoto('${photo.id}')">Editar</button>
-              <button class="btn-photo delete" onclick="deletePhoto('${photo.id}')">Excluir</button>
-            </div>
-          </div>
-        </article>
+      // Agrupa por categoria
+      const byCategory = {};
+      photos.forEach(p => {
+        const cat = p.category || 'bobojaco';
+        if (!byCategory[cat]) byCategory[cat] = [];
+        byCategory[cat].push(p);
+      });
+      const cats = CATEGORY_ORDER.filter(c => byCategory[c]);
+      grid.innerHTML = cats.map(cat => `
+        <div class="photo-section-header">
+          <span class="photo-section-title">${CATEGORY_LABELS[cat] || cat}</span>
+          <span class="photo-section-count">${byCategory[cat].length} foto(s)</span>
+        </div>
+        <div class="photo-grid">
+          ${byCategory[cat].map((photo, i) => `
+            <article class="photo-card">
+              <img src="${photo.src}" alt="${photo.alt || photo.title}" />
+              <div class="photo-card-body">
+                <div class="photo-card-title">${photo.title || 'Foto ' + (i+1)}</div>
+                <div class="photo-card-meta">${photo.alt || 'Sem legenda'}</div>
+                <div class="photo-card-meta">R$ ${Number(photo.price||0).toFixed(2).replace('.',',')}</div>
+                <div class="photo-actions">
+                  <button class="btn-photo edit" onclick="editPhoto('${photo.id}')">Editar</button>
+                  <button class="btn-photo delete" onclick="deletePhoto('${photo.id}')">Excluir</button>
+                </div>
+              </div>
+            </article>
+          `).join('')}
+        </div>
       `).join('');
     }
 
@@ -540,9 +581,11 @@
       document.getElementById('photoTitle').value = photo.title || '';
       document.getElementById('photoAlt').value = photo.alt || '';
       document.getElementById('photoPrice').value = photo.price || '';
+      document.getElementById('photoCategory').value = photo.category || 'bobojaco';
       photoEditingId = id;
       document.getElementById('savePhotoBtn').textContent = 'Salvar edição';
       document.querySelector('.admin-tab-btn[data-tab="photos"]').click();
+      document.getElementById('photoTitle').scrollIntoView({ behavior: 'smooth' });
     }
 
     function deletePhoto(id) {
@@ -572,16 +615,14 @@
 
       if (!title) { toast('Informe um título para a foto.'); return; }
 
+      const category = document.getElementById('photoCategory').value;
       if (photoEditingId) {
         const existing = photos.find(item => item.id === photoEditingId);
         const nextSrc = file ? await readFileAsDataUrl(file) : existing?.src || '';
         const next = photos.map(item => item.id === photoEditingId ? {
-          ...item,
-          title,
-          alt,
+          ...item, title, alt, category,
           price: Number.isFinite(price) ? price : (item.price || 0),
-          src: nextSrc,
-          updatedAt: new Date().toISOString()
+          src: nextSrc, updatedAt: new Date().toISOString()
         } : item);
         localStorage.setItem(PHOTO_KEY, JSON.stringify(next));
         toast('Foto editada com sucesso.');
@@ -590,7 +631,7 @@
       } else {
         if (!file) { toast('Selecione uma imagem para adicionar.'); return; }
         const src = await readFileAsDataUrl(file);
-        photos.unshift({ id: 'photo-' + Date.now(), title, alt, price: Number.isFinite(price) ? price : 0, src, createdAt: new Date().toISOString() });
+        photos.unshift({ id: 'photo-' + Date.now(), title, alt, category, price: Number.isFinite(price) ? price : 0, src, createdAt: new Date().toISOString() });
         localStorage.setItem(PHOTO_KEY, JSON.stringify(photos));
         toast('Foto adicionada com sucesso.');
       }
