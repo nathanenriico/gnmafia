@@ -1451,6 +1451,7 @@ body {
   .main-header { padding: 10px 16px; gap: 8px; }
   .brand-logo { height: 52px; }
   .actions { gap: 6px; }
+  .icon-btn { width: 42px; height: 42px; font-size: 1.1rem; border-radius: 10px; }
   .icon-btn { width: 34px; height: 34px; font-size: 0.9rem; }
 
   .hero { min-height: 420px; }
@@ -2270,6 +2271,7 @@ body {
   }
 
   .actions { gap: 6px; }
+  .icon-btn { width: 42px; height: 42px; font-size: 1.1rem; border-radius: 10px; }
 
   .cart-icon-btn {
     width: 42px;
@@ -2941,6 +2943,9 @@ body {
     content: 'COMPRAR';
   }
 }
+
+
+
 
 
 
