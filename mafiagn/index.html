@@ -659,9 +659,14 @@
         atacado:  'img-bobojaco-quicksilver/img7.jpeg',
         acessorio:'img-bobojaco/img5.jpeg'
       };
+      const NAV_KEY = 'gn_nav_state';
 
       let currentCards = [];
       let activeSize   = null;
+
+      function saveNav(cat, size) {
+        localStorage.setItem(NAV_KEY, JSON.stringify({ cat, size: size || null }));
+      }
 
       function renderCards(sizeFilter) {
         grid.innerHTML = '';
@@ -678,19 +683,21 @@
         });
       }
 
-      function buildSizeFilter(sizes) {
+      function buildSizeFilter(sizes, restoreSize) {
         sizeFilter.innerHTML = '';
         if (!sizes.length) return;
         const wrap = document.createElement('div');
         wrap.className = 'size-filter-inner';
         ['TODOS', ...sizes].forEach(s => {
           const btn = document.createElement('button');
-          btn.className = 'size-btn' + (s === 'TODOS' ? ' size-btn-active' : '');
+          const isActive = restoreSize ? s === restoreSize : s === 'TODOS';
+          btn.className = 'size-btn' + (isActive ? ' size-btn-active' : '');
           btn.textContent = s;
           btn.addEventListener('click', () => {
             wrap.querySelectorAll('.size-btn').forEach(b => b.classList.remove('size-btn-active'));
             btn.classList.add('size-btn-active');
             activeSize = s === 'TODOS' ? null : s;
+            saveNav(title.textContent, activeSize);
             renderCards(activeSize);
           });
           wrap.appendChild(btn);
@@ -698,44 +705,58 @@
         sizeFilter.appendChild(wrap);
       }
 
-      document.querySelectorAll('.category-banner').forEach(banner => {
-        banner.addEventListener('click', () => {
-          const cat      = banner.dataset.category;
-          const catLabel = labels[cat] || cat.toUpperCase();
-          title.textContent = catLabel;
-          activeSize = null;
+      function openCategory(cat, restoreSize) {
+        const catLabel = labels[cat] || cat.toUpperCase();
+        title.textContent = catLabel;
+        activeSize = restoreSize || null;
 
-          const existingBanner = document.getElementById('catModalBanner');
-          if (existingBanner) existingBanner.remove();
-          const bannerEl = document.createElement('div');
-          bannerEl.id = 'catModalBanner';
-          bannerEl.className = 'cat-modal-banner';
-          bannerEl.innerHTML = `
-            <div class="cat-modal-banner-text">
-              <span class="cat-modal-banner-sub">COLEÇÃO</span>
-              <strong class="cat-modal-banner-title">${catLabel}</strong>
-              <span class="cat-modal-banner-tags">ESTILO &middot; QUALIDADE &middot; CONFORTO</span>
-            </div>
-            <img src="${bannerImgs[cat] || ''}" alt="${catLabel}" class="cat-modal-banner-img" />
-          `;
-          sizeFilter.before(bannerEl);
+        const existingBanner = document.getElementById('catModalBanner');
+        if (existingBanner) existingBanner.remove();
+        const bannerEl = document.createElement('div');
+        bannerEl.id = 'catModalBanner';
+        bannerEl.className = 'cat-modal-banner';
+        bannerEl.innerHTML = `
+          <div class="cat-modal-banner-text">
+            <span class="cat-modal-banner-sub">COLEÇÃO</span>
+            <strong class="cat-modal-banner-title">${catLabel}</strong>
+            <span class="cat-modal-banner-tags">ESTILO &middot; QUALIDADE &middot; CONFORTO</span>
+          </div>
+          <img src="${bannerImgs[cat] || ''}" alt="${catLabel}" class="cat-modal-banner-img" />
+        `;
+        sizeFilter.before(bannerEl);
 
-          currentCards = [];
-          const allSizes = new Set();
-          document.querySelectorAll(`#produtos .product-card[data-category="${cat}"]`).forEach(card => {
-            const sizes = (card.getAttribute('data-sizes') || '').split(',').map(s => s.trim()).filter(Boolean);
-            sizes.forEach(s => allSizes.add(s));
-            currentCards.push({ card, sizes });
-          });
-
-          buildSizeFilter([...allSizes]);
-          renderCards(null);
-          overlay.classList.add('open');
+        currentCards = [];
+        const allSizes = new Set();
+        document.querySelectorAll(`#produtos .product-card[data-category="${cat}"]`).forEach(card => {
+          const sizes = (card.getAttribute('data-sizes') || '').split(',').map(s => s.trim()).filter(Boolean);
+          sizes.forEach(s => allSizes.add(s));
+          currentCards.push({ card, sizes });
         });
+
+        buildSizeFilter([...allSizes], restoreSize);
+        renderCards(restoreSize);
+        overlay.classList.add('open');
+        saveNav(cat, restoreSize);
+      }
+
+      document.querySelectorAll('.category-banner').forEach(banner => {
+        banner.addEventListener('click', () => openCategory(banner.dataset.category, null));
       });
 
-      document.getElementById('categoryClose').addEventListener('click', () => overlay.classList.remove('open'));
-      overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+      function closeCategory() {
+        overlay.classList.remove('open');
+        localStorage.removeItem(NAV_KEY);
+      }
+
+      document.getElementById('categoryClose').addEventListener('click', closeCategory);
+      overlay.addEventListener('click', e => { if (e.target === overlay) closeCategory(); });
+
+      // Restaura estado ao carregar
+      const saved = JSON.parse(localStorage.getItem(NAV_KEY) || 'null');
+      if (saved && saved.cat) {
+        // Aguarda produtos do admin serem renderizados
+        requestAnimationFrame(() => openCategory(saved.cat, saved.size));
+      }
     })();
 
     // Mobile nav toggle

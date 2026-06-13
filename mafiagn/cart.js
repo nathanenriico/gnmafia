@@ -546,7 +546,21 @@
 
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
 
-      // Limpa o carrinho
+      // Tela de confirmação antes de limpar o carrinho
+      const confirmOverlay = document.createElement('div');
+      confirmOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px';
+      confirmOverlay.innerHTML = `
+        <div style="background:#111010;border:1px solid rgba(213,166,81,0.35);border-radius:20px;padding:40px 32px;max-width:400px;width:100%;text-align:center">
+          <div style="font-size:2.5rem;margin-bottom:16px">✅</div>
+          <h2 style="font-family:'Cinzel',serif;color:#d5a651;margin-bottom:10px">Pedido enviado!</h2>
+          <p style="color:#a69e94;font-size:0.9rem;margin-bottom:8px">Seu pedido foi enviado pelo WhatsApp com sucesso.</p>
+          <p style="color:#a69e94;font-size:0.85rem;margin-bottom:28px">O carrinho foi esvaziado e está pronto para uma nova compra.</p>
+          <button onclick="this.closest('div[style]').remove()" style="width:100%;padding:13px;background:linear-gradient(135deg,#c9922a,#d5a651);border:none;border-radius:10px;color:#050404;font-weight:700;font-size:0.95rem;cursor:pointer">Fechar</button>
+        </div>
+      `;
+      document.body.appendChild(confirmOverlay);
+
+      // Limpa o carrinho após confirmação
       saveCart({ items: [] });
       updateHeader({ items: [] });
 
