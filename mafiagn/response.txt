@@ -1,0 +1,1 @@
+[{"id":"50f345e1-1447-46bd-b020-27297ef51cb7","cliente_email":"nathan3@gmail.com","cliente_nome":"nathan 3","itens":"MOLETOM ONBONGO x1, BOBOJACO QUICKSILVER VERMELHO x1","total":379.80,"forma_pagamento":"PIX","cupom_usado":null,"desconto":0.00,"endereco":"Alameda das Aroeiras, 12 - Residencial Vem Viver - CEP 12929162","criado_em":"2026-06-09T01:57:33.992415+00:00"}]

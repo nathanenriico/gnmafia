@@ -653,6 +653,13 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InloZ2d6aHlhYnVxanV4dGV0anBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NTc4MzIsImV4cCI6MjA5NjMzMzgzMn0.jvF7q0tkjFOzYp1JOBG_2e2RbpZZ2euSKc1r4VHUnJs';
 
   async function saveCustomerSupabase(data) {
+    // Verifica se email ja existe antes de inserir
+    const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(data.email)}&select=email`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    const existing = await checkRes.json();
+    if (existing && existing.length) return 'duplicate';
+
     const res = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes`, {
       method: 'POST',
       headers: {
@@ -694,101 +701,104 @@
     return coupon;
   }
 
-  function showRegisterPopup(prefillName, prefillCep, pedidoId) {
-    if (localStorage.getItem('gn_profile_email')) return;
-
-    const overlay = document.createElement('div');
-    overlay.className = 'register-overlay';
-
-    overlay.innerHTML = `
-      <div class="register-modal">
-        <button class="register-close" id="regClose">✕</button>
-        <div class="register-top">
-          <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
-          <h2>Pedido enviado!</h2>
-          <p class="register-sub">Quer receber <strong>cupons exclusivos</strong> e ficar por dentro das promoções da GN Máfia?</p>
-          <div class="register-benefits">
-            <span>10% OFF na próxima compra</span>
-            <span>Promoções antecipadas</span>
-            <span>Novidades em primeira mão</span>
-          </div>
+  function showRegisterForm(overlay, modal, title, subtitle, onSuccess) {
+    modal.innerHTML = `
+      <button class="register-close" id="regClose">✕</button>
+      <div class="register-top">
+        <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
+        <h2>${title}</h2>
+        <p class="register-sub">${subtitle}</p>
+        <div class="register-benefits">
+          <span>10% OFF na próxima compra</span>
+          <span>Promoções antecipadas</span>
+          <span>Novidades em primeira mão</span>
         </div>
-        <form class="register-form" id="registerForm">
-          <label class="form-field"><span>Nome completo</span><input type="text" name="regName" placeholder="Seu nome" value="${prefillName || ''}" required /></label>
-          <label class="form-field"><span>E-mail</span><input type="email" name="regEmail" placeholder="seu@email.com" required /></label>
-          <label class="form-field"><span>WhatsApp (com DDD)</span><input type="tel" name="regPhone" placeholder="11999999999" maxlength="11" required /></label>
-          <button type="submit" class="checkout-continue">Criar cadastro e receber cupom</button>
-        </form>
-        <button class="register-skip" id="regSkip">Agora não</button>
       </div>
+      <form class="register-form" id="registerForm">
+        <label class="form-field"><span>Nome completo</span><input type="text" name="regName" placeholder="Seu nome" required /></label>
+        <label class="form-field"><span>E-mail</span><input type="email" name="regEmail" placeholder="seu@email.com" required /></label>
+        <label class="form-field"><span>WhatsApp (com DDD)</span><input type="tel" name="regPhone" placeholder="11999999999" maxlength="11" required /></label>
+        <button type="submit" class="checkout-continue">Criar cadastro e receber cupom</button>
+      </form>
+      <button class="register-skip" id="regSkip">Agora não</button>
     `;
-
-    document.body.appendChild(overlay);
-    overlay.style.display = 'flex';
-
-    const close = () => { overlay.remove(); localStorage.removeItem('gn_register_pending'); localStorage.removeItem('gn_register_pending_addr'); };
-    overlay.querySelector('#regClose').addEventListener('click', close);
-    overlay.querySelector('#regSkip').addEventListener('click', close);
-
-    overlay.querySelector('#registerForm').addEventListener('submit', async (e) => {
+    modal.querySelector('#regClose').addEventListener('click', () => overlay.remove());
+    modal.querySelector('#regSkip').addEventListener('click', () => overlay.remove());
+    modal.querySelector('#registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
       const coupon = 'GN' + Math.random().toString(36).substring(2,7).toUpperCase();
-      const data = {
-        name: fd.get('regName'),
-        email: fd.get('regEmail'),
-        phone: fd.get('regPhone'),
-        coupon
-      };
+      const data = { name: fd.get('regName'), email: fd.get('regEmail'), phone: fd.get('regPhone'), coupon };
       const btn = e.target.querySelector('button[type="submit"]');
-      btn.textContent = 'Salvando...';
-      btn.disabled = true;
+      btn.textContent = 'Salvando...'; btn.disabled = true;
       const ok = await saveCustomerSupabase(data);
       if (ok === 'duplicate') {
-        showMiniToast('E-mail já cadastrado!');
-        btn.textContent = 'Criar cadastro e receber cupom';
-        btn.disabled = false;
+        // Loga automaticamente na conta existente
+        localStorage.setItem('gn_profile_email', data.email);
+        showMiniToast('Conta ja existente! Logado automaticamente.');
+        btn.textContent = 'Criar cadastro e receber cupom'; btn.disabled = false;
+        modal.innerHTML = `
+          <div class="register-success">
+            <img src="logo.jpeg" alt="GN Mafia" class="register-logo" />
+            <h2 style="color:var(--gold-light)">Conta encontrada!</h2>
+            <p style="color:var(--muted);font-size:0.9rem">Você já possui cadastro na GN Máfia.<br>Seu login foi realizado automaticamente.</p>
+            <button class="checkout-continue" id="regSuccessClose" style="margin-top:8px">Fechar</button>
+          </div>
+        `;
+        modal.querySelector('#regSuccessClose').addEventListener('click', () => overlay.remove());
         return;
       }
-      if (ok === 'error') {
-        showMiniToast('Erro ao salvar. Tente novamente.');
-        btn.textContent = 'Criar cadastro e receber cupom';
-        btn.disabled = false;
-        return;
-      }
+      if (ok === 'error') { showMiniToast('Erro ao salvar. Tente novamente.'); btn.textContent = 'Criar cadastro e receber cupom'; btn.disabled = false; return; }
       localStorage.setItem('gn_profile_email', data.email);
       localStorage.setItem('gn_register_done', '1');
       localStorage.removeItem('gn_register_pending');
-      // Atualiza email no pedido recém-criado
-      if (pedidoId) {
-        fetch(`${SUPABASE_URL}/rest/v1/pedidos?id=eq.${pedidoId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
-          body: JSON.stringify({ cliente_email: data.email })
-        });
-      }
-      // Salva endereço do pedido junto ao novo cadastro
-      const pendingAddr = localStorage.getItem('gn_register_pending_addr');
-      if (pendingAddr) {
-        const addr = JSON.parse(pendingAddr);
-        fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(data.email)}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
-          body: JSON.stringify(addr)
-        });
-        localStorage.removeItem('gn_register_pending_addr');
-      }
-      overlay.querySelector('.register-modal').innerHTML = `
+      localStorage.removeItem('gn_register_pending_addr');
+      if (onSuccess) onSuccess(data, coupon);
+      modal.innerHTML = `
         <div class="register-success">
           <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
           <h2>Cadastro criado!</h2>
           <p>Seu cupom exclusivo:</p>
           <div class="register-coupon">${coupon}</div>
           <p class="register-coupon-note">Use na sua próxima compra e ganhe 10% OFF.</p>
-          <button class="checkout-continue" onclick="this.closest('.register-overlay').remove()">Fechar</button>
+          <button class="checkout-continue" id="regSuccessClose">Fechar</button>
         </div>
       `;
+      modal.querySelector('#regSuccessClose').addEventListener('click', () => overlay.remove());
     });
+  }
+
+  function showRegisterPopup(prefillName, prefillCep, pedidoId) {
+    if (localStorage.getItem('gn_profile_email')) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'register-overlay';
+    const modal = document.createElement('div');
+    modal.className = 'register-modal';
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    overlay.style.display = 'flex';
+    showRegisterForm(overlay, modal, 'Pedido enviado!',
+      'Quer receber <strong>cupons exclusivos</strong> e ficar por dentro das promoções da GN Máfia?',
+      async (data, coupon) => {
+        if (pedidoId) {
+          fetch(`${SUPABASE_URL}/rest/v1/pedidos?id=eq.${pedidoId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+            body: JSON.stringify({ cliente_email: data.email })
+          });
+        }
+        const pendingAddr = localStorage.getItem('gn_register_pending_addr');
+        if (pendingAddr) {
+          fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(data.email)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+            body: JSON.stringify(JSON.parse(pendingAddr))
+          });
+          localStorage.removeItem('gn_register_pending_addr');
+        }
+      }
+    );
+    if (prefillName) modal.querySelector('[name="regName"]') && (modal.querySelector('[name="regName"]').value = prefillName);
   }
 
   async function showProfilePanel() {
@@ -832,8 +842,15 @@
           <button type="submit" class="checkout-continue">Acessar perfil</button>
         </form>
         <p style="text-align:center;margin-top:12px;font-size:0.78rem;color:var(--muted)">Ainda não tem cadastro? Finalize uma compra para criar.</p>
+        <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
+          <button class="checkout-continue" id="profileRegisterBtn" style="font-size:0.85rem">Criar cadastro e ganhar 10% OFF</button>
+        </div>
       `;
       modal.querySelector('#profileClose').addEventListener('click', () => overlay.remove());
+      modal.querySelector('#profileRegisterBtn').addEventListener('click', () => {
+        showRegisterForm(overlay, modal, 'Crie sua conta!',
+          'Cadastre-se agora e ganhe <strong>10% OFF</strong> na sua primeira compra.');
+      });
       modal.querySelector('#profileLoginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = new FormData(e.target).get('loginEmail');
@@ -903,10 +920,32 @@
   document.addEventListener('DOMContentLoaded', () => {
     updateHeader(loadCart());
 
+    // Restaura posicao de scroll
+    const savedScroll = sessionStorage.getItem('gn_scroll');
+    if (savedScroll) { window.scrollTo(0, parseInt(savedScroll)); sessionStorage.removeItem('gn_scroll'); }
+    window.addEventListener('beforeunload', () => { sessionStorage.setItem('gn_scroll', window.scrollY); });
+    window.addEventListener('pagehide', () => { sessionStorage.setItem('gn_scroll', window.scrollY); });
+
     const pending = localStorage.getItem('gn_register_pending');
     if (pending && !localStorage.getItem('gn_profile_email')) {
       const { name, cep } = JSON.parse(pending);
       showRegisterPopup(name, cep);
+    }
+
+    // Popup de boas-vindas para visitantes novos
+    if (!localStorage.getItem('gn_profile_email') && !localStorage.getItem('gn_welcome_seen')) {
+      setTimeout(() => {
+        localStorage.setItem('gn_welcome_seen', '1');
+        const overlay = document.createElement('div');
+        overlay.className = 'register-overlay';
+        const modal = document.createElement('div');
+        modal.className = 'register-modal';
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        overlay.style.display = 'flex';
+        showRegisterForm(overlay, modal, 'Bem-vindo à GN Máfia!',
+          'Cadastre-se agora e ganhe <strong>10% OFF</strong> na sua primeira compra.');
+      }, 4000);
     }
     $all('.add-to-cart').forEach(btn => {
       btn.addEventListener('click', (e) => {

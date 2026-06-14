@@ -1,40 +1,8 @@
-﻿<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GN Máfia</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-item">🚚 FRETE GRÁTIS PARA TODO BRASIL ACIMA DE R$299,90</div>
-    <div class="topbar-item">💳 PARCELE EM ATÉ 6X SEM JUROS</div>
-    <div class="topbar-item">🔒 SITE 100% SEGURO</div>
-  </div>
-
-  <!-- HEADER -->
-  <header class="main-header">
-    <div class="brand">
-      <img src="logo.jpeg" alt="GN Máfia" class="brand-logo" />
-    </div>
-
-    <button class="nav-toggle" id="navToggle" aria-label="Menu">&#9776;</button>
-
-    <nav class="nav-links" id="navLinks">
-      <a href="#inicio">INÍCIO</a>
-      <a href="#colecoes">COLEÇÕES</a>
-      <a href="#kit">MONTE SEU KIT</a>
-      <a href="#sorteios">SORTEIOS</a>
-      <a href="#sobre">SOBRE NÓS</a>
+﻿      <a href="#contato">CONTATO</a>
     </nav>
 
     <div class="actions">
+      <button class="icon-btn">🔍</button>
       <button class="icon-btn" id="profileBtn">👤</button>
       <button class="icon-btn cart-icon-btn" id="cartBtn">
         🛒
@@ -57,7 +25,7 @@
       <p class="hero-copy">Mais que roupa. É sobre mentalidade, postura e presença.</p>
       <div class="hero-cta">
         <a class="btn btn-primary" href="#colecoes">VER COLEÇÕES</a>
-        <a class="btn btn-outline" href="#kit">MONTE SEU KIT</a>
+        <a class="btn btn-outline" href="#produtos">VER PRODUTOS</a>
       </div>
     </div>
   </section>
@@ -94,6 +62,7 @@
     </div>
   </div>
 
+
   <!-- COLEÇÕES -->
   <section class="section" id="colecoes">
     <div class="section-header">
@@ -104,35 +73,33 @@
       <div class="category-carousel" id="categoryCarousel">
         <div class="category-banner" data-category="bobojaco">
           <img src="img-bobojaco-quicksilver/img1.jpeg" alt="Bobojacos" />
-          <div class="category-banner-label" data-count="+12 MODELOS">BOBOJACOS</div>
+          <div class="category-banner-label">BOBOJACOS</div>
         </div>
         <div class="category-banner" data-category="moletom">
           <img src="img-moletom-onbongo/img2.jpeg" alt="Moletons" />
-          <div class="category-banner-label" data-count="+8 MODELOS">MOLETONS</div>
+          <div class="category-banner-label">MOLETONS</div>
         </div>
         <div class="category-banner" data-category="conjunto">
           <img src="img-bobojaco-quicksilver/img5.jpeg" alt="Conjuntos" />
-          <div class="category-banner-label" data-count="+6 MODELOS">CONJUNTOS</div>
+          <div class="category-banner-label">CONJUNTOS</div>
         </div>
         <div class="category-banner" data-category="camisa">
           <img src="img-bobojaco/img2.jpeg" alt="Camisas" />
-          <div class="category-banner-label" data-count="+15 MODELOS">CAMISAS</div>
+          <div class="category-banner-label">CAMISAS</div>
         </div>
         <div class="category-banner" data-category="bermuda">
           <img src="img-bobojaco-quicksilver/img4.jpeg" alt="Bermudas" />
-          <div class="category-banner-label" data-count="+10 MODELOS">BERMUDAS</div>
+          <div class="category-banner-label">BERMUDAS</div>
         </div>
         <div class="category-banner" data-category="atacado">
           <img src="img-bobojaco-quicksilver/img7.jpeg" alt="Atacado" />
-          <div class="category-banner-label" data-count="+5 KITS">ATACADO</div>
+          <div class="category-banner-label">ATACADO</div>
         </div>
       </div>
       <button class="carousel-arrow carousel-next" id="carouselNext">&#8594;</button>
     </div>
-
-    <!-- PRODUTOS (oculto, usado como fonte de dados) -->
     <div class="product-grid" id="produtos" style="display:none">
-      <article class="product-card" data-name="BOBOJACO QUICKSILVER" data-price="129.90" data-image="img-bobojaco-quicksilver/img1.jpeg" data-category="bobojaco" data-sizes="P,M,G,GG">
+      <article class="product-card" data-name="BOBOJACO QUICKSILVER" data-price="129.90" data-image="img-bobojaco-quicksilver/img1.jpeg" data-category="bobojaco">
         <div class="product-img-wrap">
           <span class="badge-units">🔥 Últimas unidades</span>
           <img src="img-bobojaco-quicksilver/img1.jpeg" alt="Bobojaco Quicksilver" class="product-img main-img" />
@@ -154,7 +121,7 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
-      <article class="product-card" data-name="MOLETOM ONBONGO" data-price="259.90" data-image="img-moletom-onbongo/img2.jpeg" data-category="moletom" data-sizes="M,G,GG">
+      <article class="product-card" data-name="MOLETOM ONBONGO" data-price="259.90" data-image="img-moletom-onbongo/img2.jpeg" data-category="moletom">
         <div class="product-img-wrap">
           <span class="badge-units">🔥 Últimas unidades</span>
           <img src="img-moletom-onbongo/img2.jpeg" alt="Moletom Onbongo" class="product-img main-img" />
@@ -165,13 +132,14 @@
           </div>
         </div>
         <div class="product-info">
+
           <strong>MOLETOM ONBONGO</strong>
           <span class="product-price">R$ 259,90</span>
           <span class="product-installment">ou 6x de R$ 43,31</span>
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
-      <article class="product-card" data-name="BOBOJACO QUICKSILVER VERMELHO" data-price="119.90" data-image="img-bobojaco/img1.jpeg" data-category="bobojaco" data-sizes="P,M,G,GG">
+      <article class="product-card" data-name="BOBOJACO QUICKSILVER VERMELHO" data-price="119.90" data-image="img-bobojaco/img1.jpeg" data-category="bobojaco">
         <div class="product-img-wrap">
           <span class="badge-discount">🏷️ 10% OFF 1ª compra</span>
           <img src="img-bobojaco/img1.jpeg" alt="Bobojaco Quicksilver Vermelho" class="product-img main-img" />
@@ -189,7 +157,7 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
-      <article class="product-card" data-name="CORRENTE GN GOLD" data-price="199.90" data-image="img-bobojaco/img5.jpeg" data-category="acessorio" data-sizes="ÚNICO">
+      <article class="product-card" data-name="CORRENTE GN GOLD" data-price="199.90" data-image="img-bobojaco/img5.jpeg" data-category="acessorio">
         <div class="product-img-wrap">
           <span class="badge-discount">🏷️ 10% OFF 1ª compra</span>
           <img src="img-bobojaco/img5.jpeg" alt="Corrente GN Gold" class="product-img main-img" />
@@ -201,8 +169,9 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
+
       <!-- CONJUNTOS -->
-      <article class="product-card" data-name="CONJUNTO QUICKSILVER" data-price="219.90" data-image="img-bobojaco-quicksilver/img5.jpeg" data-category="conjunto" data-sizes="P,M,G,GG">
+      <article class="product-card" data-name="CONJUNTO QUICKSILVER" data-price="219.90" data-image="img-bobojaco-quicksilver/img5.jpeg" data-category="conjunto">
         <div class="product-img-wrap">
           <span class="badge-units">🔥 Últimas unidades</span>
           <img src="img-bobojaco-quicksilver/img5.jpeg" alt="Conjunto Quicksilver" class="product-img main-img" />
@@ -218,7 +187,7 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
-      <article class="product-card" data-name="CONJUNTO ONBONGO" data-price="239.90" data-image="img-moletom-onbongo/img3.jpeg" data-category="conjunto" data-sizes="M,G,GG">
+      <article class="product-card" data-name="CONJUNTO ONBONGO" data-price="239.90" data-image="img-moletom-onbongo/img3.jpeg" data-category="conjunto">
         <div class="product-img-wrap">
           <span class="badge-discount">🏷️ 10% OFF 1ª compra</span>
           <img src="img-moletom-onbongo/img3.jpeg" alt="Conjunto Onbongo" class="product-img main-img" />
@@ -233,8 +202,9 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
+
       <!-- CAMISAS -->
-      <article class="product-card" data-name="CAMISA QUICKSILVER" data-price="89.90" data-image="img-bobojaco/img2.jpeg" data-category="camisa" data-sizes="P,M,G,GG">
+      <article class="product-card" data-name="CAMISA QUICKSILVER" data-price="89.90" data-image="img-bobojaco/img2.jpeg" data-category="camisa">
         <div class="product-img-wrap">
           <span class="badge-units">🔥 Últimas unidades</span>
           <img src="img-bobojaco/img2.jpeg" alt="Camisa Quicksilver" class="product-img main-img" />
@@ -250,7 +220,7 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
-      <article class="product-card" data-name="CAMISA ONBONGO" data-price="79.90" data-image="img-moletom-onbongo/img1.jpeg" data-category="camisa" data-sizes="P,M,G,GG">
+      <article class="product-card" data-name="CAMISA ONBONGO" data-price="79.90" data-image="img-moletom-onbongo/img1.jpeg" data-category="camisa">
         <div class="product-img-wrap">
           <span class="badge-discount">🏷️ 10% OFF 1ª compra</span>
           <img src="img-moletom-onbongo/img1.jpeg" alt="Camisa Onbongo" class="product-img main-img" />
@@ -262,7 +232,7 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
-      <article class="product-card" data-name="CAMISA GN CLASSIC" data-price="69.90" data-image="img-bobojaco-quicksilver/img2.jpeg" data-category="camisa" data-sizes="P,M,G,GG">
+      <article class="product-card" data-name="CAMISA GN CLASSIC" data-price="69.90" data-image="img-bobojaco-quicksilver/img2.jpeg" data-category="camisa">
         <div class="product-img-wrap">
           <img src="img-bobojaco-quicksilver/img2.jpeg" alt="Camisa GN Classic" class="product-img main-img" />
         </div>
@@ -273,8 +243,9 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
+
       <!-- BERMUDAS -->
-      <article class="product-card" data-name="BERMUDA QUICKSILVER" data-price="99.90" data-image="img-bobojaco-quicksilver/img4.jpeg" data-category="bermuda" data-sizes="P,M,G,GG">
+      <article class="product-card" data-name="BERMUDA QUICKSILVER" data-price="99.90" data-image="img-bobojaco-quicksilver/img4.jpeg" data-category="bermuda">
         <div class="product-img-wrap">
           <span class="badge-units">🔥 Últimas unidades</span>
           <img src="img-bobojaco-quicksilver/img4.jpeg" alt="Bermuda Quicksilver" class="product-img main-img" />
@@ -289,7 +260,7 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
-      <article class="product-card" data-name="BERMUDA ONBONGO" data-price="89.90" data-image="img-moletom-onbongo/img4.jpeg" data-category="bermuda" data-sizes="P,M,G,GG">
+      <article class="product-card" data-name="BERMUDA ONBONGO" data-price="89.90" data-image="img-moletom-onbongo/img4.jpeg" data-category="bermuda">
         <div class="product-img-wrap">
           <span class="badge-discount">🏷️ 10% OFF 1ª compra</span>
           <img src="img-moletom-onbongo/img4.jpeg" alt="Bermuda Onbongo" class="product-img main-img" />
@@ -301,7 +272,7 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
-      <article class="product-card" data-name="BERMUDA GN CLASSIC" data-price="79.90" data-image="img-bobojaco/img3.jpeg" data-category="bermuda" data-sizes="M,G,GG">
+      <article class="product-card" data-name="BERMUDA GN CLASSIC" data-price="79.90" data-image="img-bobojaco/img3.jpeg" data-category="bermuda">
         <div class="product-img-wrap">
           <img src="img-bobojaco/img3.jpeg" alt="Bermuda GN Classic" class="product-img main-img" />
         </div>
@@ -312,8 +283,9 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
+
       <!-- ATACADO -->
-      <article class="product-card" data-name="KIT ATACADO 10 CAMISAS" data-price="499.90" data-image="img-bobojaco-quicksilver/img7.jpeg" data-category="atacado" data-sizes="P,M,G,GG">
+      <article class="product-card" data-name="KIT ATACADO 10 CAMISAS" data-price="499.90" data-image="img-bobojaco-quicksilver/img7.jpeg" data-category="atacado">
         <div class="product-img-wrap">
           <span class="badge-discount">🏷️ ATACADO</span>
           <img src="img-bobojaco-quicksilver/img7.jpeg" alt="Kit Atacado 10 Camisas" class="product-img main-img" />
@@ -329,7 +301,7 @@
         </div>
         <button class="add-to-cart-btn add-to-cart">🛒</button>
       </article>
-      <article class="product-card" data-name="KIT ATACADO 5 CONJUNTOS" data-price="699.90" data-image="img-bobojaco-quicksilver/img8.jpeg" data-category="atacado" data-sizes="P,M,G,GG">
+      <article class="product-card" data-name="KIT ATACADO 5 CONJUNTOS" data-price="699.90" data-image="img-bobojaco-quicksilver/img8.jpeg" data-category="atacado">
         <div class="product-img-wrap">
           <span class="badge-discount">🏷️ ATACADO</span>
           <img src="img-bobojaco-quicksilver/img8.jpeg" alt="Kit Atacado 5 Conjuntos" class="product-img main-img" />
@@ -355,41 +327,56 @@
     </div>
     <p class="kit-desc">Escolha uma camisa e um short. Qualquer combinação sai por <strong>R$ 70,00</strong>.</p>
 
-    <div class="kit-picker-layout">
-      <!-- PREVIEW -->
-      <div class="kit-3d-center">
-        <div class="kit-preview" id="kitPreview">
-          <div class="kit-preview-slot" id="previewCamisa">
-            <span class="kit-preview-placeholder">👕<br>Escolha uma camisa</span>
+    <div class="kit-3d-layout">
+
+      <!-- COLUNA ESQUERDA: CAMISAS -->
+      <div class="kit-3d-col">
+        <h3 class="kit-col-title">1. ESCOLHA A CAMISA</h3>
+        <div class="kit-options" id="kitCamisas">
+          <div class="kit-option" data-type="camisa" data-name="Camisa Oakley Preta" data-image="img-kit-camisa/frente.jpeg" data-color="#111">
+            <img src="img-kit-camisa/frente.jpeg" alt="Camisa Oakley Preta" />
+            <span>Camisa Oakley Preta</span>
           </div>
-          <div class="kit-preview-slot" id="previewShort">
-            <span class="kit-preview-placeholder">🩳<br>Escolha uma bermuda</span>
+          <div class="kit-option" data-type="camisa" data-name="Camisa Oakley Costas" data-image="img-kit-camisa/costas.jpeg" data-color="#111">
+            <img src="img-kit-camisa/costas.jpeg" alt="Camisa Oakley Costas" />
+            <span>Camisa Oakley Costas</span>
           </div>
-        </div>
-        <div class="kit-3d-labels">
-          <span id="kit3dCamisaLabel">&mdash; Nenhuma camisa &mdash;</span>
-          <span id="kit3dShortLabel">&mdash; Nenhuma bermuda &mdash;</span>
+          <div class="kit-option" data-type="camisa" data-name="Camisa GN Classic" data-image="img-bobojaco/img2.jpeg" data-color="#8b0000">
+            <img src="img-bobojaco/img2.jpeg" alt="Camisa GN Classic" />
+            <span>Camisa GN Classic</span>
+          </div>
         </div>
       </div>
 
-      <!-- BOTÕES DE SELEÇÃO -->
-      <div class="kit-picker-btns">
-        <button class="kit-picker-btn" id="btnEscolherCamisa">
-          <span class="kit-picker-icon">👕</span>
-          <span class="kit-picker-label">
-            <strong>1. ESCOLHA A CAMISA</strong>
-            <small id="camisaEscolhida">Clique para ver todas as camisas</small>
-          </span>
-          <span class="kit-picker-arrow">&#8250;</span>
-        </button>
-        <button class="kit-picker-btn" id="btnEscolherShort">
-          <span class="kit-picker-icon">🩳</span>
-          <span class="kit-picker-label">
-            <strong>2. ESCOLHA A BERMUDA</strong>
-            <small id="shortEscolhido">Clique para ver todas as bermudas</small>
-          </span>
-          <span class="kit-picker-arrow">&#8250;</span>
-        </button>
+      <!-- CENTRO: BONECO -->
+      <div class="kit-3d-center">
+        <div class="kit-3d-hint">🖱️ Arraste para rotacionar</div>
+        <div class="kit-mannequin-wrap" id="kitMannequinWrap">
+          <canvas id="kitCanvas"></canvas>
+        </div>
+        <div class="kit-3d-labels">
+          <span id="kit3dCamisaLabel">— Nenhuma camisa —</span>
+          <span id="kit3dShortLabel">— Nenhum short —</span>
+        </div>
+      </div>
+
+      <!-- COLUNA DIREITA: SHORTS -->
+      <div class="kit-3d-col">
+        <h3 class="kit-col-title">2. ESCOLHA O SHORT</h3>
+        <div class="kit-options" id="kitShorts">
+          <div class="kit-option" data-type="short" data-name="Short Quiksilver" data-image="img-kit-short/shorts.jpeg" data-color="#0a0a0a">
+            <img src="img-kit-short/shorts.jpeg" alt="Short Quiksilver" />
+            <span>Short Quiksilver</span>
+          </div>
+          <div class="kit-option" data-type="short" data-name="Short Quicksilver Azul" data-image="img-bobojaco-quicksilver/img4.jpeg" data-color="#0a1a2e">
+            <img src="img-bobojaco-quicksilver/img4.jpeg" alt="Short Quicksilver Azul" />
+            <span>Short Quicksilver Azul</span>
+          </div>
+          <div class="kit-option" data-type="short" data-name="Short GN Classic" data-image="img-bobojaco/img3.jpeg" data-color="#3d0000">
+            <img src="img-bobojaco/img3.jpeg" alt="Short GN Classic" />
+            <span>Short GN Classic</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -398,17 +385,6 @@
       <button class="checkout-continue kit-add-btn" id="kitAddBtn" disabled>Selecione camisa e short</button>
     </div>
   </section>
-
-  <!-- MODAL KIT PICKER -->
-  <div class="category-modal-overlay" id="kitPickerOverlay">
-    <div class="category-modal">
-      <div class="category-modal-header">
-        <h2 id="kitPickerTitle"></h2>
-        <button class="register-close" id="kitPickerClose">&#x2715;</button>
-      </div>
-      <div class="product-grid kit-picker-grid" id="kitPickerGrid"></div>
-    </div>
-  </div>
 
   <!-- SORTEIOS -->
   <section class="section" id="sorteios">
@@ -451,6 +427,21 @@
     </div>
   </section>
 
+  <!-- NEWSLETTER -->
+  <section class="newsletter" id="contato">
+    <div class="newsletter-text">
+      <span class="newsletter-icon">✉️</span>
+      <div>
+        <strong>RECEBA NOSSAS NOVIDADES</strong>
+        <p>Assine nossa newsletter e ganhe 10% OFF na sua primeira compra.</p>
+      </div>
+    </div>
+    <form class="newsletter-form">
+      <input type="email" placeholder="Seu melhor e-mail" />
+      <button type="submit">ASSINAR</button>
+    </form>
+  </section>
+
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-brand">
@@ -491,14 +482,6 @@
     </div>
 
     <div class="footer-col">
-      <h4>ATENDIMENTO</h4>
-      <a href="https://wa.me/5511947036093" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:0.82rem;color:#25d366;text-decoration:none;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        (11) 94703-6093
-      </a>
-    </div>
-
-    <div class="footer-col">
       <h4>FORMAS DE PAGAMENTO</h4>
       <div class="payment-icons">
         <span class="pay-badge">VISA</span>
@@ -522,9 +505,8 @@
     <div class="category-modal">
       <div class="category-modal-header">
         <h2 id="categoryModalTitle"></h2>
-        <button class="register-close" id="categoryClose">&#x2715;</button>
+        <button class="register-close" id="categoryClose">✕</button>
       </div>
-      <div class="size-filter" id="sizeFilter"></div>
       <div class="product-grid" id="categoryGrid"></div>
     </div>
   </div>
@@ -540,18 +522,120 @@
 
   <script src="cart.js"></script>
   <script>
+  (function () {
+    var canvas = document.getElementById('kitCanvas');
+    var ctx    = canvas.getContext('2d');
+    var W = 320, H = 500;
+    canvas.width = W; canvas.height = H;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+    var SKIN='#c8845a', HAIR='#1a0800', SHOE='#1a1a1a', SOLE='#333';
+    var SHIRT_CLR='#1c1c2e', SHORT_CLR='#0d0d0d';
+    var shirtImg=null, shortImg=null;
+    var shirtColor=SHIRT_CLR, shortColor=SHORT_CLR;
+    var cx=W/2;
+    function pathShirt(c){
+      c.beginPath();
+      c.moveTo(cx-18,140); c.lineTo(cx-46,150); c.lineTo(cx-52,200);
+      c.lineTo(cx-42,202); c.lineTo(cx-38,162); c.lineTo(cx-36,272);
+      c.lineTo(cx+36,272); c.lineTo(cx+38,162); c.lineTo(cx+42,202);
+      c.lineTo(cx+52,200); c.lineTo(cx+46,150); c.lineTo(cx+18,140);
+      c.quadraticCurveTo(cx,152,cx-18,140); c.closePath();
+    }
+    function pathShort(c){
+      c.beginPath();
+      c.moveTo(cx-36,270); c.lineTo(cx+36,270); c.lineTo(cx+32,348);
+      c.lineTo(cx+10,348); c.lineTo(cx,334); c.lineTo(cx-10,348);
+      c.lineTo(cx-32,348); c.closePath();
+    }
+    function rr(x,y,w,h,r,color){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+      ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+      ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+      ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+      ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+    }
+    function el(x,y,rx,ry,color){
+      ctx.beginPath(); ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);
+      ctx.fillStyle=color; ctx.fill();
+    }
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      var bg=ctx.createRadialGradient(cx,H*.5,10,cx,H*.5,W*.7);
+      bg.addColorStop(0,'rgba(28,18,8,.8)'); bg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+      ctx.save(); ctx.translate(cx,458); ctx.scale(1,.22);
+      var pg=ctx.createRadialGradient(0,0,4,0,0,68);
+      pg.addColorStop(0,'#d5a651'); pg.addColorStop(1,'#6b3f08');
+      ctx.beginPath(); ctx.arc(0,0,68,0,Math.PI*2); ctx.fillStyle=pg; ctx.fill();
+      ctx.restore();
+      [cx-22,cx+22].forEach(function(tx){ el(tx,432,19,8,SHOE); el(tx,435,19,5,SOLE); });
+      rr(cx-30,346,18,86,8,SKIN); rr(cx+12,346,18,86,8,SKIN);
+      ctx.save(); pathShort(ctx);
+      if(shortImg){
+        ctx.clip();
+        ctx.drawImage(shortImg, shortImg.width*.08, shortImg.height*.04, shortImg.width*.84, shortImg.height*.52, cx-36,270,72,80);
+      } else { ctx.fillStyle=shortColor; ctx.fill(); }
+      ctx.restore();
+      ctx.fillStyle='rgba(0,0,0,.45)'; ctx.fillRect(cx-36,269,72,10);
+      ctx.strokeStyle='rgba(255,255,255,.5)'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(cx-8,274); ctx.lineTo(cx-3,281); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx+8,274); ctx.lineTo(cx+3,281); ctx.stroke();
+      ctx.save(); pathShirt(ctx);
+      if(shirtImg){
+        ctx.clip();
+        ctx.drawImage(shirtImg, shirtImg.width*.02, shirtImg.height*.02, shirtImg.width*.96, shirtImg.height*.96, cx-52,136,104,140);
+      } else { ctx.fillStyle=shirtColor; ctx.fill(); }
+      ctx.restore();
+      ctx.save(); ctx.globalAlpha=.15; ctx.fillStyle='#000';
+      ctx.beginPath(); ctx.moveTo(cx-38,162); ctx.lineTo(cx-36,272); ctx.lineTo(cx-26,272); ctx.lineTo(cx-28,162); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(cx+38,162); ctx.lineTo(cx+36,272); ctx.lineTo(cx+26,272); ctx.lineTo(cx+28,162); ctx.closePath(); ctx.fill();
+      ctx.restore();
+      ctx.save(); ctx.beginPath(); ctx.moveTo(cx-14,142); ctx.quadraticCurveTo(cx,154,cx+14,142);
+      ctx.strokeStyle='rgba(255,255,255,.2)'; ctx.lineWidth=2; ctx.stroke(); ctx.restore();
+      rr(cx-54,200,14,52,7,SKIN); rr(cx+40,200,14,52,7,SKIN);
+      el(cx-47,258,9,11,SKIN); el(cx+47,258,9,11,SKIN);
+      rr(cx-7,125,14,18,5,SKIN);
+      ctx.save(); ctx.beginPath(); ctx.ellipse(cx,96,28,32,0,0,Math.PI*2); ctx.fillStyle=HAIR; ctx.fill(); ctx.restore();
+      ctx.save(); ctx.beginPath(); ctx.ellipse(cx,100,23,27,0,0,Math.PI*2); ctx.fillStyle=SKIN; ctx.fill(); ctx.restore();
+      el(cx-8,96,3.5,3.5,'#fff'); el(cx+8,96,3.5,3.5,'#fff');
+      el(cx-8,97,2,2,'#222'); el(cx+8,97,2,2,'#222');
+      ctx.save(); ctx.strokeStyle=HAIR; ctx.lineWidth=1.8;
+      ctx.beginPath(); ctx.moveTo(cx-12,91); ctx.lineTo(cx-4,90); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx+4,90); ctx.lineTo(cx+12,91); ctx.stroke(); ctx.restore();
+      ctx.save(); ctx.beginPath(); ctx.arc(cx,110,5,.1,Math.PI-.1);
+      ctx.strokeStyle='rgba(0,0,0,.25)'; ctx.lineWidth=1.5; ctx.stroke(); ctx.restore();
+    }
+    function loadImg(src){
+      return new Promise(function(res){
+        var img=new Image(); img.onload=function(){ res(img); }; img.onerror=function(){ res(null); }; img.src=src;
+      });
+    }
+    draw();
+    window.kitUpdate3D=async function(type,imgSrc,color){
+      if(type==='camisa'){ shirtColor=color||SHIRT_CLR; shirtImg=imgSrc?await loadImg(imgSrc):null; }
+      else { shortColor=color||SHORT_CLR; shortImg=imgSrc?await loadImg(imgSrc):null; }
+      draw();
+    };
+  })();
     // Monte seu Kit
     (function() {
-      const KIT_KEY = 'gn_kit_selected';
-      let selected = JSON.parse(sessionStorage.getItem(KIT_KEY) || '{"camisa":null,"short":null}');
+      let selected = { camisa: null, short: null };
 
-      function saveKit() { sessionStorage.setItem(KIT_KEY, JSON.stringify(selected)); }
-
-      function updatePreview(type, imgSrc, name) {
-        const slot = document.getElementById(type === 'camisa' ? 'previewCamisa' : 'previewShort');
-        slot.innerHTML = '<img src="' + imgSrc + '" alt="' + name + '" />';
-        slot.classList.add('filled');
-      }
+      document.querySelectorAll('.kit-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          const type = opt.dataset.type;
+          document.querySelectorAll(`.kit-option[data-type="${type}"]`).forEach(o => o.classList.remove('kit-selected'));
+          opt.classList.add('kit-selected');
+          selected[type] = { name: opt.dataset.name, image: opt.dataset.image, color: opt.dataset.color };
+          // Atualiza boneco 2D com imagem real
+          if (window.kitUpdate3D) window.kitUpdate3D(type, opt.dataset.image, opt.dataset.color);
+          // Atualiza labels
+          if (type === 'camisa') document.getElementById('kit3dCamisaLabel').textContent = '👕 ' + opt.dataset.name;
+          if (type === 'short')  document.getElementById('kit3dShortLabel').textContent  = '🩳 ' + opt.dataset.name;
+          updateKitBtn();
+        });
+      });
 
       function updateKitBtn() {
         const btn = document.getElementById('kitAddBtn');
@@ -564,65 +648,15 @@
         }
       }
 
-      // Restaura seleção ao carregar
-      if (selected.camisa) {
-        updatePreview('camisa', selected.camisa.image, selected.camisa.name);
-        document.getElementById('kit3dCamisaLabel').textContent = '👕 ' + selected.camisa.name;
-        document.getElementById('camisaEscolhida').textContent = selected.camisa.name;
-        document.getElementById('btnEscolherCamisa').classList.add('kit-picker-btn-done');
-      }
-      if (selected.short) {
-        updatePreview('short', selected.short.image, selected.short.name);
-        document.getElementById('kit3dShortLabel').textContent = '🩳 ' + selected.short.name;
-        document.getElementById('shortEscolhido').textContent = selected.short.name;
-        document.getElementById('btnEscolherShort').classList.add('kit-picker-btn-done');
-      }
-      updateKitBtn();
-
-      function openKitPicker(type) {
-        const isCamisa = type === 'camisa';
-        const cat = isCamisa ? 'camisa' : 'bermuda';
-        document.getElementById('kitPickerTitle').textContent = isCamisa ? 'ESCOLHA A CAMISA' : 'ESCOLHA A BERMUDA';
-        const grid = document.getElementById('kitPickerGrid');
-        grid.innerHTML = '';
-        document.querySelectorAll('#produtos .product-card[data-category="' + cat + '"]').forEach(card => {
-          const clone = card.cloneNode(true);
-          clone.querySelector('.add-to-cart-btn')?.remove();
-          clone.style.cursor = 'pointer';
-          clone.addEventListener('click', () => {
-            const name = card.getAttribute('data-name');
-            const img  = card.getAttribute('data-image');
-            selected[type] = { name, image: img };
-            saveKit();
-            updatePreview(type, img, name);
-            if (type === 'camisa') {
-              document.getElementById('kit3dCamisaLabel').textContent = '👕 ' + name;
-              document.getElementById('camisaEscolhida').textContent = name;
-              document.getElementById('btnEscolherCamisa').classList.add('kit-picker-btn-done');
-            } else {
-              document.getElementById('kit3dShortLabel').textContent = '🩳 ' + name;
-              document.getElementById('shortEscolhido').textContent = name;
-              document.getElementById('btnEscolherShort').classList.add('kit-picker-btn-done');
-            }
-            updateKitBtn();
-            document.getElementById('kitPickerOverlay').classList.remove('open');
-          });
-          grid.appendChild(clone);
-        });
-        document.getElementById('kitPickerOverlay').classList.add('open');
-      }
-
-      document.getElementById('btnEscolherCamisa').addEventListener('click', () => openKitPicker('camisa'));
-      document.getElementById('btnEscolherShort').addEventListener('click', () => openKitPicker('short'));
-      document.getElementById('kitPickerClose').addEventListener('click', () => document.getElementById('kitPickerOverlay').classList.remove('open'));
-      document.getElementById('kitPickerOverlay').addEventListener('click', e => { if (e.target === document.getElementById('kitPickerOverlay')) document.getElementById('kitPickerOverlay').classList.remove('open'); });
-
       document.getElementById('kitAddBtn').addEventListener('click', () => {
         const base = window.location.href.replace(/\/[^\/]*$/, '/');
-        const kitName = 'Kit: ' + selected.camisa.name + ' + ' + selected.short.name;
-        window.gnAddToCart({ id: kitName, name: kitName, price: 70, image: base + selected.camisa.image });
-        selected = { camisa: null, short: null };
-        saveKit();
+        const kitName = `Kit: ${selected.camisa.name} + ${selected.short.name}`;
+        window.gnAddToCart({
+          id: kitName,
+          name: kitName,
+          price: 70,
+          image: base + selected.camisa.image
+        });
       });
     })();
 
@@ -645,118 +679,43 @@
 
     // Banners de categoria
     (function() {
-      const overlay    = document.getElementById('categoryOverlay');
-      const title      = document.getElementById('categoryModalTitle');
-      const grid       = document.getElementById('categoryGrid');
-      const sizeFilter = document.getElementById('sizeFilter');
-      const labels     = { bobojaco: 'BOBOJACOS', moletom: 'MOLETONS', acessorio: 'ACESSÓRIOS', conjunto: 'CONJUNTOS', camisa: 'CAMISAS', bermuda: 'BERMUDAS', atacado: 'ATACADO' };
-      const bannerImgs = {
-        bobojaco: 'img-bobojaco-quicksilver/img1.jpeg',
-        moletom:  'img-moletom-onbongo/img2.jpeg',
-        conjunto: 'img-bobojaco-quicksilver/img5.jpeg',
-        camisa:   'img-bobojaco/img2.jpeg',
-        bermuda:  'img-bobojaco-quicksilver/img4.jpeg',
-        atacado:  'img-bobojaco-quicksilver/img7.jpeg',
-        acessorio:'img-bobojaco/img5.jpeg'
-      };
-      const NAV_KEY = 'gn_nav_state';
+      const overlay = document.getElementById('categoryOverlay');
+      const title = document.getElementById('categoryModalTitle');
+      const grid = document.getElementById('categoryGrid');
+      const labels = { bobojaco: 'BOBOJACOS', moletom: 'MOLETONS', acessorio: 'ACESSÓRIOS', conjunto: 'CONJUNTOS', camisa: 'CAMISAS', bermuda: 'BERMUDAS', atacado: 'ATACADO' };
 
-      let currentCards = [];
-      let activeSize   = null;
-
-      function saveNav(cat, size) {
-        localStorage.setItem(NAV_KEY, JSON.stringify({ cat, size: size || null }));
-      }
-
-      function renderCards(sizeFilter) {
-        grid.innerHTML = '';
-        currentCards.forEach(({ card, sizes }) => {
-          if (sizeFilter && !sizes.includes(sizeFilter)) return;
-          const clone = card.cloneNode(true);
-          grid.appendChild(clone);
-          clone.querySelectorAll('.add-to-cart').forEach(btn => {
-            btn.addEventListener('click', () => {
-              const original = document.querySelector(`#produtos .product-card[data-name="${card.getAttribute('data-name')}"] .add-to-cart`);
+      document.querySelectorAll('.category-banner').forEach(banner => {
+        banner.addEventListener('click', () => {
+          const cat = banner.dataset.category;
+          title.textContent = labels[cat] || cat.toUpperCase();
+          grid.innerHTML = '';
+          document.querySelectorAll(`.product-card[data-category="${cat}"]`).forEach(card => {
+            grid.appendChild(card.cloneNode(true));
+          });
+          // Re-bind add-to-cart nos clones
+          grid.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              const c = e.target.closest('.product-card');
+              const imgEl = c.querySelector('.main-img, img');
+              const rawSrc = c.getAttribute('data-image') || (imgEl ? imgEl.getAttribute('src') : '');
+              const base = window.location.href.replace(/\/[^\/]*$/, '/');
+              const product = {
+                id: c.getAttribute('data-name'),
+                name: c.getAttribute('data-name'),
+                price: Number(c.getAttribute('data-price')),
+                image: rawSrc.startsWith('http') ? rawSrc : base + rawSrc
+              };
+              // Clica no botao original para usar o handler do cart.js
+              const original = document.querySelector(`#produtos .product-card[data-name="${product.name}"] .add-to-cart`);
               if (original) original.click();
             });
           });
+          overlay.classList.add('open');
         });
-      }
-
-      function buildSizeFilter(sizes, restoreSize) {
-        sizeFilter.innerHTML = '';
-        if (!sizes.length) return;
-        const wrap = document.createElement('div');
-        wrap.className = 'size-filter-inner';
-        ['TODOS', ...sizes].forEach(s => {
-          const btn = document.createElement('button');
-          const isActive = restoreSize ? s === restoreSize : s === 'TODOS';
-          btn.className = 'size-btn' + (isActive ? ' size-btn-active' : '');
-          btn.textContent = s;
-          btn.addEventListener('click', () => {
-            wrap.querySelectorAll('.size-btn').forEach(b => b.classList.remove('size-btn-active'));
-            btn.classList.add('size-btn-active');
-            activeSize = s === 'TODOS' ? null : s;
-            saveNav(title.textContent, activeSize);
-            renderCards(activeSize);
-          });
-          wrap.appendChild(btn);
-        });
-        sizeFilter.appendChild(wrap);
-      }
-
-      function openCategory(cat, restoreSize) {
-        const catLabel = labels[cat] || cat.toUpperCase();
-        title.textContent = catLabel;
-        activeSize = restoreSize || null;
-
-        const existingBanner = document.getElementById('catModalBanner');
-        if (existingBanner) existingBanner.remove();
-        const bannerEl = document.createElement('div');
-        bannerEl.id = 'catModalBanner';
-        bannerEl.className = 'cat-modal-banner';
-        bannerEl.innerHTML = `
-          <div class="cat-modal-banner-text">
-            <span class="cat-modal-banner-sub">COLEÇÃO</span>
-            <strong class="cat-modal-banner-title">${catLabel}</strong>
-            <span class="cat-modal-banner-tags">ESTILO &middot; QUALIDADE &middot; CONFORTO</span>
-          </div>
-          <img src="${bannerImgs[cat] || ''}" alt="${catLabel}" class="cat-modal-banner-img" />
-        `;
-        sizeFilter.before(bannerEl);
-
-        currentCards = [];
-        const allSizes = new Set();
-        document.querySelectorAll(`#produtos .product-card[data-category="${cat}"]`).forEach(card => {
-          const sizes = (card.getAttribute('data-sizes') || '').split(',').map(s => s.trim()).filter(Boolean);
-          sizes.forEach(s => allSizes.add(s));
-          currentCards.push({ card, sizes });
-        });
-
-        buildSizeFilter([...allSizes], restoreSize);
-        renderCards(restoreSize);
-        overlay.classList.add('open');
-        saveNav(cat, restoreSize);
-      }
-
-      document.querySelectorAll('.category-banner').forEach(banner => {
-        banner.addEventListener('click', () => openCategory(banner.dataset.category, null));
       });
 
-      function closeCategory() {
-        overlay.classList.remove('open');
-        localStorage.removeItem(NAV_KEY);
-      }
-
-      document.getElementById('categoryClose').addEventListener('click', closeCategory);
-      overlay.addEventListener('click', e => { if (e.target === overlay) closeCategory(); });
-
-      // Restaura estado ao carregar
-      const saved = JSON.parse(localStorage.getItem(NAV_KEY) || 'null');
-      if (saved && saved.cat) {
-        // Aguarda produtos do admin serem renderizados
-        requestAnimationFrame(() => openCategory(saved.cat, saved.size));
-      }
+      document.getElementById('categoryClose').addEventListener('click', () => overlay.classList.remove('open'));
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
     })();
 
     // Mobile nav toggle
@@ -779,8 +738,6 @@
         card.setAttribute('data-name', photo.title || 'Coleção GN Máfia');
         card.setAttribute('data-price', String(price));
         card.setAttribute('data-image', photo.src || '');
-        card.setAttribute('data-category', photo.category || 'bobojaco');
-        card.setAttribute('data-sizes', 'P,M,G,GG');
         card.innerHTML = `
           <div class="product-img-wrap">
             <img src="${photo.src}" alt="${photo.alt || photo.title}" class="product-img main-img" />
@@ -848,9 +805,11 @@
         });
       }
 
+      // Carrega inicial
       grid.innerHTML = '<div class="sorteio-loading">Carregando cupons...</div>';
       await loadSorteios();
 
+      // Realtime via Supabase WebSocket
       const wsUrl = `wss://yhggzhyabuqjuxtetjpj.supabase.co/realtime/v1/websocket?apikey=${SUPABASE_KEY}&vsn=1.0.0`;
       const ws = new WebSocket(wsUrl);
 
@@ -870,6 +829,7 @@
         }
       });
 
+      // Fallback: reconecta se cair
       ws.addEventListener('close', () => setTimeout(() => location.reload(), 3000));
     })();
 
@@ -919,3 +879,4 @@
   </script>
 </body>
 </html>
+
