@@ -46,8 +46,29 @@ async function signInWithProvider(provider) {
     const user = result.user;
     showStatus(`Bem-vindo, ${user.displayName || user.email}`);
     // exemplo: salvar no localStorage e fechar modal
-    localStorage.setItem('gn_user', JSON.stringify({ uid: user.uid, name: user.displayName, email: user.email }));
-    setTimeout(closeModal, 900);
+const profile = {
+  uid: user.uid,
+  name: user.displayName || '',
+  email: user.email || ''
+};
+
+localStorage.setItem('gn_user', JSON.stringify(profile));
+localStorage.setItem('gn_profile_email', profile.email);
+
+// garante que aparece no admin em dados_clientes
+await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(profile.email)}`, {
+  method: 'PATCH',
+  headers: {
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Prefer': 'return=minimal'
+  },
+  body: JSON.stringify({
+    nome: profile.name,
+    email: profile.email
+  })
+});    setTimeout(closeModal, 900);
   } catch (err) {
     console.error(err);
     showStatus('Erro durante autenticação: ' + (err.message || err.code));

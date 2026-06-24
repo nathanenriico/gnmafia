@@ -272,13 +272,30 @@
     overlay.style.display = 'block';
   }
 
+  const SUPABASE_URL = 'https://yhggzhyabuqjuxtetjpj.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InloZ2d6aHlhYnVxanV4dGV0anBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NTc4MzIsImV4cCI6MjA5NjMzMzgzMn0.jvF7q0tkjFOzYp1JOBG_2e2RbpZZ2euSKc1r4VHUnJs';
+
+  // Interpreta o campo desconto de cupons_conquistados e retorna { rate, fixed }
+  // rate = fração (ex: 0.1 para 10%), fixed = valor fixo em R$
+  function parseCouponDiscount(desconto, total) {
+    // Valor fixo: "Cupom R$ 20", "Cupom R$ 50"
+    const fixedMatch = desconto.match(/R\$\s*([\d,.]+)/);
+    if (fixedMatch) return { rate: 0, fixed: parseFloat(fixedMatch[1].replace(',', '.')) };
+    // Percentual: "5% OFF", "10% OFF", "Frete + 15% OFF"
+    const pctMatch = desconto.match(/(\d+)%/);
+    if (pctMatch) return { rate: parseInt(pctMatch[1]) / 100, fixed: 0 };
+    return { rate: 0, fixed: 0 };
+  }
+
   async function renderIdentificationPanel() {
     const { overlay, container } = buildCheckoutShell(2);
     const cart = loadCart();
     const { total } = cartTotals(cart);
     let appliedDiscount = 0;
+    let appliedFixedDiscount = 0;
     let appliedCoupon = '';
     let appliedCouponType = '';
+    let appliedCouponId = null;
 
     // Busca dados do cliente logado
     let clienteLogado = null;
@@ -387,18 +404,23 @@
     const right = document.createElement('aside');
     right.className = 'checkout-right';
 
-    function updateSummary(discount) {
-      const finalTotal = discount > 0 ? total * 0.9 : total;
+    function updateSummary(discount, fixed = 0) {
+      const finalTotal = fixed > 0 ? Math.max(0, total - fixed) : discount > 0 ? total * (1 - discount) : total;
+      const discountRow = fixed > 0
+        ? `<div class="summary-row" style="color:#4caf50"><span>Desconto (R$ ${fixed.toFixed(2).replace('.',',')})</span><strong>- ${formatBRL(fixed)}</strong></div>`
+        : discount > 0
+        ? `<div class="summary-row" style="color:#4caf50"><span>Desconto (${Math.round(discount * 100)}%)</span><strong>- ${formatBRL(total * discount)}</strong></div>`
+        : '';
       right.innerHTML = `
         <div class="checkout-summary">
           <h4>Resumo</h4>
           <div class="summary-row"><span>Valor dos produtos</span><strong>${formatBRL(total)}</strong></div>
-          ${discount > 0 ? `<div class="summary-row" style="color:#4caf50"><span>Desconto (10%)</span><strong>- ${formatBRL(total * 0.1)}</strong></div>` : ''}
+          ${discountRow}
           <div class="summary-row"><span>Frete</span><span>A calcular</span></div>
           <div class="summary-total"><span>Total da compra</span><strong>${formatBRL(finalTotal)}</strong></div>
         </div>`;
     }
-    updateSummary(0);
+    updateSummary(0, 0);
 
     // Logica do cupom
     couponWrap.querySelector('#couponApplyBtn').addEventListener('click', async () => {
@@ -446,7 +468,7 @@
         const vagasRestantes = cupom.limite - cupom.usados - 1;
         msg.textContent = `Cupom aplicado! ${cupom.desconto_percent}% de desconto. ${vagasRestantes > 0 ? `Restam ${vagasRestantes} vagas.` : 'Ultima vaga!'}` ;
         msg.className = 'coupon-msg-success';
-        updateSummary(1);
+        updateSummary(appliedDiscount, appliedFixedDiscount);
         btn.textContent = 'Aplicado'; btn.disabled = true;
         return;
       }
@@ -471,7 +493,41 @@
         appliedCouponType = 'pessoal';
         msg.textContent = 'Cupom aplicado! 10% de desconto.';
         msg.className = 'coupon-msg-success';
-        updateSummary(1);
+        updateSummary(appliedDiscount, appliedFixedDiscount);
+        btn.textContent = 'Aplicado'; btn.disabled = true;
+        return;
+      }
+
+      // 3. Verifica cupons conquistados por missão
+      const conquRes = await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados?codigo=eq.${encodeURIComponent(code)}&select=id,codigo,desconto,usado,cliente_email`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const conquData = await conquRes.json();
+
+      if (conquData && conquData.length) {
+        const cupom = conquData[0];
+        if (cupom.usado) {
+          msg.textContent = 'Este cupom de missão já foi utilizado.';
+          msg.className = 'coupon-msg-error';
+          btn.textContent = 'Aplicar'; btn.disabled = false;
+          return;
+        }
+        const emailLogado = localStorage.getItem('gn_profile_email');
+        if (!emailLogado || emailLogado.toLowerCase() !== cupom.cliente_email.toLowerCase()) {
+          msg.textContent = 'Este cupom pertence a outra conta.';
+          msg.className = 'coupon-msg-error';
+          btn.textContent = 'Aplicar'; btn.disabled = false;
+          return;
+        }
+        const parsed = parseCouponDiscount(cupom.desconto, total);
+        appliedDiscount = parsed.rate;
+        appliedFixedDiscount = parsed.fixed;
+        appliedCoupon = code;
+        appliedCouponType = 'conquistado';
+        appliedCouponId = cupom.id;
+        msg.textContent = `Cupom aplicado! ${cupom.desconto}.`;
+        msg.className = 'coupon-msg-success';
+        updateSummary(appliedDiscount, appliedFixedDiscount);
         btn.textContent = 'Aplicado'; btn.disabled = true;
         return;
       }
@@ -479,7 +535,7 @@
       msg.textContent = 'Cupom invalido ou ja utilizado.';
       msg.className = 'coupon-msg-error';
       appliedDiscount = 0; appliedCoupon = ''; appliedCouponType = '';
-      updateSummary(0);
+      updateSummary(0, 0);
       btn.textContent = 'Aplicar'; btn.disabled = false;
     });
 
@@ -543,9 +599,14 @@
       const error = validateCheckoutForm(values);
       if (error) { showMiniToast(error); return; }
 
-      const finalTotal = appliedDiscount > 0 ? total * 0.9 : total;
+      const finalTotal = appliedFixedDiscount > 0
+        ? Math.max(0, total - appliedFixedDiscount)
+        : appliedDiscount > 0 ? total * (1 - appliedDiscount) : total;
+      const discountLabel = appliedFixedDiscount > 0
+        ? `(-R$ ${appliedFixedDiscount.toFixed(2).replace('.',',')})`
+        : appliedDiscount > 0 ? `(-${Math.round(appliedDiscount * 100)}%)` : '';
       const items = cart.items.map(item => `- ${item.name} x${item.qty}`).join('\n');
-      const discountLine = appliedDiscount > 0 ? `\nCupom: ${appliedCoupon} (-10%) = ${formatBRL(finalTotal)}` : '';
+      const discountLine = (appliedDiscount > 0 || appliedFixedDiscount > 0) ? `\nCupom: ${appliedCoupon} ${discountLabel} = ${formatBRL(finalTotal)}` : '';
       const message = `Novo Pedido - GN Mafia\n\nCliente: ${values.customerName}\n\nEndereco: Rua ${values.customerStreet}, n ${values.customerNumber}\nBairro: ${values.customerNeighborhood}\nCEP: ${sanitizeCep(values.customerCep)}\n\nForma de Pagamento: ${values.customerPayment}\nPagamento na entrega.${discountLine}\n\nTotal: ${formatBRL(finalTotal)}\n\nPedido:\n${items}`;
 
       // Remove o cupom do banco apos uso
@@ -562,6 +623,15 @@
         });
         const patchData = await patchRes.json().catch(() => null);
         console.log('Cupom removido:', patchRes.status, patchData);
+      }
+
+      // Marca cupom conquistado como usado
+      if (appliedCoupon && appliedCouponType === 'conquistado' && appliedCouponId) {
+        await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados?id=eq.${appliedCouponId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+          body: JSON.stringify({ usado: true })
+        });
       }
 
       window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
@@ -603,15 +673,18 @@
           total: finalTotal,
           forma_pagamento: values.customerPayment,
           cupom_usado: appliedCoupon || null,
-          desconto: appliedDiscount > 0 ? total * 0.1 : 0,
-          endereco: `${values.customerStreet}, ${values.customerNumber} - ${values.customerNeighborhood} - CEP ${sanitizeCep(values.customerCep)}`
+          desconto: appliedFixedDiscount > 0 ? appliedFixedDiscount : appliedDiscount > 0 ? total * appliedDiscount : 0,
+          endereco: `${values.customerStreet}, ${values.customerNumber} - ${values.customerNeighborhood} - CEP ${sanitizeCep(values.customerCep)}`,
+          missao_status: null
         })
       });
       const pedidoData = await pedidoRes.json().catch(() => null);
       const pedidoId = pedidoData && pedidoData[0] && pedidoData[0].id;
 
-      // Salva endereço no Supabase se logado
+      // Progresso das missões é atualizado pelo admin ao aprovar o pedido
       const loggedEmail = localStorage.getItem('gn_profile_email');
+
+      // Salva endereço no Supabase se logado
       if (loggedEmail) {
         const patchEndRes = await fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(loggedEmail)}`, {
           method: 'PATCH',
@@ -649,8 +722,7 @@
     overlay.style.display = 'block';
   }
 
-  const SUPABASE_URL = 'https://yhggzhyabuqjuxtetjpj.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InloZ2d6aHlhYnVxanV4dGV0anBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NTc4MzIsImV4cCI6MjA5NjMzMzgzMn0.jvF7q0tkjFOzYp1JOBG_2e2RbpZZ2euSKc1r4VHUnJs';
+
 
   async function saveCustomerSupabase(data) {
     // Verifica se email ja existe antes de inserir
@@ -801,6 +873,128 @@
     if (prefillName) modal.querySelector('[name="regName"]') && (modal.querySelector('[name="regName"]').value = prefillName);
   }
 
+  // ── SISTEMA DE MISSOES ──
+  const MISSOES = [
+    { id: 'bronze',   tipo: 'gasto',   icone: '💰', titulo: 'Cliente Bronze',      meta: 500,  recompensa: '5% OFF',           descricao: 'Gaste R$ 500 em compras',   desconto: '5',  valor: null },
+    { id: 'prata',    tipo: 'gasto',   icone: '🥈', titulo: 'Cliente Prata',       meta: 1000, recompensa: '10% OFF',          descricao: 'Gaste R$ 1.000 em compras', desconto: '10', valor: null },
+    { id: 'ouro',     tipo: 'gasto',   icone: '🥇', titulo: 'Cliente Ouro',        meta: 2000, recompensa: 'Frete + 15% OFF',  descricao: 'Gaste R$ 2.000 em compras', desconto: '15', valor: null },
+    { id: 'freq5',    tipo: 'pedidos', icone: '📦', titulo: 'Comprador Frequente', meta: 5,    recompensa: 'Cupom R$ 20',      descricao: 'Faca 5 pedidos',            desconto: null, valor: 20 },
+    { id: 'vip10',    tipo: 'pedidos', icone: '🚀', titulo: 'Cliente VIP',         meta: 10,   recompensa: 'Cupom R$ 50',      descricao: 'Faca 10 pedidos',           desconto: null, valor: 50 },
+    { id: 'lenda20',  tipo: 'pedidos', icone: '👑', titulo: 'Lenda GN',            meta: 20,   recompensa: 'Cupom R$ 100',     descricao: 'Faca 20 pedidos',           desconto: null, valor: 100 },
+  ];
+
+  // Faixas: [metaInicio, metaFim, nome, icone, cor]
+  const NIVEIS = [
+    { min: 0,    max: 500,  nome: 'Bronze',   icone: '🥉', cor: '#cd7f32' },
+    { min: 500,  max: 1000, nome: 'Prata',    icone: '🥈', cor: '#c0c0c0' },
+    { min: 1000, max: 2000, nome: 'Ouro',     icone: '🥇', cor: '#d5a651' },
+    { min: 2000, max: null, nome: 'Diamante', icone: '💎', cor: '#a8d8ea' },
+  ];
+
+  function getNivel(totalGasto) {
+    return NIVEIS.find(n => n.max === null || totalGasto < n.max) || NIVEIS[NIVEIS.length - 1];
+  }
+
+  // XP = pontos dentro do nível atual (0 a 100)
+  function calcXP(totalGasto) {
+    const n = getNivel(totalGasto);
+    if (n.max === null) return 100;
+    return Math.min(100, Math.round(((totalGasto - n.min) / (n.max - n.min)) * 100));
+  }
+
+  function gerarCodigoCupom(prefixo) {
+    return prefixo + Math.random().toString(36).substring(2, 7).toUpperCase();
+  }
+
+  async function getProgresso(email) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/missoes_progresso?cliente_email=eq.${encodeURIComponent(email)}&select=*`, {
+      cache: 'no-store',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+    return data && data.length ? data[0] : null;
+  }
+
+  async function getCuponsConquistados(email) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados?cliente_email=eq.${encodeURIComponent(email)}&select=*&order=criado_em.desc`, {
+      cache: 'no-store',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    return await res.json() || [];
+  }
+
+  async function atualizarProgressoMissoes(email, totalPedido) {
+    if (!email) return;
+    let prog = await getProgresso(email);
+    const novoTotal = (prog ? prog.total_gasto : 0) + totalPedido;
+    const novosPedidos = (prog ? prog.total_pedidos : 0) + 1;
+    const novoXP = calcXP(novoTotal);
+    const nivel = getNivel(novoTotal).nome.toLowerCase();
+
+    const progPayload = { total_gasto: novoTotal, total_pedidos: novosPedidos, xp: novoXP, nivel, atualizado_em: new Date().toISOString() };
+    if (prog) {
+      const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/missoes_progresso?cliente_email=eq.${encodeURIComponent(email)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=representation' },
+        body: JSON.stringify(progPayload)
+      });
+      console.log('[missoes] PATCH progresso status:', patchRes.status, await patchRes.text());
+    } else {
+      const postRes = await fetch(`${SUPABASE_URL}/rest/v1/missoes_progresso`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=representation' },
+        body: JSON.stringify({ cliente_email: email, ...progPayload })
+      });
+      console.log('[missoes] POST progresso status:', postRes.status, await postRes.text());
+    }
+
+    // Verifica missoes concluidas
+    const cuponsExistentes = await getCuponsConquistados(email);
+    const origensExistentes = cuponsExistentes.map(c => c.origem);
+    const conquistados = [];
+
+    for (const m of MISSOES) {
+      if (origensExistentes.includes(m.id)) continue;
+      const progValor = m.tipo === 'gasto' ? novoTotal : novosPedidos;
+      if (progValor >= m.meta) {
+        const codigo = gerarCodigoCupom('GN');
+        await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ cliente_email: email, codigo, descricao: m.titulo, desconto: m.recompensa, origem: m.id, usado: false })
+        });
+        conquistados.push(m);
+      }
+    }
+
+    if (conquistados.length) showConquistaAnimation(conquistados);
+  }
+
+  function showConquistaAnimation(missoes) {
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;top:80px;right:20px;z-index:9999;display:grid;gap:10px;max-width:320px';
+    missoes.forEach(m => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:linear-gradient(135deg,#1a1400,#2a1e00);border:1px solid rgba(213,166,81,0.6);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.6);animation:slideIn 0.4s ease';
+      card.innerHTML = `<span style="font-size:2rem">${m.icone}</span><div><div style="color:#d5a651;font-weight:700;font-size:0.9rem">🏆 Missao Concluida!</div><div style="color:#f5f1ec;font-size:0.85rem">${m.titulo}</div><div style="color:#4caf50;font-size:0.78rem">+${m.recompensa}</div></div>`;
+      el.appendChild(card);
+    });
+    document.body.appendChild(el);
+    launchConfetti();
+    setTimeout(() => { el.style.transition = 'opacity 0.5s'; el.style.opacity = '0'; }, 4000);
+    setTimeout(() => el.remove(), 4600);
+  }
+
+  function launchConfetti() {
+    const colors = ['#d5a651','#c9922a','#fff','#4caf50','#ffd700'];
+    for (let i = 0; i < 80; i++) {
+      const c = document.createElement('div');
+      c.style.cssText = `position:fixed;top:-10px;left:${Math.random()*100}vw;width:8px;height:8px;border-radius:2px;background:${colors[Math.floor(Math.random()*colors.length)]};opacity:1;z-index:99999;pointer-events:none;animation:confettiFall ${1.2+Math.random()*1.6}s ease-in forwards;animation-delay:${Math.random()*0.6}s`;
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3000);
+    }
+  }
+
   async function showProfilePanel() {
     const existing = document.getElementById('profileOverlay');
     if (existing) { existing.remove(); return; }
@@ -808,12 +1002,11 @@
     const overlay = document.createElement('div');
     overlay.id = 'profileOverlay';
     overlay.className = 'profile-overlay';
-    overlay.innerHTML = `<div class="profile-modal"><div class="profile-loading">Carregando...</div></div>`;
+    overlay.innerHTML = `<div class="profile-modal profile-modal-wide"><div class="profile-loading">Carregando...</div></div>`;
     document.body.appendChild(overlay);
     overlay.style.display = 'flex';
     overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
 
-    // Busca cliente pelo email salvo localmente
     const savedEmail = localStorage.getItem('gn_profile_email');
     let cliente = null;
 
@@ -829,7 +1022,6 @@
     const modal = overlay.querySelector('.profile-modal');
 
     if (!cliente) {
-      // Tela de login por email
       modal.innerHTML = `
         <button class="register-close" id="profileClose">✕</button>
         <div style="text-align:center">
@@ -862,7 +1054,6 @@
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const data = await res.json();
-        console.log('Profile login response:', res.status, data);
         if (!data || !data.length) {
           showMiniToast('E-mail não encontrado.');
           btn.textContent = 'Acessar perfil';
@@ -873,34 +1064,232 @@
         overlay.remove();
         showProfilePanel();
       });
-    } else {
-      const firstName = cliente.nome.split(' ')[0];
-      modal.innerHTML = `
-        <button class="register-close" id="profileClose">✕</button>
-        <div class="profile-header">
-          <img src="logo.jpeg" class="register-logo" alt="GN Máfia" />
-          <h2>Olá, <span style="color:var(--gold-light)">${firstName}</span>!</h2>
-          <p style="color:var(--muted);font-size:0.82rem">${cliente.email}</p>
-        </div>
-        <div class="profile-section">
-          <h4>Seus Cupons</h4>
-          ${ cliente.cupom
-            ? `<div class="profile-coupon">
-                <div class="register-coupon">${cliente.cupom}</div>
-                <p class="register-coupon-note">10% OFF na próxima compra — uso único</p>
-                <button class="coupon-copy" onclick="navigator.clipboard.writeText('${cliente.cupom}');this.textContent='Copiado!';setTimeout(()=>this.textContent='Copiar cupom',2000)">Copiar cupom</button>
-              </div>`
-            : `<p style="color:var(--muted);font-size:0.85rem">Nenhum cupom disponível.<br><span style="font-size:0.78rem">O cupom é removido após o uso.</span></p>`
-          }
-        </div>
-        <button class="register-skip" id="profileLogout">Sair da conta</button>
-      `;
-      modal.querySelector('#profileClose').addEventListener('click', () => overlay.remove());
-      modal.querySelector('#profileLogout').addEventListener('click', () => {
-        localStorage.removeItem('gn_profile_email');
-        overlay.remove();
-      });
+      return;
     }
+
+    // ── Busca progresso e cupons conquistados ──
+    const [prog, cuponsConq] = await Promise.all([
+      getProgresso(savedEmail),
+      getCuponsConquistados(savedEmail)
+    ]);
+
+    const totalGasto   = prog ? prog.total_gasto   : 0;
+    const totalPedidos = prog ? prog.total_pedidos  : 0;
+    const nivel        = getNivel(totalGasto);
+    const xp           = calcXP(totalGasto);
+    const firstName    = cliente.nome.split(' ')[0];
+
+    // Barra de XP dentro do nível atual
+    const xpMin  = nivel.max === null ? totalGasto : nivel.min;
+    const xpMax  = nivel.max === null ? totalGasto : nivel.max;
+    const proximaMeta = nivel.max || null;
+    const pctNivel = xp;
+
+    // Cupons ativos vs usados
+    const cuponsAtivos  = cuponsConq.filter(c => !c.usado);
+    const cuponsUsados  = cuponsConq.filter(c => c.usado === true);
+    // Cupom de cadastro
+    const cupomCadastro = cliente.cupom ? [{ codigo: cliente.cupom, descricao: 'Boas-vindas', desconto: '10% OFF', usado: false, _cadastro: true }] : [];
+    const todosCuponsAtivos = [...cupomCadastro, ...cuponsAtivos];
+
+    // Renderiza abas
+    modal.innerHTML = `
+      <button class="register-close" id="profileClose">✕</button>
+      <div class="profile-header">
+        <img src="logo.jpeg" class="register-logo" alt="GN Máfia" />
+        <h2>Olá, <span style="color:var(--gold-light)">${firstName}</span>! <span style="font-size:1.1rem">${nivel.icone}</span></h2>
+        <p style="color:${nivel.cor};font-size:0.8rem;font-weight:700;letter-spacing:0.08em">Nível ${nivel.nome} · ${xp} XP</p>
+        <p style="color:var(--muted);font-size:0.78rem;margin-top:2px">${cliente.email}</p>
+      </div>
+
+      <div class="profile-tabs">
+        <button class="profile-tab profile-tab-active" data-tab="missoes">🏆 Missões</button>
+        <button class="profile-tab" data-tab="cupons">🎁 Meus Cupons</button>
+        <button class="profile-tab" data-tab="conquistas">⭐ Conquistas</button>
+      </div>
+
+      <div class="profile-tab-content" id="tab-missoes">
+        <!-- Stats -->
+        <div class="profile-stats">
+          <div class="stat-card">
+            <div class="stat-value">${formatBRL(totalGasto)}</div>
+            <div class="stat-label">Total Gasto</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${totalPedidos}</div>
+            <div class="stat-label">Pedidos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:${nivel.cor}">${nivel.icone} ${nivel.nome}</div>
+            <div class="stat-label">Nível Atual</div>
+          </div>
+        </div>
+
+        ${ proximaMeta ? `
+        <div class="proxima-meta">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:0.78rem;color:var(--muted)">XP — Nível ${nivel.nome}</span>
+            <span style="font-size:0.75rem;color:${nivel.cor};font-weight:700">${xp}%</span>
+          </div>
+          <div class="missao-barra-wrap"><div class="missao-barra" style="width:${xp}%;background:${nivel.cor}"></div></div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:6px">${formatBRL(totalGasto)} / ${formatBRL(proximaMeta)} — Avance para <strong>${NIVEIS.find(n => n.min === (nivel.max || 0))?.nome || 'Diamante'}</strong></div>
+        </div>` : `<div class="proxima-meta" style="text-align:center;color:var(--gold-light);font-size:0.85rem">💎 Nível máximo atingido: Diamante! XP: 100%</div>` }
+
+        <div style="font-size:0.75rem;color:var(--muted);letter-spacing:0.1em;margin-bottom:10px;text-align:left">MISSÕES GN MÁFIA</div>
+        <div class="missoes-lista" id="missoesList"></div>
+      </div>
+
+      <div class="profile-tab-content" id="tab-cupons" style="display:none">
+        <div style="font-size:0.75rem;color:var(--muted);letter-spacing:0.1em;margin-bottom:12px">CUPONS DISPONÍVEIS</div>
+        ${ todosCuponsAtivos.length ? todosCuponsAtivos.map(c => `
+          <div class="missao-card" style="margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+              <div>
+                <div style="font-size:0.8rem;font-weight:700;color:var(--text)">${c.descricao}</div>
+                <div style="font-size:0.72rem;color:var(--gold-light);margin-top:2px">${c.desconto}</div>
+              </div>
+              <div style="text-align:right">
+                <div class="register-coupon" style="font-size:1rem;padding:8px 14px;letter-spacing:0.18em">${c.codigo}</div>
+                <button class="coupon-copy" style="margin-top:6px;font-size:0.72rem;padding:5px 12px" onclick="navigator.clipboard.writeText('${c.codigo}');this.textContent='Copiado!';setTimeout(()=>this.textContent='Copiar',2000)">Copiar</button>
+              </div>
+            </div>
+          </div>`).join('') : `<p style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0">Nenhum cupom disponível.<br><span style="font-size:0.78rem">Complete missões para ganhar cupons!</span></p>` }
+
+        ${ cuponsUsados.length ? `
+          <div style="font-size:0.75rem;color:var(--muted);letter-spacing:0.1em;margin:16px 0 10px">HISTÓRICO DE CUPONS USADOS</div>
+          ${ cuponsUsados.map(c => `
+            <div class="missao-card" style="opacity:0.5;margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:0.78rem;color:var(--muted);text-decoration:line-through">${c.descricao}</div>
+                  <div style="font-size:0.7rem;color:var(--muted)">${c.desconto}</div>
+                </div>
+                <div style="font-size:0.78rem;color:var(--muted);text-decoration:line-through;letter-spacing:0.1em">${c.codigo}</div>
+              </div>
+            </div>`).join('') }` : '' }
+      </div>
+
+      <div class="profile-tab-content" id="tab-conquistas" style="display:none">
+        <div style="font-size:0.75rem;color:var(--muted);letter-spacing:0.1em;margin-bottom:12px">MINHAS CONQUISTAS</div>
+        <div id="conquistasList"></div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+          <div style="font-size:0.75rem;color:var(--muted);letter-spacing:0.1em;margin-bottom:10px">BENEFÍCIOS DO SEU NÍVEL: <span style="color:${nivel.cor}">${nivel.icone} ${nivel.nome.toUpperCase()}</span></div>
+          ${ renderBeneficios(nivel.nome) }
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+          <div style="font-size:0.75rem;color:var(--muted);letter-spacing:0.1em;margin-bottom:10px">DESAFIOS DE ENGAJAMENTO</div>
+          <div class="missao-card" style="margin-bottom:8px">
+            <div class="missao-header">
+              <span class="missao-icone">📸</span>
+              <div class="missao-info">
+                <div class="missao-titulo">Poste sua compra</div>
+                <div class="missao-desc">Publique uma foto usando a roupa e marque @gnmafia_oficial</div>
+              </div>
+              <div class="missao-recompensa">10% OFF</div>
+            </div>
+          </div>
+          <div class="missao-card">
+            <div class="missao-header">
+              <span class="missao-icone">⭐</span>
+              <div class="missao-info">
+                <div class="missao-titulo">Avalie sua compra</div>
+                <div class="missao-desc">Deixe uma avaliação do produto</div>
+              </div>
+              <div class="missao-recompensa">R$ 10 OFF</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="register-skip" id="profileLogout" style="margin-top:16px">Sair da conta</button>
+    `;
+
+    // Renderiza missões com progresso
+    const missoesList = modal.querySelector('#missoesList');
+    MISSOES.forEach(m => {
+      const progValor  = m.tipo === 'gasto' ? totalGasto : totalPedidos;
+      const pct        = Math.min(100, Math.round((progValor / m.meta) * 100));
+      const concluida  = progValor >= m.meta;
+      const origens    = cuponsConq.map(c => c.origem);
+      const resgatada  = origens.includes(m.id);
+
+      const card = document.createElement('div');
+      card.className = 'missao-card' + (concluida ? ' missao-concluida' : '');
+      card.innerHTML = `
+        <div class="missao-header">
+          <span class="missao-icone">${m.icone}</span>
+          <div class="missao-info">
+            <div class="missao-titulo">${m.titulo} ${resgatada ? '✅' : ''}</div>
+            <div class="missao-desc">${m.descricao}</div>
+          </div>
+          <div>
+            <div class="missao-recompensa">🎁 ${m.recompensa}</div>
+            <div class="missao-pct">${pct}%</div>
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="missao-barra-wrap"><div class="missao-barra" style="width:${pct}%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--muted);margin-top:4px">
+            <span>${m.tipo === 'gasto' ? formatBRL(Math.min(progValor, m.meta)) : Math.min(progValor, m.meta) + ' pedidos'}</span>
+            <span>${m.tipo === 'gasto' ? formatBRL(m.meta) : m.meta + ' pedidos'}</span>
+          </div>
+        </div>
+      `;
+      missoesList.appendChild(card);
+    });
+
+    // Renderiza conquistas
+    const conquistasList = modal.querySelector('#conquistasList');
+    if (cuponsConq.length) {
+      cuponsConq.forEach(c => {
+        const missao = MISSOES.find(m => m.id === c.origem);
+        const div = document.createElement('div');
+        div.className = 'missao-card missao-concluida';
+        div.style.marginBottom = '8px';
+        div.innerHTML = `
+          <div class="missao-header">
+            <span class="missao-icone">${missao ? missao.icone : '🏆'}</span>
+            <div class="missao-info">
+              <div class="missao-titulo">${c.descricao}</div>
+              <div class="missao-desc">${c.desconto}${c.usado ? ' — <span style="color:#f55e5e">Usado</span>' : ''}</div>
+            </div>
+            <div style="font-size:1.4rem">✅</div>
+          </div>
+        `;
+        conquistasList.appendChild(div);
+      });
+    } else {
+      conquistasList.innerHTML = `<p style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0">Nenhuma conquista ainda.<br><span style="font-size:0.78rem">Complete missões para desbloquear medalhas!</span></p>`;
+    }
+
+    // Lógica das abas
+    modal.querySelectorAll('.profile-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        modal.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('profile-tab-active'));
+        modal.querySelectorAll('.profile-tab-content').forEach(c => c.style.display = 'none');
+        tab.classList.add('profile-tab-active');
+        modal.querySelector('#tab-' + tab.dataset.tab).style.display = 'block';
+      });
+    });
+
+    modal.querySelector('#profileClose').addEventListener('click', () => overlay.remove());
+    modal.querySelector('#profileLogout').addEventListener('click', () => {
+      localStorage.removeItem('gn_profile_email');
+      overlay.remove();
+    });
+  }
+
+  function renderBeneficios(nomeNivel) {
+    const mapa = {
+      'Bronze':   ['Cupons exclusivos de boas-vindas', 'Acesso a promoções da semana'],
+      'Prata':    ['Cupons exclusivos 5% OFF', 'Acesso antecipado a lançamentos', 'Frete promocional'],
+      'Ouro':     ['Cupons exclusivos 10% OFF', 'Acesso VIP a lançamentos', 'Frete grátis em pedidos acima de R$ 200'],
+      'Diamante': ['Cupons exclusivos 15% OFF', 'Acesso VIP a lançamentos', 'Frete grátis em todos os pedidos', 'Sorteios mensais exclusivos'],
+    };
+    const itens = mapa[nomeNivel] || mapa['Bronze'];
+    return itens.map(b => `<div style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--muted);margin-bottom:7px"><span style="color:var(--gold-light)">✓</span>${b}</div>`).join('');
   }
 
   function toggleCartPanel() {
@@ -918,13 +1307,35 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    // Desativa restauracao automatica do browser para controlar manualmente
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
     updateHeader(loadCart());
 
     // Restaura posicao de scroll
     const savedScroll = sessionStorage.getItem('gn_scroll');
-    if (savedScroll) { window.scrollTo(0, parseInt(savedScroll)); sessionStorage.removeItem('gn_scroll'); }
-    window.addEventListener('beforeunload', () => { sessionStorage.setItem('gn_scroll', window.scrollY); });
-    window.addEventListener('pagehide', () => { sessionStorage.setItem('gn_scroll', window.scrollY); });
+    if (savedScroll) {
+      sessionStorage.removeItem('gn_scroll');
+      const target = parseInt(savedScroll);
+      // Tenta restaurar após o layout estabilizar (imagens/fontes)
+      const tryScroll = (attempts) => {
+        window.scrollTo(0, target);
+        if (Math.abs(window.scrollY - target) > 10 && attempts > 0) {
+          requestAnimationFrame(() => tryScroll(attempts - 1));
+        }
+      };
+      // Aguarda load completo para garantir altura total da página
+      if (document.readyState === 'complete') {
+        requestAnimationFrame(() => tryScroll(20));
+      } else {
+        window.addEventListener('load', () => requestAnimationFrame(() => tryScroll(20)), { once: true });
+      }
+    }
+    const saveScroll = () => sessionStorage.setItem('gn_scroll', window.scrollY);
+    window.addEventListener('beforeunload', saveScroll);
+    window.addEventListener('pagehide', saveScroll);
+    // Salva periodicamente para cobrir navegacao por SPA/hash
+    window.addEventListener('scroll', () => sessionStorage.setItem('gn_scroll', window.scrollY), { passive: true });
 
     const pending = localStorage.getItem('gn_register_pending');
     if (pending && !localStorage.getItem('gn_profile_email')) {
@@ -950,6 +1361,7 @@
     $all('.add-to-cart').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const card = e.target.closest('.product-card');
+        if (!card) return;
         const imgEl = card.querySelector('.main-img, img');
         const rawSrc = card.getAttribute('data-image') || (imgEl ? imgEl.getAttribute('src') : '');
         const base = window.location.href.replace(/\/[^\/]*$/, '/');
@@ -961,6 +1373,24 @@
           image: absoluteImage
         };
         addToCart(product);
+      });
+    });
+
+    // Delegação para cards carregados dinamicamente (Supabase)
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.add-to-cart');
+      if (!btn || btn.dataset.cartBound) return;
+      const card = btn.closest('.product-card');
+      if (!card) return;
+      const imgEl = card.querySelector('.main-img, img');
+      const rawSrc = card.getAttribute('data-image') || (imgEl ? imgEl.getAttribute('src') : '');
+      const base = window.location.href.replace(/\/[^\/]*$/, '/');
+      const absoluteImage = rawSrc ? (rawSrc.startsWith('http') ? rawSrc : base + rawSrc) : '';
+      addToCart({
+        id: card.getAttribute('data-name'),
+        name: card.getAttribute('data-name'),
+        price: Number(card.getAttribute('data-price')),
+        image: absoluteImage
       });
     });
 

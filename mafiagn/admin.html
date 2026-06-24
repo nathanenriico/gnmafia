@@ -221,6 +221,57 @@
 
     .empty-row td { text-align: center; color: var(--muted); padding: 32px; }
 
+    /* PROGRESSOS MODAL */
+    .prog-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.82);
+      display: flex; align-items: flex-start; justify-content: center;
+      z-index: 1000; padding: 24px; overflow-y: auto;
+    }
+    .prog-modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; width: min(880px,100%); padding: 32px;
+      display: grid; gap: 28px; margin: auto;
+    }
+    .prog-modal-header { display: flex; align-items: center; justify-content: space-between; }
+    .prog-modal-header h2 { font-family: 'Cinzel', serif; color: var(--gold-light); font-size: 1.1rem; }
+    .prog-close { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.85rem; }
+    .prog-close:hover { background: rgba(255,255,255,0.06); }
+    .prog-section { display: grid; gap: 12px; }
+    .prog-section-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .prog-resumo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .prog-resumo-item { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 14px; }
+    .prog-resumo-item .label { font-size: 0.7rem; color: var(--muted); margin-bottom: 4px; }
+    .prog-resumo-item .value { font-size: 1rem; font-weight: 700; color: var(--gold-light); }
+    .missao-admin-card {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px;
+    }
+    .missao-admin-card .ma-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .missao-admin-card .ma-titulo { font-weight: 700; font-size: 0.88rem; }
+    .missao-admin-card .ma-desc { font-size: 0.75rem; color: var(--muted); }
+    .missao-admin-card .ma-meta { font-size: 0.75rem; color: var(--gold-light); margin-left: auto; }
+    .ma-barra-wrap { height: 6px; background: rgba(255,255,255,0.07); border-radius: 999px; margin-bottom: 10px; }
+    .ma-barra { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+    .ma-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+    .ma-btn { padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: rgba(255,255,255,0.04); color: var(--text); transition: background 0.2s; }
+    .ma-btn:hover { background: rgba(255,255,255,0.1); }
+    .ma-btn.green { border-color: rgba(76,175,80,0.4); color: var(--green); background: rgba(76,175,80,0.07); }
+    .ma-btn.green:hover { background: rgba(76,175,80,0.16); }
+    .ma-btn.gold { border-color: rgba(213,166,81,0.4); color: var(--gold-light); background: rgba(213,166,81,0.07); }
+    .ma-btn.gold:hover { background: rgba(213,166,81,0.16); }
+    .ma-btn.red { border-color: rgba(245,94,94,0.4); color: var(--red); background: rgba(245,94,94,0.07); }
+    .ma-btn.red:hover { background: rgba(245,94,94,0.16); }
+    .pedido-missao-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+    .pedido-missao-row:last-child { border-bottom: none; }
+    .tag-pendente { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; background: rgba(255,193,7,0.12); border: 1px solid rgba(255,193,7,0.3); color: #ffc107; }
+    .tag-aprovado { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; background: rgba(76,175,80,0.12); border: 1px solid rgba(76,175,80,0.3); color: var(--green); }
+    .tag-ignorado { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); }
+    .hist-row { font-size: 0.78rem; color: var(--muted); padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .hist-row:last-child { border-bottom: none; }
+    .hist-row strong { color: var(--text); }
+    .obs-input { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.85rem; resize: vertical; min-height: 60px; }
+    .obs-input:focus { outline: none; border-color: rgba(213,166,81,0.5); }
+
     @media (max-width: 860px) {
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .create-form { grid-template-columns: 1fr 1fr; }
@@ -266,6 +317,7 @@
         <button class="admin-tab-btn" data-tab="photos">Fotos do Site</button>
         <button class="admin-tab-btn" data-tab="cupons">Cupons</button>
         <button class="admin-tab-btn" data-tab="clientes">Clientes</button>
+        <button class="admin-tab-btn" data-tab="progressos">Progressos</button>
       </div>
 
       <!-- STATS -->
@@ -282,40 +334,53 @@
       <!-- FOTOS -->
       <div id="photos" class="admin-panel">
         <div class="section-title">Fotos do Site</div>
-        <div class="table-wrap" style="padding:18px; display:grid; gap:16px;">
-          <div class="photo-form-grid">
-            <div class="form-group">
-              <label>Título da foto</label>
-              <input type="text" id="photoTitle" placeholder="Ex: Coleção Verão" />
+        <div class="table-wrap" style="padding:20px; display:grid; gap:20px;">
+
+          <!-- Formulário -->
+          <div style="display:grid;gap:14px">
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:14px;align-items:end">
+              <div class="form-group"><label>Título do produto</label><input type="text" id="photoTitle" placeholder="Ex: Bobojaco Premium" /></div>
+              <div class="form-group"><label>Legenda / ALT</label><input type="text" id="photoAlt" placeholder="Descrição da imagem" /></div>
+              <div class="form-group">
+                <label>Categoria</label>
+                <select id="photoCategory" style="padding:11px 14px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;">
+                  <option value="bobojaco">Bobojacos</option>
+                  <option value="moletom">Moletons</option>
+                  <option value="conjunto">Conjuntos</option>
+                  <option value="camisa">Camisas</option>
+                  <option value="bermuda">Bermudas</option>
+                  <option value="acessorio">Acessórios</option>
+                  <option value="atacado">Atacado</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Preço (R$)</label><input type="number" id="photoPrice" min="0" step="0.01" placeholder="99.90" /></div>
             </div>
-            <div class="form-group">
-              <label>Legenda / ALT</label>
-              <input type="text" id="photoAlt" placeholder="Descrição da imagem" />
+
+            <!-- Upload múltiplo -->
+            <div>
+              <label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:8px">Imagens do produto <span style="color:var(--gold-light)">(selecione uma ou várias — JPG, PNG, WEBP)</span></label>
+              <label id="photoDropZone" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:2px dashed rgba(213,166,81,0.35);border-radius:12px;padding:28px;cursor:pointer;transition:border-color 0.2s;background:rgba(213,166,81,0.03)">
+                <span style="font-size:2rem">📷</span>
+                <span style="font-size:0.85rem;color:var(--muted)">Clique ou arraste imagens aqui</span>
+                <span style="font-size:0.72rem;color:var(--muted)">Múltiplas imagens permitidas</span>
+                <input type="file" id="photoFile" accept="image/jpeg,image/png,image/webp" multiple style="display:none" />
+              </label>
             </div>
-            <div class="form-group">
-              <label>Categoria</label>
-              <select id="photoCategory" style="padding:11px 14px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;">
-                <option value="bobojaco">Bobojacos</option>
-                <option value="moletom">Moletons</option>
-                <option value="conjunto">Conjuntos</option>
-                <option value="camisa">Camisas</option>
-                <option value="bermuda">Bermudas</option>
-                <option value="acessorio">Acessórios</option>
-                <option value="atacado">Atacado</option>
-              </select>
+
+            <!-- Preview das imagens selecionadas -->
+            <div id="photoPreviewWrap" style="display:none">
+              <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px">Pré-visualização — <strong style="color:var(--gold-light)">Clique para definir como principal</strong> — &#x2715; para remover</div>
+              <div id="photoPreviewGrid" style="display:flex;flex-wrap:wrap;gap:10px"></div>
             </div>
-            <div class="form-group">
-              <label>Preço (R$)</label>
-              <input type="number" id="photoPrice" min="0" step="0.01" placeholder="99.90" />
+
+            <div style="display:flex;gap:10px">
+              <button class="btn-create" id="savePhotoBtn">Adicionar produto</button>
+              <button id="cancelEditBtn" style="display:none;padding:11px 20px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:0.88rem">Cancelar edição</button>
             </div>
-            <div class="form-group">
-              <label>Imagem</label>
-              <input type="file" id="photoFile" accept="image/*" />
-            </div>
-            <button class="btn-create" id="savePhotoBtn">Adicionar foto</button>
           </div>
-          <p style="color:var(--muted); font-size:0.82rem;">As fotos salvas aqui aparecem na galeria do site. Você pode editar o título e trocar a imagem quando quiser.</p>
-          <div class="photo-grid" id="photoGrid"></div>
+
+          <p style="color:var(--muted); font-size:0.82rem;">Os produtos aparecem na galeria do site com todas as fotos. A primeira imagem é usada como principal.</p>
+          <div id="photoGrid"></div>
         </div>
       </div>
 
@@ -396,6 +461,30 @@
               </tr>
             </thead>
             <tbody id="pedidosBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PROGRESSOS -->
+      <div id="progressos" class="admin-panel">
+        <div class="section-title">Controle de Missoes dos Clientes</div>
+        <div style="color:var(--muted);font-size:0.82rem;margin-bottom:16px">Pedidos aguardando analise administrativa. Aprove o progresso das missoes manualmente.</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>WhatsApp</th>
+                <th>Pedidos</th>
+                <th>Total Gasto (aprovado)</th>
+                <th>Ultima Compra</th>
+                <th>Nivel</th>
+                <th>XP</th>
+                <th>Pendentes</th>
+                <th>Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="progressosBody"><tr class="empty-row"><td colspan="9">Carregando...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -521,16 +610,54 @@
           document.getElementById('cuponsList').classList.add('active');
         } else if (target === 'clientes') {
           document.getElementById('clientes').classList.add('active');
+        } else if (target === 'progressos') {
+          document.getElementById('progressos').classList.add('active');
+          loadProgressos();
         }
       });
     });
 
-    const PHOTO_KEY = 'gn_site_photos';
     let photoEditingId = null;
+    let pendingImages = []; // { src: dataUrl }
 
-    function loadPhotos() {
-      const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]');
-      renderPhotos(photos);
+    // Drop zone
+    const dropZone = document.getElementById('photoDropZone');
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = 'var(--gold-light)'; });
+    dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = 'rgba(213,166,81,0.35)'; });
+    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.style.borderColor = 'rgba(213,166,81,0.35)'; handleFiles(Array.from(e.dataTransfer.files)); });
+    document.getElementById('photoFile').addEventListener('change', e => { handleFiles(Array.from(e.target.files)); e.target.value = ''; });
+
+    async function handleFiles(files) {
+      const valid = files.filter(f => /image\/(jpeg|png|webp)/.test(f.type));
+      if (!valid.length) { toast('Formato inválido. Use JPG, PNG ou WEBP.'); return; }
+      for (const f of valid) pendingImages.push({ src: await readFileAsDataUrl(f) });
+      renderPreview();
+    }
+
+    function renderPreview() {
+      const wrap = document.getElementById('photoPreviewWrap');
+      const grid = document.getElementById('photoPreviewGrid');
+      if (!pendingImages.length) { wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+      grid.innerHTML = '';
+      pendingImages.forEach((img, i) => {
+        const item = document.createElement('div');
+        item.style.cssText = 'position:relative;width:100px;flex-shrink:0';
+        item.innerHTML = `
+          <img src="${img.src}" style="width:100px;height:100px;object-fit:cover;border-radius:10px;border:2px solid ${i===0?'var(--gold-light)':'var(--border)'}" />
+          ${i===0?'<div style="position:absolute;top:4px;left:4px;background:var(--gold);color:#050404;font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:5px">PRINCIPAL</div>':''}
+          <button style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.2);color:#fff;cursor:pointer;font-size:0.75rem;display:grid;place-items:center" data-remove="${i}">×</button>
+        `;
+        item.querySelector('img').addEventListener('click', () => { const [m] = pendingImages.splice(i,1); pendingImages.unshift(m); renderPreview(); });
+        item.querySelector('[data-remove]').addEventListener('click', e => { e.stopPropagation(); pendingImages.splice(i,1); renderPreview(); });
+        grid.appendChild(item);
+      });
+    }
+
+    async function loadPhotos() {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/produtos?select=*&order=created_at.desc`, { headers: headers() });
+      const data = await res.json();
+      renderPhotos(Array.isArray(data) ? data : []);
     }
 
     const CATEGORY_LABELS = { bobojaco:'Bobojacos', moletom:'Moletons', conjunto:'Conjuntos', camisa:'Camisas', bermuda:'Bermudas', acessorio:'Acessórios', atacado:'Atacado' };
@@ -538,64 +665,73 @@
 
     function renderPhotos(photos) {
       const grid = document.getElementById('photoGrid');
-      if (!photos.length) {
-        grid.innerHTML = '<div class="empty-row" style="grid-column:1/-1;">Nenhuma foto cadastrada.</div>';
-        return;
-      }
-      // Agrupa por categoria
+      if (!photos.length) { grid.innerHTML = '<div style="color:var(--muted);padding:20px;text-align:center">Nenhum produto cadastrado.</div>'; return; }
       const byCategory = {};
-      photos.forEach(p => {
-        const cat = p.category || 'bobojaco';
-        if (!byCategory[cat]) byCategory[cat] = [];
-        byCategory[cat].push(p);
-      });
+      photos.forEach(p => { const cat = p.category || 'bobojaco'; (byCategory[cat] = byCategory[cat]||[]).push(p); });
       const cats = CATEGORY_ORDER.filter(c => byCategory[c]);
       grid.innerHTML = cats.map(cat => `
-        <div class="photo-section-header">
-          <span class="photo-section-title">${CATEGORY_LABELS[cat] || cat}</span>
-          <span class="photo-section-count">${byCategory[cat].length} foto(s)</span>
-        </div>
-        <div class="photo-grid">
-          ${byCategory[cat].map((photo, i) => `
-            <article class="photo-card">
-              <img src="${photo.src}" alt="${photo.alt || photo.title}" />
-              <div class="photo-card-body">
-                <div class="photo-card-title">${photo.title || 'Foto ' + (i+1)}</div>
-                <div class="photo-card-meta">${photo.alt || 'Sem legenda'}</div>
-                <div class="photo-card-meta">R$ ${Number(photo.price||0).toFixed(2).replace('.',',')}</div>
-                <div class="photo-actions">
-                  <button class="btn-photo edit" onclick="editPhoto('${photo.id}')">Editar</button>
-                  <button class="btn-photo delete" onclick="deletePhoto('${photo.id}')">Excluir</button>
+        <div style="margin-bottom:24px">
+          <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--gold-light);text-transform:uppercase;padding:10px 0 8px;border-bottom:1px solid var(--border);margin-bottom:12px">${CATEGORY_LABELS[cat]} <span style="color:var(--muted);font-weight:400">(${byCategory[cat].length})</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px">
+            ${byCategory[cat].map(photo => {
+              const images = Array.isArray(photo.images) && photo.images.length ? photo.images : [];
+              const thumbs = images.slice(0,4).map((s,i) => `<img src="${s}" style="width:36px;height:36px;object-fit:cover;border-radius:5px;border:1px solid ${i===0?'var(--gold-light)':'var(--border)'}" />`).join('');
+              return `
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+                <img src="${images[0]||''}" style="width:100%;height:140px;object-fit:cover;display:block" />
+                <div style="padding:10px 12px;display:grid;gap:6px">
+                  <div style="font-weight:700;font-size:0.85rem;color:var(--gold-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${photo.title}</div>
+                  <div style="font-size:0.75rem;color:var(--muted)">R$ ${Number(photo.price||0).toFixed(2).replace('.',',')} · ${images.length} foto${images.length!==1?'s':''}</div>
+                  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px">${thumbs}</div>
+                  <div style="display:flex;gap:6px;margin-top:4px">
+                    <button class="btn-photo edit" onclick="editPhoto('${photo.id}')">Editar</button>
+                    <button class="btn-photo delete" onclick="deletePhoto('${photo.id}')">Excluir</button>
+                  </div>
                 </div>
-              </div>
-            </article>
-          `).join('')}
+              </div>`;
+            }).join('')}
+          </div>
         </div>
       `).join('');
     }
 
-    function editPhoto(id) {
-      const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]');
-      const photo = photos.find(item => item.id === id);
+    async function editPhoto(id) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/produtos?id=eq.${id}&select=*`, { headers: headers() });
+      const data = await res.json();
+      const photo = data[0];
       if (!photo) return;
       document.getElementById('photoTitle').value = photo.title || '';
       document.getElementById('photoAlt').value = photo.alt || '';
       document.getElementById('photoPrice').value = photo.price || '';
       document.getElementById('photoCategory').value = photo.category || 'bobojaco';
+      pendingImages = (Array.isArray(photo.images) ? photo.images : []).map(src => ({ src }));
+      renderPreview();
       photoEditingId = id;
       document.getElementById('savePhotoBtn').textContent = 'Salvar edição';
+      document.getElementById('cancelEditBtn').style.display = 'block';
       document.querySelector('.admin-tab-btn[data-tab="photos"]').click();
       document.getElementById('photoTitle').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function deletePhoto(id) {
-      const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]');
-      const next = photos.filter(item => item.id !== id);
-      localStorage.setItem(PHOTO_KEY, JSON.stringify(next));
+    async function deletePhoto(id) {
+      if (!confirm('Excluir este produto?')) return;
+      await fetch(`${SUPABASE_URL}/rest/v1/produtos?id=eq.${id}`, { method: 'DELETE', headers: headers() });
+      toast('Produto excluído.');
       loadPhotos();
-      toast('Foto excluída.');
-      window.dispatchEvent(new Event('gnPhotosUpdated'));
     }
+
+    function cancelEdit() {
+      photoEditingId = null;
+      pendingImages = [];
+      renderPreview();
+      document.getElementById('savePhotoBtn').textContent = 'Adicionar produto';
+      document.getElementById('cancelEditBtn').style.display = 'none';
+      document.getElementById('photoTitle').value = '';
+      document.getElementById('photoAlt').value = '';
+      document.getElementById('photoPrice').value = '';
+    }
+
+    document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
 
     function readFileAsDataUrl(file) {
       return new Promise((resolve, reject) => {
@@ -607,45 +743,47 @@
     }
 
     document.getElementById('savePhotoBtn').addEventListener('click', async () => {
-      const title = document.getElementById('photoTitle').value.trim();
-      const alt = document.getElementById('photoAlt').value.trim();
-      const price = parseFloat(document.getElementById('photoPrice').value);
-      const file = document.getElementById('photoFile').files[0];
-      const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]');
-
-      if (!title) { toast('Informe um título para a foto.'); return; }
-
+      const title    = document.getElementById('photoTitle').value.trim();
+      const alt      = document.getElementById('photoAlt').value.trim();
+      const price    = parseFloat(document.getElementById('photoPrice').value);
       const category = document.getElementById('photoCategory').value;
+
+      if (!title) { toast('Informe um título para o produto.'); return; }
+      if (!pendingImages.length) { toast('Adicione pelo menos uma imagem.'); return; }
+
+      const btn = document.getElementById('savePhotoBtn');
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+
+      const images = pendingImages.map(p => p.src);
+      const payload = { title, alt, category, price: Number.isFinite(price) ? price : 0, images };
+
+      let res;
       if (photoEditingId) {
-        const existing = photos.find(item => item.id === photoEditingId);
-        const nextSrc = file ? await readFileAsDataUrl(file) : existing?.src || '';
-        const next = photos.map(item => item.id === photoEditingId ? {
-          ...item, title, alt, category,
-          price: Number.isFinite(price) ? price : (item.price || 0),
-          src: nextSrc, updatedAt: new Date().toISOString()
-        } : item);
-        localStorage.setItem(PHOTO_KEY, JSON.stringify(next));
-        toast('Foto editada com sucesso.');
-        photoEditingId = null;
-        document.getElementById('savePhotoBtn').textContent = 'Adicionar foto';
+        res = await fetch(`${SUPABASE_URL}/rest/v1/produtos?id=eq.${photoEditingId}`, {
+          method: 'PATCH',
+          headers: headers({ 'Prefer': 'return=minimal' }),
+          body: JSON.stringify({ ...payload, updated_at: new Date().toISOString() })
+        });
       } else {
-        if (!file) { toast('Selecione uma imagem para adicionar.'); return; }
-        const src = await readFileAsDataUrl(file);
-        photos.unshift({ id: 'photo-' + Date.now(), title, alt, category, price: Number.isFinite(price) ? price : 0, src, createdAt: new Date().toISOString() });
-        localStorage.setItem(PHOTO_KEY, JSON.stringify(photos));
-        toast('Foto adicionada com sucesso.');
+        res = await fetch(`${SUPABASE_URL}/rest/v1/produtos`, {
+          method: 'POST',
+          headers: headers({ 'Prefer': 'return=minimal' }),
+          body: JSON.stringify(payload)
+        });
       }
 
-      document.getElementById('photoTitle').value = '';
-      document.getElementById('photoAlt').value = '';
-      document.getElementById('photoPrice').value = '';
-      document.getElementById('photoFile').value = '';
-      loadPhotos();
-      window.dispatchEvent(new Event('gnPhotosUpdated'));
+      btn.disabled = false;
+      if (res.ok || res.status === 201 || res.status === 204) {
+        toast(photoEditingId ? 'Produto editado!' : 'Produto adicionado!');
+        cancelEdit();
+        loadPhotos();
+      } else {
+        const err = await res.text();
+        toast('Erro ao salvar: ' + err);
+        btn.textContent = photoEditingId ? 'Salvar edição' : 'Adicionar produto';
+      }
     });
-
-    window.editPhoto = editPhoto;
-    window.deletePhoto = deletePhoto;
 
     async function loadCupons() {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/cupons_sorteio?select=*&order=criado_em.desc`, { headers: headers() });
@@ -769,6 +907,323 @@
         toast('Erro ao excluir. Veja o console.');
       }
     }
+
+    // ── PROGRESSOS ──
+    const MISSOES_DEF = [
+      { id: 'bronze',  tipo: 'gasto',   icone: '\uD83D\uDCB0', titulo: 'Cliente Bronze',      meta: 500,  recompensa: '5% OFF' },
+      { id: 'prata',   tipo: 'gasto',   icone: '\uD83E\uDD48', titulo: 'Cliente Prata',       meta: 1000, recompensa: '10% OFF' },
+      { id: 'ouro',    tipo: 'gasto',   icone: '\uD83E\uDD47', titulo: 'Cliente Ouro',        meta: 2000, recompensa: 'Frete + 15% OFF' },
+      { id: 'freq5',   tipo: 'pedidos', icone: '\uD83D\uDCE6', titulo: 'Comprador Frequente', meta: 5,    recompensa: 'Cupom R$ 20' },
+      { id: 'vip10',   tipo: 'pedidos', icone: '\uD83D\uDE80', titulo: 'Cliente VIP',         meta: 10,   recompensa: 'Cupom R$ 50' },
+      { id: 'lenda20', tipo: 'pedidos', icone: '\uD83D\uDC51', titulo: 'Lenda GN',            meta: 20,   recompensa: 'Cupom R$ 100' },
+    ];
+    const NIVEIS_DEF = [
+      { min: 0,    max: 500,  nome: 'Bronze',   cor: '#cd7f32' },
+      { min: 500,  max: 1000, nome: 'Prata',    cor: '#c0c0c0' },
+      { min: 1000, max: 2000, nome: 'Ouro',     cor: '#d5a651' },
+      { min: 2000, max: null, nome: 'Diamante', cor: '#a8d8ea' },
+    ];
+    function getNivelAdmin(g) { return NIVEIS_DEF.find(n => n.max === null || g < n.max) || NIVEIS_DEF[3]; }
+    function calcXPAdmin(g) { const n = getNivelAdmin(g); if (!n.max) return 100; return Math.min(100, Math.round(((g - n.min) / (n.max - n.min)) * 100)); }
+    function fmtBRL(v) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v); }
+    function fmtDate(s) { return s ? new Date(s).toLocaleString('pt-BR') : '\u2014'; }
+    function gerarCodigo() { return 'GN' + Math.random().toString(36).substring(2,7).toUpperCase(); }
+
+    async function loadProgressos() {
+      const tbody = document.getElementById('progressosBody');
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Carregando...</td></tr>';
+      const [cliRes, pedRes, progRes] = await Promise.all([
+        fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?select=nome,email,whatsapp&order=id.desc`, { cache: 'no-store', headers: headers() }),
+        fetch(`${SUPABASE_URL}/rest/v1/pedidos?select=*&order=criado_em.desc`, { cache: 'no-store', headers: headers() }),
+        fetch(`${SUPABASE_URL}/rest/v1/missoes_progresso?select=*`, { cache: 'no-store', headers: headers() }),
+      ]);
+      const clientes = await cliRes.json() || [];
+      const pedidos  = await pedRes.json()  || [];
+      const progs    = await progRes.json() || [];
+      if (!clientes.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Nenhum cliente.</td></tr>'; return; }
+      tbody.innerHTML = clientes.map(cli => {
+        const pedsCli    = pedidos.filter(p => p.cliente_email === cli.email);
+        const progCli    = progs.find(p => p.cliente_email === cli.email);
+        const totalGasto = progCli ? (progCli.total_gasto || 0) : 0;
+        const totalPeds  = progCli ? (progCli.total_pedidos || 0) : 0;
+        const nivel      = getNivelAdmin(totalGasto);
+        const xp         = calcXPAdmin(totalGasto); // sempre recalcula localmente
+        const pendentes  = pedsCli.filter(p => p.missao_status === null || p.missao_status === 'pendente').length;
+        const ultima     = pedsCli[0] ? fmtDate(pedsCli[0].criado_em) : '\u2014';
+        return `<tr>
+          <td><strong>${cli.nome}</strong><br><span style="color:var(--muted);font-size:0.75rem">${cli.email}</span></td>
+          <td style="font-size:0.82rem">${cli.whatsapp || '\u2014'}</td>
+          <td style="text-align:center">${totalPeds}</td>
+          <td><strong style="color:var(--gold-light)">${fmtBRL(totalGasto)}</strong></td>
+          <td style="font-size:0.78rem;color:var(--muted)">${ultima}</td>
+          <td><span style="color:${nivel.cor};font-weight:700">${nivel.nome}</span></td>
+          <td style="min-width:90px">
+            <div style="font-size:0.72rem;color:var(--muted);margin-bottom:3px">${xp}%</div>
+            <div class="progress-bar-wrap"><div class="progress-bar" style="width:${xp}%;background:${nivel.cor}"></div></div>
+          </td>
+          <td style="text-align:center">${pendentes > 0 ? `<span class="tag-pendente">${pendentes} pendente${pendentes>1?'s':''}</span>` : '<span style="color:var(--muted);font-size:0.75rem">\u2014</span>'}</td>
+          <td><button class="btn-desativar" onclick="abrirDetalheCliente('${cli.email}')">Ver detalhes</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function abrirDetalheCliente(email) {
+      document.getElementById('progModalOverlay')?.remove();
+      const overlay = document.createElement('div');
+      overlay.id = 'progModalOverlay';
+      overlay.className = 'prog-overlay';
+      overlay.innerHTML = '<div class="prog-modal"><div style="color:var(--muted);text-align:center;padding:32px">Carregando...</div></div>';
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+      const nc = { cache: 'no-store' };
+      const [cliRes, pedRes, progRes, conquRes] = await Promise.all([
+        fetch(`${SUPABASE_URL}/rest/v1/dados_clientes?email=eq.${encodeURIComponent(email)}&select=*`, { ...nc, headers: headers() }),
+        fetch(`${SUPABASE_URL}/rest/v1/pedidos?cliente_email=eq.${encodeURIComponent(email)}&select=*&order=criado_em.desc`, { ...nc, headers: headers() }),
+        fetch(`${SUPABASE_URL}/rest/v1/missoes_progresso?cliente_email=eq.${encodeURIComponent(email)}&select=*`, { ...nc, headers: headers() }),
+        fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados?cliente_email=eq.${encodeURIComponent(email)}&select=*&order=criado_em.desc`, { ...nc, headers: headers() }),
+      ]);
+      const [cliData, pedidos, progArr, conquistas] = await Promise.all([cliRes.json(), pedRes.json(), progRes.json(), conquRes.json()]);
+      const cli  = (cliData || [])[0] || { nome: email, email, whatsapp: '\u2014' };
+      const prog = (progArr || [])[0] || { total_gasto: 0, total_pedidos: 0 };
+      const totalGasto   = prog.total_gasto   || 0;
+      const totalPedidos = prog.total_pedidos || 0;
+      const nivel = getNivelAdmin(totalGasto);
+      const xp    = calcXPAdmin(totalGasto);
+      const ticketMedio = totalPedidos > 0 ? totalGasto / totalPedidos : 0;
+      const origensConq = (conquistas || []).map(c => c.origem);
+
+      const tagMap   = { pendente: 'tag-pendente', aprovado: 'tag-aprovado', ignorado: 'tag-ignorado', contabilizado: 'tag-aprovado' };
+      const labelMap = { pendente: 'Pendente', aprovado: 'Aprovado', ignorado: 'Ignorado', contabilizado: 'Contabilizado' };
+
+      const modal = overlay.querySelector('.prog-modal');
+      modal.innerHTML = `
+        <div class="prog-modal-header">
+          <h2>${cli.nome}</h2>
+          <button class="prog-close" onclick="document.getElementById('progModalOverlay').remove()">Fechar</button>
+        </div>
+        <div class="prog-section">
+          <div class="prog-section-title">Resumo do Cliente</div>
+          <div class="prog-resumo-grid">
+            <div class="prog-resumo-item"><div class="label">E-mail</div><div class="value" style="font-size:0.78rem">${cli.email}</div></div>
+            <div class="prog-resumo-item"><div class="label">WhatsApp</div><div class="value" style="font-size:0.85rem">${cli.whatsapp || '\u2014'}</div></div>
+            <div class="prog-resumo-item"><div class="label">Total Pedidos</div><div class="value">${totalPedidos}</div></div>
+            <div class="prog-resumo-item"><div class="label">Total Gasto</div><div class="value">${fmtBRL(totalGasto)}</div></div>
+            <div class="prog-resumo-item"><div class="label">Ticket Medio</div><div class="value" style="font-size:0.9rem">${fmtBRL(ticketMedio)}</div></div>
+            <div class="prog-resumo-item"><div class="label">Nivel</div><div class="value" style="color:${nivel.cor}">${nivel.nome}</div></div>
+            <div class="prog-resumo-item"><div class="label">XP no Nivel</div><div class="value">${xp}%</div></div>
+            <div class="prog-resumo-item"><div class="label">Ultima Compra</div><div class="value" style="font-size:0.72rem">${(pedidos||[])[0] ? fmtDate((pedidos||[])[0].criado_em) : '\u2014'}</div></div>
+          </div>
+        </div>
+        <div class="prog-section">
+          <div class="prog-section-title">Historico de Pedidos</div>
+          <div id="pedidosCliBlock">
+            ${!(pedidos&&pedidos.length) ? '<div style="color:var(--muted);font-size:0.85rem">Nenhum pedido.</div>' : pedidos.map(p => {
+              const st = p.missao_status || 'pendente';
+              return `<div class="pedido-missao-row">
+                <div style="flex:1"><strong style="font-size:0.82rem">${p.cliente_nome}</strong> <span style="color:var(--muted);font-size:0.75rem">${fmtDate(p.criado_em)}</span></div>
+                <div style="color:var(--gold-light);font-weight:700;min-width:80px;text-align:right">${fmtBRL(p.total)}</div>
+                <div style="min-width:110px;text-align:right"><span class="${tagMap[st]||'tag-pendente'}">${labelMap[st]||st}</span></div>
+                <div style="display:flex;gap:6px;margin-left:8px">
+                  ${st === 'pendente' || st === null ? `<button class="ma-btn green" onclick="aprovarPedidoMissao('${p.id}','${email}',${p.total})">Aprovar</button><button class="ma-btn red" onclick="ignorarPedidoMissao('${p.id}','${email}')">Ignorar</button>` : ''}
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+        <div class="prog-section">
+          <div class="prog-section-title">Missoes do Cliente</div>
+          <div style="display:grid;gap:10px">
+            ${MISSOES_DEF.map(m => {
+              const progVal = m.tipo === 'gasto' ? totalGasto : totalPedidos;
+              const pct = Math.min(100, Math.round((progVal / m.meta) * 100));
+              const concluida = progVal >= m.meta;
+              const conquistada = origensConq.includes(m.id);
+              return `<div class="missao-admin-card">
+                <div class="ma-header">
+                  <span style="font-size:1.2rem">${m.icone}</span>
+                  <div><div class="ma-titulo">${m.titulo} ${conquistada ? '\u2705' : ''}</div><div class="ma-desc">${m.tipo==='gasto' ? fmtBRL(Math.min(progVal,m.meta))+' / '+fmtBRL(m.meta) : Math.min(progVal,m.meta)+' / '+m.meta+' pedidos'}</div></div>
+                  <div class="ma-meta">&#127873; ${m.recompensa}</div>
+                  <div style="margin-left:8px;font-size:0.75rem;color:${concluida?'var(--green)':'var(--muted)'}">${pct}%</div>
+                </div>
+                <div class="ma-barra-wrap"><div class="ma-barra" style="width:${pct}%"></div></div>
+                <div class="ma-btns">
+                  <button class="ma-btn green" onclick="ajustarProgresso('${email}','${m.id}','${m.tipo}',1)">+ Adicionar</button>
+                  <button class="ma-btn red" onclick="ajustarProgresso('${email}','${m.id}','${m.tipo}',-1)">- Remover</button>
+                  ${!conquistada ? `<button class="ma-btn gold" onclick="concluirMissao('${email}','${m.id}','${m.recompensa}')">Concluir missao</button>` : ''}
+                  <button class="ma-btn" onclick="resetarMissao('${email}','${m.id}')">Resetar</button>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    async function registrarHistorico(email, acao, missaoId, valor, obs) {
+      return;
+    }
+
+    async function salvarProgresso(email, novoTotal, novosPedidos) {
+      const xp = calcXPAdmin(novoTotal);
+      const nivel = getNivelAdmin(novoTotal).nome.toLowerCase();
+      const payload = { total_gasto: novoTotal, total_pedidos: novosPedidos, xp, nivel, atualizado_em: new Date().toISOString() };
+
+      // Tenta PATCH primeiro (atualiza se existe)
+      const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/missoes_progresso?cliente_email=eq.${encodeURIComponent(email)}`, {
+        method: 'PATCH',
+        headers: headers({ 'Prefer': 'return=representation' }),
+        body: JSON.stringify(payload)
+      });
+      const patched = await patchRes.json().catch(() => []);
+
+      // Se não existia registro, cria via POST
+      if (!Array.isArray(patched) || patched.length === 0) {
+        const postRes = await fetch(`${SUPABASE_URL}/rest/v1/missoes_progresso`, {
+          method: 'POST',
+          headers: headers({ 'Prefer': 'return=minimal' }),
+          body: JSON.stringify({ cliente_email: email, ...payload })
+        });
+        const postBody = await postRes.text();
+        if (!postRes.ok) {
+          console.error('[admin] salvarProgresso POST erro:', postRes.status, postBody);
+          toast('Erro ao salvar progresso: ' + postBody);
+          return false;
+        }
+      }
+      console.log('[admin] salvarProgresso ok:', email, { xp, nivel, novoTotal, novosPedidos });
+      return true;
+    }
+
+    async function aprovarPedidoMissao(pedidoId, email, valorPedido) {
+      // 1. Marca pedido como aprovado
+      const pRes = await fetch(`${SUPABASE_URL}/rest/v1/pedidos?id=eq.${pedidoId}`, {
+        method: 'PATCH', headers: headers(), body: JSON.stringify({ missao_status: 'aprovado' })
+      });
+      if (!pRes.ok) { toast('Erro ao aprovar pedido: ' + pRes.status); console.error(await pRes.text()); return; }
+
+      // 2. Busca progresso atual
+      const progRes = await fetch(`${SUPABASE_URL}/rest/v1/missoes_progresso?cliente_email=eq.${encodeURIComponent(email)}&select=*`, {
+        cache: 'no-store', headers: headers()
+      });
+      const progArr = await progRes.json();
+      const prog = (progArr||[])[0] || { total_gasto: 0, total_pedidos: 0 };
+      const novoTotal    = (prog.total_gasto   || 0) + Number(valorPedido);
+      const novosPedidos = (prog.total_pedidos || 0) + 1;
+
+      // 3. Salva progresso atualizado
+      const ok = await salvarProgresso(email, novoTotal, novosPedidos);
+      if (!ok) return;
+
+      // 4. Verifica missões atingidas e gera cupons
+      const conquRes = await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados?cliente_email=eq.${encodeURIComponent(email)}&select=origem`, {
+        cache: 'no-store', headers: headers()
+      });
+      const conquistas = await conquRes.json() || [];
+      const origensExist = conquistas.map(c => c.origem);
+      const novasMissoes = [];
+      for (const m of MISSOES_DEF) {
+        if (origensExist.includes(m.id)) continue;
+        const pv = m.tipo === 'gasto' ? novoTotal : novosPedidos;
+        if (pv >= m.meta) {
+          const codigo = gerarCodigo();
+          const cRes = await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados`, {
+            method: 'POST',
+            headers: headers({ 'Prefer': 'return=minimal' }),
+            body: JSON.stringify({ cliente_email: email, codigo, descricao: m.titulo, desconto: m.recompensa, origem: m.id, usado: false })
+          });
+          if (!cRes.ok) { console.error('[admin] erro ao criar cupom conquistado:', await cRes.text()); }
+          else novasMissoes.push(m.titulo);
+        }
+      }
+
+      const msg = novasMissoes.length
+        ? `Aprovado! Missao(oes) concluida(s): ${novasMissoes.join(', ')}`
+        : 'Pedido aprovado! Progresso atualizado.';
+      toast(msg);
+      abrirDetalheCliente(email);
+      loadProgressos();
+    }
+
+    async function ignorarPedidoMissao(pedidoId, email) {
+      const obs = prompt('Motivo para ignorar este pedido (obrigatorio):');
+      if (obs === null) return;
+      if (!obs.trim()) { toast('Observacao obrigatoria.'); return; }
+      await fetch(`${SUPABASE_URL}/rest/v1/pedidos?id=eq.${pedidoId}`, { method: 'PATCH', headers: headers(), body: JSON.stringify({ missao_status: 'ignorado' }) });
+      await registrarHistorico(email, 'Pedido ignorado', null, null, obs);
+      toast('Pedido marcado como ignorado.');
+      abrirDetalheCliente(email);
+    }
+
+    async function ajustarProgresso(email, missaoId, tipo, sentido) {
+      const unidade = tipo === 'gasto' ? 'valor em R$' : 'quantidade de pedidos';
+      const valorStr = prompt(`Informe o ${unidade} a ${sentido > 0 ? 'adicionar' : 'remover'}:`);
+      if (valorStr === null) return;
+      const valor = parseFloat(valorStr.replace(',', '.'));
+      if (isNaN(valor) || valor <= 0) { toast('Valor invalido.'); return; }
+      let obs = '';
+      if (sentido < 0) {
+        obs = prompt('Motivo da remocao (obrigatorio):');
+        if (obs === null) return;
+        if (!obs.trim()) { toast('Observacao obrigatoria para remover progresso.'); return; }
+      }
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/missoes_progresso?cliente_email=eq.${encodeURIComponent(email)}&select=*`, { headers: headers() });
+      const progArr = await res.json();
+      const prog = (progArr||[])[0] || { total_gasto: 0, total_pedidos: 0 };
+      const delta = sentido * valor;
+      const novoTotal    = tipo === 'gasto'   ? Math.max(0, (prog.total_gasto   || 0) + delta) : (prog.total_gasto   || 0);
+      const novosPedidos = tipo === 'pedidos' ? Math.max(0, (prog.total_pedidos || 0) + delta) : (prog.total_pedidos || 0);
+      await salvarProgresso(email, novoTotal, novosPedidos);
+      // Verifica missoes atingidas apos ajuste manual
+      const conquResAdj = await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados?cliente_email=eq.${encodeURIComponent(email)}&select=origem`, { cache: 'no-store', headers: headers() });
+      const conquistasAdj = await conquResAdj.json() || [];
+      const origensAdj = conquistasAdj.map(c => c.origem);
+      for (const m of MISSOES_DEF) {
+        if (origensAdj.includes(m.id)) continue;
+        const pv = m.tipo === 'gasto' ? novoTotal : novosPedidos;
+        if (pv >= m.meta) {
+          const codigo = gerarCodigo();
+          await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados`, { method: 'POST', headers: headers({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ cliente_email: email, codigo, descricao: m.titulo, desconto: m.recompensa, origem: m.id, usado: false }) });
+          await registrarHistorico(email, 'Missao concluida automaticamente', m.id, null, `Cupom ${codigo} gerado`);
+        }
+      }
+      await registrarHistorico(email, sentido > 0 ? 'Progresso adicionado manualmente' : 'Progresso removido manualmente', missaoId, delta, obs || null);
+      toast(`Progresso ${sentido > 0 ? 'adicionado' : 'removido'}.`);
+      abrirDetalheCliente(email);
+      loadProgressos();
+    }
+
+    async function concluirMissao(email, missaoId, recompensa) {
+      if (!confirm(`Concluir missao "${missaoId}" e liberar "${recompensa}" para ${email}?`)) return;
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados?cliente_email=eq.${encodeURIComponent(email)}&origem=eq.${missaoId}&select=id`, { headers: headers() });
+      const exist = await res.json();
+      if (exist && exist.length) { toast('Missao ja concluida para este cliente.'); return; }
+      const codigo = gerarCodigo();
+      const missao = MISSOES_DEF.find(m => m.id === missaoId);
+      await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados`, { method: 'POST', headers: headers({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ cliente_email: email, codigo, descricao: missao?.titulo || missaoId, desconto: recompensa, origem: missaoId, usado: false }) });
+      await registrarHistorico(email, 'Missao concluida pelo admin', missaoId, null, `Cupom ${codigo} gerado`);
+      toast(`Missao concluida! Cupom ${codigo} liberado.`);
+      abrirDetalheCliente(email);
+    }
+
+    async function resetarMissao(email, missaoId) {
+      const obs = prompt(`Motivo para resetar a missao "${missaoId}" (obrigatorio):`);
+      if (obs === null) return;
+      if (!obs.trim()) { toast('Observacao obrigatoria.'); return; }
+      await fetch(`${SUPABASE_URL}/rest/v1/cupons_conquistados?cliente_email=eq.${encodeURIComponent(email)}&origem=eq.${missaoId}`, { method: 'DELETE', headers: headers() });
+      await registrarHistorico(email, 'Missao resetada pelo admin', missaoId, null, obs);
+      toast(`Missao "${missaoId}" resetada.`);
+      abrirDetalheCliente(email);
+    }
+
+    window.editPhoto           = editPhoto;
+    window.deletePhoto          = deletePhoto;
+    window.abrirDetalheCliente  = abrirDetalheCliente;
+    window.aprovarPedidoMissao = aprovarPedidoMissao;
+    window.ignorarPedidoMissao = ignorarPedidoMissao;
+    window.ajustarProgresso    = ajustarProgresso;
+    window.concluirMissao      = concluirMissao;
+    window.resetarMissao       = resetarMissao;
 
     // Realtime
     const ws = new WebSocket(`wss://yhggzhyabuqjuxtetjpj.supabase.co/realtime/v1/websocket?apikey=${SUPABASE_KEY}&vsn=1.0.0`);
