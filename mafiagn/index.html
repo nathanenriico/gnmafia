@@ -130,6 +130,7 @@
     <div class="section-header" id="todosHeader" style="margin-top:40px;display:none">
       <h2>TODOS OS PRODUTOS</h2>
     </div>
+    <div class="size-filter" id="todosSizeFilter" style="display:none;padding:14px 0"></div>
     <div class="product-grid" id="produtos" style="display:none"></div>
   </section>
 
@@ -584,7 +585,7 @@
         card.setAttribute('data-price', String(price));
         card.setAttribute('data-image', mainSrc);
         card.setAttribute('data-category', photo.category || 'bobojaco');
-        card.setAttribute('data-sizes', 'P,M,G,GG');
+        card.setAttribute('data-sizes', Array.isArray(photo.sizes) && photo.sizes.length ? photo.sizes.join(',') : 'P,M,G,GG');
 
         const thumbsHtml = images.length > 1
           ? `<div class="product-thumbs">${images.map((src, i) =>
@@ -620,6 +621,42 @@
       grid.style.display = 'grid';
       const todosHeader = document.getElementById('todosHeader');
       if (todosHeader) todosHeader.style.display = 'flex';
+
+      // Filtro de tamanho — seção Todos os Produtos
+      const todosSizeFilter = document.getElementById('todosSizeFilter');
+      if (todosSizeFilter) {
+        const SIZE_ORDER = ['PP','P','M','G','GG','XGG','ÚNICO'];
+        const allSizes = new Set();
+        grid.querySelectorAll('.product-card').forEach(c => {
+          (c.getAttribute('data-sizes') || 'P,M,G,GG').split(',').map(s => s.trim()).filter(Boolean).forEach(s => allSizes.add(s));
+        });
+        const sortedSizes = SIZE_ORDER.filter(s => allSizes.has(s));
+        // inclui tamanhos fora da ordem padrão no final
+        allSizes.forEach(s => { if (!SIZE_ORDER.includes(s)) sortedSizes.push(s); });
+
+        todosSizeFilter.style.display = 'block';
+        const wrap = document.createElement('div');
+        wrap.className = 'size-filter-inner';
+        ['TODOS', ...sortedSizes].forEach(s => {
+          const btn = document.createElement('button');
+          btn.className = 'size-btn' + (s === 'TODOS' ? ' size-btn-active' : '');
+          btn.textContent = s;
+          btn.addEventListener('click', () => {
+            wrap.querySelectorAll('.size-btn').forEach(b => b.classList.remove('size-btn-active'));
+            btn.classList.add('size-btn-active');
+            const filter = s === 'TODOS' ? null : s;
+            grid.querySelectorAll('.product-card').forEach(card => {
+              if (!filter) { card.style.display = ''; return; }
+              const sizes = (card.getAttribute('data-sizes') || 'P,M,G,GG').split(',').map(x => x.trim());
+              card.style.display = sizes.includes(filter) ? '' : 'none';
+            });
+          });
+          wrap.appendChild(btn);
+        });
+        todosSizeFilter.innerHTML = '';
+        todosSizeFilter.appendChild(wrap);
+      }
+
       initLightbox();
     }
 

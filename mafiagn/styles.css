@@ -2438,6 +2438,7 @@ body {
 
   /* -- TODOS OS PRODUTOS: oculto no mobile -- */
   #todosHeader,
+  #todosSizeFilter,
   #produtos { display: none !important; }
 
   /* -- HEADER -- */
