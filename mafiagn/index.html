@@ -8,6 +8,264 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── ATACADO BLOCK ── */
+    #atacadoBlock { width: 100% !important; display: block !important; }
+
+    /* Banner principal */
+    .atacado-banner {
+      position: relative; overflow: hidden;
+      min-height: 340px; display: flex; align-items: center;
+      width: 100% !important;
+    }
+    .atacado-banner-bg { position: absolute; inset: 0; }
+    .atacado-banner-img {
+      width: 100%; height: 100%; object-fit: cover;
+      object-position: center top; filter: brightness(0.32);
+    }
+    .atacado-banner-overlay {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(120deg, rgba(201,146,42,0.22) 0%, transparent 55%),
+        linear-gradient(to right, rgba(0,0,0,0.92) 45%, rgba(0,0,0,0.3) 100%);
+    }
+    .atacado-banner-overlay::after {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(-52deg, transparent, transparent 28px, rgba(213,166,81,0.04) 28px, rgba(213,166,81,0.04) 29px);
+    }
+    .atacado-banner-content {
+      position: relative; z-index: 1;
+      padding: 48px 56px; display: flex; align-items: center; width: 100%;
+    }
+    .atacado-banner-left {
+      max-width: 520px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .atacado-crown { font-size: 1.8rem; color: var(--gold-light); line-height: 1; }
+    .atacado-sub {
+      font-size: 0.7rem; letter-spacing: 0.36em;
+      color: var(--gold-light); font-weight: 700; text-transform: uppercase;
+    }
+    .atacado-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.6rem, 5vw, 4.5rem);
+      font-weight: 900; color: #fff;
+      line-height: 1; letter-spacing: 0.04em;
+      text-transform: uppercase; margin: 0;
+    }
+    .atacado-tagline {
+      font-size: 0.7rem; letter-spacing: 0.24em;
+      color: rgba(255,255,255,0.45); text-transform: uppercase; margin: 0;
+    }
+    .atacado-features {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px 16px; margin-top: 6px;
+    }
+    .atacado-feat {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 0.8rem; color: #d4c9b8;
+    }
+    .atacado-feat span {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(213,166,81,0.15); border: 1px solid rgba(213,166,81,0.4);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--gold-light); font-weight: 700; font-size: 0.7rem; flex-shrink: 0;
+    }
+    .atacado-cta {
+      margin-top: 12px; width: fit-content;
+      font-size: 0.9rem; letter-spacing: 0.08em;
+      padding: 13px 28px;
+    }
+
+    /* Tabela de preços */
+    .atacado-table-wrap {
+      background: #0e0c0c;
+      border-top: 1px solid rgba(213,166,81,0.18);
+      padding: 28px 36px 32px;
+      width: 100% !important; box-sizing: border-box;
+    }
+    .atacado-table-title {
+      font-size: 1rem; font-weight: 700; color: var(--text);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .atacado-table {
+      width: 100%; border-collapse: separate;
+      border-spacing: 0; margin-bottom: 20px;
+      border-radius: 12px; overflow: hidden;
+      border: 1px solid rgba(213,166,81,0.12);
+    }
+    .atacado-table thead tr { background: rgba(213,166,81,0.08); }
+    .atacado-table th {
+      padding: 12px 16px; font-size: 0.78rem; font-weight: 700;
+      color: var(--gold-light); letter-spacing: 0.08em;
+      text-transform: uppercase; border-bottom: 1px solid rgba(213,166,81,0.15);
+    }
+    .atacado-table th:last-child { text-align: right; }
+    .atacado-table td {
+      padding: 14px 16px; font-size: 0.92rem;
+      color: var(--text); border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .atacado-table td:last-child { text-align: right; }
+    .atacado-table tbody tr:last-child td { border-bottom: none; }
+    .atacado-table tbody tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .atacado-table tbody tr:hover td { background: rgba(213,166,81,0.06); }
+    .atacado-price {
+      color: var(--gold-light) !important; font-weight: 800;
+      font-size: 1rem !important; letter-spacing: 0.02em;
+    }
+    .atacado-table-cta {
+      width: 100%; justify-content: center;
+      font-size: 0.9rem; letter-spacing: 0.06em; padding: 15px;
+      border-radius: 10px;
+    }
+
+    /* Filtros de tamanho no modal atacado */
+    #categoryOverlay .size-filter-inner {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    #categoryOverlay .size-btn {
+      flex: 1; min-width: 60px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px; font-size: 0.85rem; font-weight: 700;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+    }
+    #categoryOverlay .size-btn:active { transform: scale(0.95); }
+
+    /* Cards no modal de categoria — mobile premium */
+    @media (max-width: 600px) {
+      /* Modal ocupa tela toda */
+      #categoryOverlay .category-modal {
+        border-radius: 20px 20px 0 0 !important;
+        max-height: 92vh !important;
+        overflow-y: auto !important;
+        width: 100% !important;
+      }
+
+      /* Banner atacado mobile */
+      #atacadoBlock { width: 100% !important; display: block !important; }
+      .atacado-banner {
+        min-height: 260px !important;
+        align-items: flex-end !important;
+      }
+      .atacado-banner-overlay {
+        background:
+          linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.1) 100%) !important;
+      }
+      .atacado-banner-content {
+        padding: 0 16px 24px !important;
+        align-items: flex-end !important;
+      }
+      .atacado-banner-left { max-width: 100% !important; gap: 8px !important; }
+      .atacado-crown { font-size: 1.4rem !important; }
+      .atacado-sub { font-size: 0.65rem !important; letter-spacing: 0.28em !important; }
+      .atacado-title { font-size: clamp(2rem, 8vw, 2.8rem) !important; }
+      .atacado-tagline { font-size: 0.65rem !important; }
+      .atacado-features {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px 12px !important; margin-top: 4px !important;
+      }
+      .atacado-feat { font-size: 0.75rem !important; }
+      .atacado-cta {
+        width: 100% !important; justify-content: center !important;
+        margin-top: 10px !important; padding: 13px 20px !important;
+        font-size: 0.88rem !important;
+      }
+
+      /* Tabela mobile */
+      .atacado-table-wrap { padding: 20px 16px 24px !important; }
+      .atacado-table-title { font-size: 0.9rem !important; margin-bottom: 12px !important; }
+      .atacado-table { border-radius: 10px !important; }
+      .atacado-table th { padding: 10px 12px !important; font-size: 0.72rem !important; }
+      .atacado-table td { padding: 12px 12px !important; font-size: 0.85rem !important; }
+      .atacado-price { font-size: 0.92rem !important; }
+      .atacado-table-cta { font-size: 0.85rem !important; padding: 13px !important; }
+
+      /* Filtros mobile */
+      #categoryOverlay .size-filter { padding: 10px 16px 0 !important; }
+      #categoryOverlay .size-filter-inner { gap: 6px !important; padding-bottom: 10px !important; }
+      #categoryOverlay .size-btn {
+        flex: 1 !important; min-width: 0 !important; height: 36px !important;
+        font-size: 0.78rem !important; border-radius: 8px !important;
+        padding: 0 8px !important;
+      }
+
+      /* Cards premium 1 coluna */
+      #categoryOverlay .category-modal .product-grid {
+        grid-template-columns: 1fr !important;
+        padding: 16px !important; gap: 16px !important;
+      }
+      #categoryOverlay .category-modal .product-card {
+        display: flex !important; flex-direction: column !important;
+        border-radius: 16px !important; overflow: hidden !important;
+        background: #111010 !important;
+        border: 1px solid rgba(255,255,255,0.08) !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+      }
+      #categoryOverlay .category-modal .product-img-wrap {
+        padding: 0 !important; background: #161313 !important; position: relative !important;
+      }
+      #categoryOverlay .category-modal .product-img-wrap::before { display: none !important; }
+      #categoryOverlay .category-modal .product-img {
+        width: 100% !important; height: 280px !important;
+        object-fit: cover !important; object-position: center top !important;
+        border-radius: 0 !important; filter: none !important;
+        border-bottom: none !important; display: block !important;
+      }
+      #categoryOverlay .category-modal .product-thumbs {
+        display: flex !important; gap: 6px !important;
+        padding: 8px 12px 4px !important; overflow-x: auto !important;
+        scrollbar-width: none !important; background: #111010 !important;
+      }
+      #categoryOverlay .category-modal .product-thumb {
+        width: 44px !important; height: 44px !important;
+        flex-shrink: 0 !important; border-radius: 6px !important;
+      }
+      #categoryOverlay .category-modal .product-info {
+        padding: 14px 16px 10px !important; text-align: left !important;
+        gap: 4px !important; border-top: 1px solid rgba(255,255,255,0.06) !important;
+        display: flex !important; flex-direction: column !important;
+      }
+      #categoryOverlay .category-modal .product-info strong {
+        font-size: 1rem !important; font-weight: 700 !important;
+        color: var(--text) !important; display: block !important;
+        line-height: 1.3 !important; letter-spacing: 0 !important;
+        overflow: hidden !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+      }
+      #categoryOverlay .category-modal .product-price {
+        font-size: 1.4rem !important; font-weight: 800 !important;
+        color: var(--gold-light) !important; display: block !important;
+        margin-top: 6px !important;
+      }
+      #categoryOverlay .category-modal .product-installment {
+        display: block !important; font-size: 0.78rem !important;
+        color: var(--muted) !important;
+      }
+      #categoryOverlay .category-modal .product-info::after { display: none !important; }
+      #categoryOverlay .category-modal .add-to-cart-btn {
+        position: static !important;
+        width: calc(100% - 32px) !important; height: 48px !important;
+        margin: 8px 16px 16px !important; border-radius: 12px !important;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light)) !important;
+        color: #050404 !important; font-size: 0.92rem !important;
+        font-weight: 800 !important; letter-spacing: 0.06em !important;
+        border: none !important; display: flex !important;
+        align-items: center !important; justify-content: center !important; gap: 8px !important;
+      }
+      #categoryOverlay .category-modal .add-to-cart-btn::after { content: 'COMPRAR'; }
+      #categoryOverlay .category-modal .product-gallery { display: none !important; }
+      #categoryOverlay .category-modal .badge-units,
+      #categoryOverlay .category-modal .badge-discount { display: none !important; }
+    }
+
+    /* Desktop — tabela e banner OK */
+    @media (max-width: 860px) {
+      .atacado-banner-content { padding: 36px 32px !important; }
+      .atacado-table-wrap { padding: 24px 24px 28px !important; }
+    }
+  </style>
 </head>
 <body>
 
@@ -464,6 +722,8 @@
         currentCards.forEach(({ card, sizes }) => {
           if (sizeFilter && !sizes.includes(sizeFilter)) return;
           const clone = card.cloneNode(true);
+          // lazy loading nas imagens clonadas
+          clone.querySelectorAll('img').forEach(img => { img.loading = 'lazy'; });
           grid.appendChild(clone);
           clone.querySelectorAll('.add-to-cart').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -471,7 +731,6 @@
               if (original) original.click();
             });
           });
-          // bind lightbox nos clones do modal de categoria
           if (window.lbBindCard) window.lbBindCard(clone);
         });
       }
@@ -530,6 +789,57 @@
         renderCards(restoreSize);
         overlay.classList.add('open');
         saveNav(cat, restoreSize);
+
+        // Bloco especial de atacado
+        const existingAtacado = document.getElementById('atacadoBlock');
+        if (existingAtacado) existingAtacado.remove();
+        if (cat === 'atacado') {
+          // Remove o cat-modal-banner genérico pois o atacadoBlock tem seu próprio banner
+          document.getElementById('catModalBanner')?.remove();
+
+          const block = document.createElement('div');
+          block.id = 'atacadoBlock';
+          block.innerHTML = `
+            <div class="atacado-banner">
+              <div class="atacado-banner-bg">
+                <img src="img-bobojaco-quicksilver/img7.jpeg" alt="Atacado GN M\u00e1fia" class="atacado-banner-img" loading="lazy" />
+                <div class="atacado-banner-overlay"></div>
+              </div>
+              <div class="atacado-banner-content">
+                <div class="atacado-banner-left">
+                  <span class="atacado-crown">&#9813;</span>
+                  <span class="atacado-sub">COMPRA EM</span>
+                  <h2 class="atacado-title">ATACADO</h2>
+                  <p class="atacado-tagline">HONRA &middot; LEALDADE &middot; ESTILO</p>
+                  <div class="atacado-features">
+                    <div class="atacado-feat"><span>&#10003;</span><small>M\u00ednimo 10 pe\u00e7as</small></div>
+                    <div class="atacado-feat"><span>&#10003;</span><small>Frete negoci\u00e1vel</small></div>
+                    <div class="atacado-feat"><span>&#10003;</span><small>Mix de modelos</small></div>
+                    <div class="atacado-feat"><span>&#10003;</span><small>Nota fiscal</small></div>
+                  </div>
+                  <a href="https://wa.me/5511947036093?text=Ol%C3%A1%2C%20quero%20comprar%20no%20atacado!" target="_blank" rel="noopener" class="btn btn-primary atacado-cta">&#128722; FAZER PEDIDO</a>
+                </div>
+              </div>
+            </div>
+            <div class="atacado-table-wrap">
+              <h3 class="atacado-table-title">&#9776; Tabela de Valores</h3>
+              <table class="atacado-table">
+                <thead><tr><th>Quantidade</th><th>Valor / pe\u00e7a</th></tr></thead>
+                <tbody>
+                  <tr><td>10 &ndash; 19 pe\u00e7as</td><td class="atacado-price">R$&nbsp;27,00</td></tr>
+                  <tr><td>20 &ndash; 29 pe\u00e7as</td><td class="atacado-price">R$&nbsp;24,00</td></tr>
+                  <tr><td>30 &ndash; 49 pe\u00e7as</td><td class="atacado-price">R$&nbsp;23,00</td></tr>
+                  <tr><td>50 &ndash; 99 pe\u00e7as</td><td class="atacado-price">R$&nbsp;22,00</td></tr>
+                  <tr><td>100 &ndash; 199 pe\u00e7as</td><td class="atacado-price">R$&nbsp;20,00</td></tr>
+                  <tr><td>200+ pe\u00e7as</td><td class="atacado-price">R$&nbsp;19,00</td></tr>
+                </tbody>
+              </table>
+              <a href="https://wa.me/5511947036093?text=Ol%C3%A1%2C%20quero%20comprar%20no%20atacado!" target="_blank" rel="noopener" class="btn btn-primary atacado-table-cta">&#128172; Falar com consultor no WhatsApp</a>
+            </div>
+          `;
+          // insere antes do grid de produtos (fora do contexto de grid)
+          grid.parentNode.insertBefore(block, grid);
+        }
       }
 
       document.querySelectorAll('.category-banner').forEach(banner => {
@@ -538,6 +848,7 @@
 
       function closeCategory() {
         overlay.classList.remove('open');
+        document.getElementById('atacadoBlock')?.remove();
         localStorage.removeItem(NAV_KEY);
       }
 

@@ -3520,3 +3520,189 @@ table {
     font-size: 15px;
   }
 }
+
+/* -- ATACADO (dentro do modal de categoria) -- */\r\n.atacado-banner {\r\n  position: relative;\r\n  overflow: hidden;\r\n  min-height: 300px;\r\n  display: flex;\r\n  align-items: center;\r\n  margin-bottom: 0;\r\n}
+
+.atacado-banner-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.atacado-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(0.35);
+}
+
+.atacado-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(201,146,42,0.18) 0%, transparent 50%),
+    linear-gradient(to right, rgba(0,0,0,0.85) 40%, transparent 100%);
+}
+
+/* Linhas diagonais douradas */
+.atacado-banner-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -52deg,
+    transparent,
+    transparent 28px,
+    rgba(213,166,81,0.04) 28px,
+    rgba(213,166,81,0.04) 29px
+  );
+}
+
+.atacado-banner-content {
+  position: relative;
+  z-index: 1;
+  padding: 48px 56px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.atacado-banner-left {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.atacado-crown {
+  font-size: 1.6rem;
+  color: var(--gold-light);
+  line-height: 1;
+}
+
+.atacado-sub {
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
+  color: var(--gold-light);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.atacado-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.atacado-tagline {
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.atacado-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-top: 4px;
+}
+
+.atacado-feat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #c9bcae;
+}
+
+.atacado-feat span {
+  color: var(--gold-light);
+  font-weight: 700;
+}
+
+.atacado-cta {
+  margin-top: 8px;
+  width: fit-content;
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+}
+
+/* Tabela de preços */
+.atacado-table-wrap {\r\n  background: #111010;\r\n  border-top: 1px solid rgba(213,166,81,0.15);\r\n  border-bottom: 1px solid rgba(213,166,81,0.15);\r\n  padding: 32px 36px;\r\n  max-width: 100%;\r\n}
+
+.atacado-table-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.atacado-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+}
+
+.atacado-table thead tr {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.atacado-table th {
+  text-align: left;
+  padding: 10px 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  background: transparent;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.atacado-table td {
+  padding: 16px 0;
+  font-size: 0.95rem;
+  color: var(--text);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.atacado-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.atacado-table tbody tr:hover td {
+  background: rgba(213,166,81,0.04);
+}
+
+.atacado-price {
+  color: var(--gold-light) !important;
+  font-weight: 700;
+  font-size: 1rem !important;
+}
+
+.atacado-table-cta {
+  width: 100%;
+  justify-content: center;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  padding: 14px;
+}
+
+@media (max-width: 860px) {
+  .atacado-banner-content { padding: 36px 32px; }
+  .atacado-table-wrap { padding: 24px 20px; }
+}
+
+@media (max-width: 600px) {
+  .atacado-banner { min-height: 260px; }
+  .atacado-banner-content { padding: 28px 20px; }
+  .atacado-title { font-size: 2.4rem; }
+  .atacado-table-wrap { padding: 20px 16px; max-width: 100%; }
+  .atacado-table td, .atacado-table th { padding: 12px 0; font-size: 0.88rem; }
+}
