@@ -153,6 +153,7 @@ body {
   justify-content: center;
   text-align: center;
   overflow: hidden;
+  background: var(--bg);
 }
 
 .hero-bg {
@@ -185,7 +186,8 @@ body {
   height: 180px;
   width: auto;
   object-fit: contain;
-  margin-bottom: 8px;
+  margin: 0 auto 8px;
+  display: block;
 }
 
 .hero-subtitle {
@@ -563,7 +565,6 @@ body {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  touch-action: none;
 }
 
 .lightbox.open { display: flex; }
@@ -578,6 +579,7 @@ body {
   overflow: hidden;
   cursor: grab;
   user-select: none;
+  touch-action: pan-y pinch-zoom;
 }
 .lightbox-viewport:active { cursor: grabbing; }
 
@@ -617,7 +619,7 @@ body {
   background: rgba(0,0,0,0.55);
   border: 1px solid rgba(213,166,81,0.45);
   color: var(--gold-light);
-  width: 48px; height: 48px;
+  width: 52px; height: 52px;
   border-radius: 50%;
   font-size: 1.4rem;
   cursor: pointer;
@@ -625,11 +627,13 @@ body {
   place-items: center;
   transition: background 0.2s;
   user-select: none;
-  z-index: 10;
+  z-index: 20;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .lightbox-arrow:hover { background: rgba(213,166,81,0.2); }
-.lightbox-arrow.prev { left: 18px; }
-.lightbox-arrow.next { right: 18px; }
+.lightbox-arrow.prev { left: 14px; }
+.lightbox-arrow.next { right: 14px; }
 
 .lightbox-counter {
   color: rgba(255,255,255,0.5);

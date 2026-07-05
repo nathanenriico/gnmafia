@@ -46,10 +46,6 @@
 
   <!-- HERO -->
   <section class="hero" id="inicio">
-    <div class="hero-bg">
-      <img src="d8dcbe50-c110-4b9f-84e4-fd1ce7b58988.jpg" alt="GN Máfia" class="hero-img" />
-      <div class="hero-overlay"></div>
-    </div>
     <div class="hero-content">
       <img src="logo.jpeg" alt="GN Máfia" class="hero-logo" />
       <p class="hero-subtitle">HONRA · LEALDADE · ESTILO</p>
@@ -322,10 +318,10 @@
   <!-- LIGHTBOX -->
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" id="lbClose">&#x2715;</button>
+    <button class="lightbox-arrow prev" id="lbPrev">&#8592;</button>
+    <button class="lightbox-arrow next" id="lbNext">&#8594;</button>
     <div class="lightbox-viewport" id="lbViewport">
-      <button class="lightbox-arrow prev" id="lbPrev">&#8592;</button>
       <img class="lightbox-img" id="lbImg" src="" alt="" />
-      <button class="lightbox-arrow next" id="lbNext">&#8594;</button>
       <div class="lightbox-zoom-hint" id="lbZoomHint">Duplo toque para zoom</div>
     </div>
     <div class="lightbox-counter" id="lbCounter"></div>
@@ -828,6 +824,8 @@
       /* ---- touch ---- */
       let t0x = 0, t0y = 0, tMoved = 0;
       lbVp.addEventListener('touchstart', e => {
+        // ignora se o toque foi numa seta
+        if (e.target.closest('.lightbox-arrow')) return;
         const t = e.touches;
         if (t.length === 1) {
           t0x = t[0].clientX; t0y = t[0].clientY; tMoved = 0;
@@ -845,6 +843,7 @@
       }, { passive: true });
 
       lbVp.addEventListener('touchmove', e => {
+        if (e.target.closest('.lightbox-arrow')) return;
         const t = e.touches;
         if (t.length === 2) {
           const d = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
