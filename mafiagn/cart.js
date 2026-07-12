@@ -669,7 +669,7 @@
         body: JSON.stringify({
           cliente_email: emailCliente,
           cliente_nome: values.customerName,
-          itens: cart.items.map(i => `${i.name} x${i.qty}`).join(', '),
+          itens: JSON.stringify(cart.items.map(i => ({ name: i.name, price: i.price, qty: i.qty, image: i.image || '' }))),
           total: finalTotal,
           forma_pagamento: values.customerPayment,
           cupom_usado: appliedCoupon || null,
