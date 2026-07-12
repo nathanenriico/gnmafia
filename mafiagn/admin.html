@@ -394,15 +394,44 @@
       #cuponsList thead th:nth-child(3),
       #cuponsList tbody td:nth-child(3) { display: none; }
 
-      /* Clientes — oculta colunas menos importantes */
-      .clientes-table th:nth-child(3),
-      .clientes-table td:nth-child(3) { display: none; }
+      /* Clientes — cards no mobile */
+      #clientes .table-wrap { background: transparent; border: none; }
+      #clientes table, #clientes thead { display: none; }
+      #clientesBody { display: grid; gap: 10px; }
+      #clientesBody tr {
+        display: block;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 16px;
+      }
+      #clientesBody td { display: block; border: none; padding: 2px 0; font-size: 0.82rem; }
+      #clientesBody td:first-child { font-weight: 700; font-size: 0.9rem; color: var(--text); margin-bottom: 4px; }
+      #clientesBody td:nth-child(2) { color: var(--muted); font-size: 0.78rem; }
+      #clientesBody td:nth-child(3)::before { content: '📱 '; }
+      #clientesBody td:nth-child(4) { margin-top: 6px; }
 
-      /* Progressos — oculta colunas menos importantes */
-      #progressosBody td:nth-child(2),
-      #progressos thead th:nth-child(2),
-      #progressosBody td:nth-child(5),
-      #progressos thead th:nth-child(5) { display: none; }
+      /* Progressos — cards no mobile */
+      #progressos .table-wrap { background: transparent; border: none; }
+      #progressos table, #progressos thead { display: none; }
+      #progressosBody { display: grid; gap: 10px; }
+      #progressosBody tr {
+        display: block;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 16px;
+      }
+      #progressosBody td { display: block; border: none; padding: 2px 0; font-size: 0.82rem; }
+      #progressosBody td:first-child { font-weight: 700; font-size: 0.88rem; margin-bottom: 6px; }
+      #progressosBody td:nth-child(2) { display: none; }
+      #progressosBody td:nth-child(3)::before { content: 'Pedidos: '; color: var(--muted); font-size: 0.75rem; }
+      #progressosBody td:nth-child(4)::before { content: 'Total gasto: '; color: var(--muted); font-size: 0.75rem; }
+      #progressosBody td:nth-child(5) { display: none; }
+      #progressosBody td:nth-child(6)::before { content: 'Nível: '; color: var(--muted); font-size: 0.75rem; }
+      #progressosBody td:nth-child(7) { display: none; }
+      #progressosBody td:nth-child(8) { margin-top: 4px; }
+      #progressosBody td:nth-child(9) { margin-top: 8px; }
 
       /* Modal de detalhe do cliente */
       .prog-overlay { padding: 0; align-items: flex-end; }
