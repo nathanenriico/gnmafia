@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="responsive-fix.css">
   <style>
     /* ── ATACADO BLOCK ── */
     #atacadoBlock { width: 100% !important; display: block !important; }
@@ -735,41 +736,43 @@
 
   <script>
   (function() {
-    const OPENAI_KEY = window.__GN_KEY__ || '';
-    const SYSTEM = `Você é o GN-GPT, assistente virtual oficial da GN Máfia, marca de moda streetwear premium.
-Responda sempre em português, de forma direta, simpática e com a personalidade da marca (honra, lealdade, estilo).
-Informações da loja:
-- Loja 100% online. NÃO temos loja física.
-- Frete grátis acima de R$299,90 para todo o Brasil.
-- Parcelamento em até 6x sem juros.
-- Trocas e devoluções em até 7 dias.
-- Atacado: mínimo 10 peças, preços de R$19 a R$27/peça conforme quantidade.
-- Kit camisa + short por R$70,00.
-- Cupons de desconto disponíveis na seção Sorteios.
-- WhatsApp para atendimento: (11) 94703-6093.
-- Formas de pagamento: Visa, Master, Elo, Pix, Amex.
-- Categorias: Bobojacos, Moletons, Conjuntos, Camisas, Bermudas, Atacado.
-Se não souber algo específico, oriente o cliente a entrar em contato pelo WhatsApp.`;
+    const MENU = [
+      { label: '🚚 Prazo de entrega',      reply: 'O prazo de entrega varia conforme o CEP informado. Durante a finalização da compra você poderá consultar o prazo estimado para sua região.' },
+      { label: '📦 Frete',                  reply: 'O valor do frete é calculado automaticamente no checkout de acordo com o CEP informado.' },
+      { label: '💳 Formas de pagamento',    reply: 'Aceitamos PIX, cartões de crédito e cartões de débito.' },
+      { label: '🏷️ Desconto PIX',           reply: 'Sim! Algumas promoções oferecem descontos para pagamentos via PIX. Consulte as ofertas disponíveis no momento da compra.' },
+      { label: '🛍️ Atacado / Revenda',      reply: 'Acesse nossa página Atacado, confira a tabela de preços por quantidade e clique em Fazer Pedido para entrar em contato com nossa equipe.' },
+      { label: '👤 Cadastro',               reply: 'Clique em Entrar ou Cadastrar, preencha seus dados e aproveite os benefícios exclusivos para clientes cadastrados.' },
+      { label: '🎟️ Cupom de desconto',      reply: 'Digite o código do cupom no carrinho de compras e clique em Aplicar antes de finalizar o pedido.' },
+      { label: '🕐 Horário de atendimento', reply: 'Nosso atendimento funciona em horário comercial. Caso envie uma mensagem fora desse período, responderemos assim que possível.' },
+      { label: '📲 Contato / WhatsApp',     reply: 'Você pode entrar em contato conosco pelo WhatsApp (11) 94703-6093 ou através do nosso Instagram oficial.' },
+      { label: '👕 Marcas disponíveis',     reply: 'Trabalhamos com diversas marcas reconhecidas, como Lacoste, Quiksilver, Oakley, Nike, Adidas, Puma e outras. Nosso catálogo é atualizado constantemente com novos modelos e lançamentos.' },
+      { label: '🏢 Loja física',             reply: 'No momento somos 100% online! Você pode comprar pelo nosso site com segurança e receber em casa.' }
+    ];
 
-    const btn    = document.getElementById('gnGptBtn');
-    const panel  = document.getElementById('gnGptPanel');
-    const close  = document.getElementById('gnGptClose');
-    const msgs   = document.getElementById('gnGptMessages');
-    const input  = document.getElementById('gnGptInput');
-    const send   = document.getElementById('gnGptSend');
+    const KB = [
+      { keys: ['ola','oi','bom dia','boa tarde','boa noite','tudo bem','tudo bom'], reply: null },
+      { keys: ['entrega','prazo','quando chega'], reply: MENU[0].reply },
+      { keys: ['frete','valor do frete','quanto custa'], reply: MENU[1].reply },
+      { keys: ['pagamento','cartao','credito','debito'], reply: MENU[2].reply },
+      { keys: ['pix','desconto pix','tem desconto'], reply: MENU[3].reply },
+      { keys: ['atacado','revenda','quantidade'], reply: MENU[4].reply },
+      { keys: ['cadastro','criar conta','registrar'], reply: MENU[5].reply },
+      { keys: ['cupom','desconto','aplicar cupom'], reply: MENU[6].reply },
+      { keys: ['atendimento','horario','funcionamento'], reply: MENU[7].reply },
+      { keys: ['contato','whatsapp','instagram'], reply: MENU[8].reply },
+      { keys: ['marca','lacoste','quiksilver','oakley','nike','adidas','puma'], reply: MENU[9].reply },
+      { keys: ['loja fisica','loja','fisica','loja presencial','tem loja','onde fica'], reply: MENU[10].reply }
+    ];
 
-    const history = [{ role: 'system', content: SYSTEM }];
-    let loading = false;
+    const btn   = document.getElementById('gnGptBtn');
+    const panel = document.getElementById('gnGptPanel');
+    const close = document.getElementById('gnGptClose');
+    const msgs  = document.getElementById('gnGptMessages');
+    const input = document.getElementById('gnGptInput');
+    const send  = document.getElementById('gnGptSend');
 
-    function open() {
-      panel.classList.add('open');
-      if (msgs.children.length === 0) addMsg('bot', 'Olá! Sou o GN-GPT, assistente da GN Máfia. 👑\nComo posso te ajudar hoje?');
-      setTimeout(() => input.focus(), 100);
-    }
-    function close_() { panel.classList.remove('open'); }
-
-    btn.addEventListener('click', () => panel.classList.contains('open') ? close_() : open());
-    close.addEventListener('click', close_);
+    function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
 
     function addMsg(role, text) {
       const el = document.createElement('div');
@@ -780,48 +783,79 @@ Se não souber algo específico, oriente o cliente a entrar em contato pelo What
       return el;
     }
 
-    function addTyping() {
+    function showMenu() {
+      const wrap = document.createElement('div');
+      wrap.className = 'gn-msg gn-msg-bot';
+      wrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;max-width:100%';
+      const title = document.createElement('span');
+      title.textContent = 'Escolha uma opção:';
+      title.style.marginBottom = '4px';
+      wrap.appendChild(title);
+      MENU.forEach((item, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = (i + 1) + '. ' + item.label;
+        btn.style.cssText = 'background:rgba(213,166,81,0.12);border:1px solid rgba(213,166,81,0.3);color:var(--gold-light);border-radius:8px;padding:7px 12px;font-size:0.82rem;cursor:pointer;text-align:left;transition:background 0.15s;font-family:inherit;';
+        btn.onmouseenter = () => btn.style.background = 'rgba(213,166,81,0.25)';
+        btn.onmouseleave = () => btn.style.background = 'rgba(213,166,81,0.12)';
+        btn.addEventListener('click', () => selectOption(i));
+        wrap.appendChild(btn);
+      });
+      msgs.appendChild(wrap);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function selectOption(i) {
+      addMsg('user', MENU[i].label);
+      setTimeout(() => {
+        addMsg('bot', MENU[i].reply);
+        setTimeout(showBackBtn, 300);
+      }, 200);
+    }
+
+    function showBackBtn() {
       const el = document.createElement('div');
-      el.className = 'gn-msg gn-msg-bot gn-msg-typing';
-      el.id = 'gnTyping';
-      el.innerHTML = '<div class="gn-dot"></div><div class="gn-dot"></div><div class="gn-dot"></div>';
+      el.className = 'gn-msg gn-msg-bot';
+      const btn = document.createElement('button');
+      btn.textContent = '↩ Ver outras opções';
+      btn.style.cssText = 'background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);border-radius:8px;padding:6px 12px;font-size:0.78rem;cursor:pointer;font-family:inherit;';
+      btn.addEventListener('click', () => { el.remove(); showMenu(); });
+      el.appendChild(btn);
       msgs.appendChild(el);
       msgs.scrollTop = msgs.scrollHeight;
     }
-    function removeTyping() { document.getElementById('gnTyping')?.remove(); }
 
-    async function ask(text) {
-      if (loading || !text.trim()) return;
-      loading = true;
-      send.disabled = true;
+    function ask(text) {
+      if (!text.trim()) return;
       input.value = '';
-
-      addMsg('user', text);
-      history.push({ role: 'user', content: text });
-      addTyping();
-
-      try {
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: 'gpt-4o-mini', messages: history, max_tokens: 400, temperature: 0.7 })
-        });
-        const data = await res.json();
-        const reply = data.choices?.[0]?.message?.content?.trim() || 'Desculpe, não consegui responder agora. Fale com a gente pelo WhatsApp: (11) 94703-6093.';
-        removeTyping();
-        addMsg('bot', reply);
-        history.push({ role: 'assistant', content: reply });
-        if (history.length > 20) history.splice(1, 2);
-      } catch {
-        removeTyping();
-        addMsg('bot', 'Ops, erro de conexão. Tente novamente ou fale pelo WhatsApp: (11) 94703-6093.');
+      const t = norm(text);
+      // verifica se digitou um número
+      const num = parseInt(text.trim());
+      if (num >= 1 && num <= MENU.length) { addMsg('user', text); setTimeout(() => { addMsg('bot', MENU[num-1].reply); setTimeout(showBackBtn, 300); }, 200); return; }
+      // busca por palavra-chave
+      for (const item of KB) {
+        if (item.keys.some(k => t.includes(norm(k)))) {
+          addMsg('user', text);
+          if (item.reply === null) { setTimeout(() => { addMsg('bot', 'Olá! 👑 Seja bem-vindo à GN Máfia!'); setTimeout(showMenu, 300); }, 200); }
+          else { setTimeout(() => { addMsg('bot', item.reply); setTimeout(showBackBtn, 300); }, 200); }
+          return;
+        }
       }
-
-      loading = false;
-      send.disabled = false;
-      input.focus();
+      addMsg('user', text);
+      setTimeout(() => { addMsg('bot', 'Desculpe, ainda não consigo responder essa pergunta. Entre em contato com nossa equipe pelo WhatsApp, teremos o prazer em ajudar.'); setTimeout(showBackBtn, 300); }, 200);
     }
 
+    function open() {
+      panel.classList.add('open');
+      if (!msgs.children.length) {
+        addMsg('bot', 'Olá! 👑 Seja bem-vindo à GN Máfia! Selecione uma opção abaixo ou digite sua dúvida.');
+        setTimeout(showMenu, 300);
+      }
+      setTimeout(() => input.focus(), 100);
+    }
+    function close_() { panel.classList.remove('open'); }
+
+    btn.addEventListener('click', () => panel.classList.contains('open') ? close_() : open());
+    close.addEventListener('click', close_);
     send.addEventListener('click', () => ask(input.value));
     input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(input.value); } });
   })();

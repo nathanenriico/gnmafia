@@ -6,9 +6,13 @@ create table if not exists produtos (
   category    text default 'bobojaco',
   price       numeric(10,2) default 0,
   images      jsonb default '[]',
+  sizes       jsonb default '["P","M","G","GG"]',
   created_at  timestamptz default now(),
   updated_at  timestamptz default now()
 );
+
+-- Adiciona coluna sizes em tabela existente (rode se a tabela já existe)
+alter table produtos add column if not exists sizes jsonb default '["P","M","G","GG"]';
 
 alter table produtos enable row level security;
 
