@@ -454,6 +454,7 @@
 
       <div class="admin-tabs">
         <button class="admin-tab-btn active" data-tab="overview">Visão Geral</button>
+        <button class="admin-tab-btn" data-tab="pedidos">Pedidos</button>
         <button class="admin-tab-btn" data-tab="photos">Fotos do Site</button>
         <button class="admin-tab-btn" data-tab="cupons">Cupons</button>
         <button class="admin-tab-btn" data-tab="clientes">Clientes</button>
@@ -578,7 +579,7 @@
       </div>
 
       <!-- PEDIDOS -->
-      <div>
+      <div id="pedidos" class="admin-panel">
         <div class="section-title">Pedidos Realizados</div>
         <div id="pedidosList" class="pedidos-list"></div>
       </div>
@@ -751,6 +752,8 @@
         const target = btn.getAttribute('data-tab');
         if (target === 'overview') {
           document.getElementById('overview').classList.add('active');
+        } else if (target === 'pedidos') {
+          document.getElementById('pedidos').classList.add('active');
         } else if (target === 'photos') {
           document.getElementById('photos').classList.add('active');
         } else if (target === 'cupons') {
