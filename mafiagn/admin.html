@@ -384,11 +384,15 @@
       .create-form { grid-template-columns: 1fr; gap: 10px; padding: 16px; }
 
       /* Tabelas — scroll horizontal */
-      .table-wrap { overflow-x: auto; }
-      table { font-size: 0.75rem; min-width: 480px; }
+      .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      table { font-size: 0.75rem; min-width: unset; width: 100%; }
       th, td { padding: 9px 10px; }
       .action-btns { flex-direction: column; gap: 4px; }
       .btn-desativar, .btn-deletar, .btn-ativar { font-size: 0.7rem; padding: 5px 8px; }
+
+      /* Cupons — oculta coluna Progresso no mobile */
+      #cuponsList thead th:nth-child(3),
+      #cuponsList tbody td:nth-child(3) { display: none; }
 
       /* Clientes — oculta colunas menos importantes */
       .clientes-table th:nth-child(3),
