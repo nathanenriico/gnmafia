@@ -1310,14 +1310,24 @@
         }));
       });
 
-      ws.addEventListener('message', (e) => {
-        const msg = JSON.parse(e.data);
-        if (msg.event === 'UPDATE' || msg.event === 'INSERT' || msg.event === 'DELETE') {
-          loadSorteios();
+      ws.addEventListener('message', (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (['UPDATE', 'INSERT', 'DELETE'].includes(msg.event)) {
+            loadSorteios();
+          }
+        } catch (error) {
+          console.warn('Mensagem inválida do Supabase:', error);
         }
       });
 
-      ws.addEventListener('close', () => setTimeout(() => location.reload(), 3000));
+      ws.addEventListener('close', () => {
+        console.warn('Conexão com o Supabase encerrada.');
+      });
+
+      ws.addEventListener('error', () => {
+        console.warn('Falha na conexão com o Supabase.');
+      });
     })();
 
     // Lightbox — arraste para navegar, swipe mobile, zoom, teclado
