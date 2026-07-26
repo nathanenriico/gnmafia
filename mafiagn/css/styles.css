@@ -3444,11 +3444,10 @@ table {
   overflow-x: auto;
 }
 
-/* CARDS E GRIDS */
+/* CARDS E GRIDS — não sobrescreve .product-grid que tem regras próprias */
 .grid,
 .cards,
-.products,
-.product-grid {
+.products {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
@@ -3456,72 +3455,32 @@ table {
 
 /* MOBILE */
 @media (max-width: 768px) {
-  body {
-    font-size: 15px;
-  }
+  body { font-size: 15px; }
 
-  .container,
-  .content,
-  .wrapper {
+  .container, .content, .wrapper {
     width: 100%;
     padding-left: 16px;
     padding-right: 16px;
   }
 
-  header,
-  nav,
-  footer {
-    width: 100%;
-  }
+  header, nav, footer { width: 100%; }
 
-  nav ul {
-    flex-direction: column;
-    gap: 12px;
-  }
+  nav ul { flex-direction: column; gap: 12px; }
 
-  .grid,
-  .cards,
-  .products,
-  .product-grid {
+  .grid, .cards, .products {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-  }
-
-  button,
-  input,
-  select,
-  textarea {
-    width: 100%;
   }
 }
 
 /* CELULARES PEQUENOS */
 @media (max-width: 480px) {
-  .container,
-  .content,
-  .wrapper {
+  .container, .content, .wrapper {
     padding-left: 12px;
     padding-right: 12px;
   }
 
-  .grid,
-  .cards,
-  .products,
-  .product-grid {
-    grid-template-columns: 1fr;
-  }
-
-  h1 {
-    font-size: 26px;
-  }
-
-  h2 {
-    font-size: 22px;
-  }
-
-  p {
-    font-size: 15px;
-  }
+  .grid, .cards, .products { grid-template-columns: 1fr; }
 }
 
 /* -- ATACADO (dentro do modal de categoria) -- */

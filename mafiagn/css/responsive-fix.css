@@ -129,6 +129,7 @@ th {
 
 .product-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-width: 0;
 }
 
 .product-card,
