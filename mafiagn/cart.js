@@ -157,7 +157,7 @@
     // Header
     const header = document.createElement('div');
     header.className = 'checkout-header';
-    header.innerHTML = `<img src="logo.jpeg" alt="GN Máfia" class="checkout-logo" /><button class="cart-modal-close" id="closeCartBtn">✕</button>`;
+    header.innerHTML = `<img src="assets/images/logo.jpeg" alt="GN Máfia" class="checkout-logo" /><button class="cart-modal-close" id="closeCartBtn">✕</button>`;
     container.appendChild(header);
     header.querySelector('#closeCartBtn').addEventListener('click', closeCartModal);
 
@@ -777,7 +777,7 @@
     modal.innerHTML = `
       <button class="register-close" id="regClose">✕</button>
       <div class="register-top">
-        <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
+        <img src="assets/images/logo.jpeg" alt="GN Máfia" class="register-logo" />
         <h2>${title}</h2>
         <p class="register-sub">${subtitle}</p>
         <div class="register-benefits">
@@ -811,7 +811,7 @@
         btn.textContent = 'Criar cadastro e receber cupom'; btn.disabled = false;
         modal.innerHTML = `
           <div class="register-success">
-            <img src="logo.jpeg" alt="GN Mafia" class="register-logo" />
+            <img src="assets/images/logo.jpeg" alt="GN Mafia" class="register-logo" />
             <h2 style="color:var(--gold-light)">Conta encontrada!</h2>
             <p style="color:var(--muted);font-size:0.9rem">Você já possui cadastro na GN Máfia.<br>Seu login foi realizado automaticamente.</p>
             <button class="checkout-continue" id="regSuccessClose" style="margin-top:8px">Fechar</button>
@@ -828,7 +828,7 @@
       if (onSuccess) onSuccess(data, coupon);
       modal.innerHTML = `
         <div class="register-success">
-          <img src="logo.jpeg" alt="GN Máfia" class="register-logo" />
+          <img src="assets/images/logo.jpeg" alt="GN Máfia" class="register-logo" />
           <h2>Cadastro criado!</h2>
           <p>Seu cupom exclusivo:</p>
           <div class="register-coupon">${coupon}</div>
@@ -1025,7 +1025,7 @@
       modal.innerHTML = `
         <button class="register-close" id="profileClose">✕</button>
         <div style="text-align:center">
-          <img src="logo.jpeg" class="register-logo" alt="GN Máfia" />
+          <img src="assets/images/logo.jpeg" class="register-logo" alt="GN Máfia" />
           <h2 style="color:var(--gold-light);margin-bottom:8px">Minha Conta</h2>
           <p style="color:var(--muted);font-size:0.88rem;margin-bottom:24px">Informe seu e-mail para acessar seu perfil</p>
         </div>
@@ -1096,7 +1096,7 @@
     modal.innerHTML = `
       <button class="register-close" id="profileClose">✕</button>
       <div class="profile-header">
-        <img src="logo.jpeg" class="register-logo" alt="GN Máfia" />
+        <img src="assets/images/logo.jpeg" class="register-logo" alt="GN Máfia" />
         <h2>Olá, <span style="color:var(--gold-light)">${firstName}</span>! <span style="font-size:1.1rem">${nivel.icone}</span></h2>
         <p style="color:${nivel.cor};font-size:0.8rem;font-weight:700;letter-spacing:0.08em">Nível ${nivel.nome} · ${xp} XP</p>
         <p style="color:var(--muted);font-size:0.78rem;margin-top:2px">${cliente.email}</p>
