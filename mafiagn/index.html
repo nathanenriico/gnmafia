@@ -1161,7 +1161,8 @@
       photos.forEach(photo => {
         const price = Number(photo.price || 0);
         const installment = (price / 6).toFixed(2).replace('.', ',');
-        const images = (Array.isArray(photo.images) && photo.images.length ? photo.images : []).filter(s => s && (s.startsWith('data:') || s.startsWith('http')));
+        const rawImages = Array.isArray(photo.images) && photo.images.length ? photo.images : [];
+        const images = rawImages.filter(s => s && (s.startsWith('data:') || s.startsWith('http') || s.startsWith('blob:')));
         const mainSrc = images[0] || '';
         const card = document.createElement('article');
         card.className = 'product-card featured-photo-card';
@@ -1171,6 +1172,10 @@
         card.setAttribute('data-category', photo.category || 'bobojaco');
         card.setAttribute('data-sizes', Array.isArray(photo.sizes) && photo.sizes.length ? photo.sizes.join(',') : 'P,M,G,GG');
 
+        const imgHtml = mainSrc
+          ? `<img src="${mainSrc}" alt="${photo.alt || photo.title}" class="product-img main-img" />`
+          : `<div class="product-img main-img" style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem;background:rgba(255,255,255,0.03)">👕</div>`;
+
         const thumbsHtml = images.length > 1
           ? `<div class="product-thumbs">${images.map((src, i) =>
               `<img src="${src}" class="product-thumb${i === 0 ? ' active' : ''}" data-idx="${i}" alt="foto ${i+1}" />`
@@ -1179,7 +1184,7 @@
 
         card.innerHTML = `
           <div class="product-img-wrap">
-            <img src="${mainSrc}" alt="${photo.alt || photo.title}" class="product-img main-img" />
+            ${imgHtml}
           </div>
           ${thumbsHtml}
           <div class="product-info">
