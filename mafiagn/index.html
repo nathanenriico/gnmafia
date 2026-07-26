@@ -1161,7 +1161,7 @@
       photos.forEach(photo => {
         const price = Number(photo.price || 0);
         const installment = (price / 6).toFixed(2).replace('.', ',');
-        const images = Array.isArray(photo.images) && photo.images.length ? photo.images : [];
+        const images = (Array.isArray(photo.images) && photo.images.length ? photo.images : []).filter(s => s && (s.startsWith('data:') || s.startsWith('http')));
         const mainSrc = images[0] || '';
         const card = document.createElement('article');
         card.className = 'product-card featured-photo-card';
